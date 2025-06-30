@@ -1,4 +1,4 @@
-# Main.gd - 修复版本，解决字体、结局界面和按钮状态问题
+# Main.gd - 集成QTE系统的主脚本
 extends Control
 
 # UI界面节点引用
@@ -37,6 +37,13 @@ extends Control
 @onready var stats_label = $UIContainer/HomeUI/CenterContainer/VBoxContainer/StatsLabel
 @onready var shop_money_label = $UIContainer/ShopUI/VBoxContainer/MoneyLabel
 
+# QTE系统
+var qte_system: DrivingQTESystem
+var qte_ui_container: Control
+var qte_voice_label: Label
+var qte_countdown_label: Label
+var qte_action_buttons: Dictionary = {}
+
 # 当前状态
 var current_ui: Control
 var current_area: String = ""
@@ -57,12 +64,22 @@ var test_npcs = [
     {
         "name": "Sarah",
         "dialogues": ["我今天加班到很晚...", "有时候觉得生活就是个循环", "你觉得这样的生活有意义吗？"],
-        "interrupt_responses": ["是啊，工作压力很大", "生活确实需要思考"]
+        "interrupt_responses": ["是啊，工作压力很大", "生活确实需要思考"],
+        "driving_preferences": {
+            "smooth_driving": 1.0,
+            "music_classical": 0.8,
+            "window_closed": 0.9
+        }
     },
     {
         "name": "老王", 
         "dialogues": ["年轻人，现在的世界变化太快了", "我记得以前的日子更简单", "你觉得简单的生活好吗？"],
-        "interrupt_responses": ["确实，科技发展很快", "简单也有简单的美好"]
+        "interrupt_responses": ["确实，科技发展很快", "简单也有简单的美好"],
+        "driving_preferences": {
+            "smooth_driving": 1.0,
+            "music_off": 0.7,
+            "window_open": 0.6
+        }
     }
 ]
 var current_npc_index = 0
@@ -70,6 +87,9 @@ var current_dialogue_index = 0
 
 func _ready():
     print("=== 主场景初始化 ===")
+    
+    # 初始化QTE系统
+    setup_qte_system()
     
     # 检查并应用字体到对话标签
     setup_dialogue_fonts()
@@ -90,6 +110,107 @@ func _ready():
     
     print("=== 初始化完成 ===\n")
 
+func setup_qte_system():
+    """初始化QTE系统"""
+    qte_system = DrivingQTESystem.new()
+    add_child(qte_system)
+    
+    # 连接QTE信号
+    qte_system.qte_event_started.connect(_on_qte_event_started)
+    qte_system.qte_event_completed.connect(_on_qte_event_completed)
+    qte_system.voice_assistant_speaks.connect(_on_voice_assistant_speaks)
+    
+    # 创建QTE UI
+    create_qte_ui()
+    
+    print("QTE系统初始化完成")
+
+func create_qte_ui():
+    """创建QTE事件的UI界面"""
+    # 创建QTE UI容器
+    qte_ui_container = Panel.new()
+    qte_ui_container.name = "QTEContainer"
+    qte_ui_container.visible = false
+    qte_ui_container.anchors_preset = Control.PRESET_CENTER
+    qte_ui_container.position = Vector2(300, 50)
+    qte_ui_container.size = Vector2(400, 200)
+    
+    # 设置面板样式
+    var panel_style = StyleBoxFlat.new()
+    panel_style.bg_color = Color(0.1, 0.1, 0.2, 0.9)
+    panel_style.border_color = Color(1.0, 0.3, 0.3)
+    panel_style.border_width_left = 2
+    panel_style.border_width_right = 2
+    panel_style.border_width_top = 2
+    panel_style.border_width_bottom = 2
+    panel_style.corner_radius_top_left = 8
+    panel_style.corner_radius_top_right = 8
+    panel_style.corner_radius_bottom_left = 8
+    panel_style.corner_radius_bottom_right = 8
+    qte_ui_container.add_theme_stylebox_override("panel", panel_style)
+    
+    # 创建垂直布局
+    var vbox = VBoxContainer.new()
+    vbox.anchors_preset = Control.PRESET_FULL_RECT
+    vbox.offset_left = 10
+    vbox.offset_right = -10
+    vbox.offset_top = 10
+    vbox.offset_bottom = -10
+    qte_ui_container.add_child(vbox)
+    
+    # 语音助手标题
+    var voice_title = Label.new()
+    voice_title.text = "🤖 ARIA 助手"
+    voice_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    voice_title.add_theme_font_size_override("font_size", 14)
+    vbox.add_child(voice_title)
+    
+    # 语音助手提示
+    qte_voice_label = Label.new()
+    qte_voice_label.text = ""
+    qte_voice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    qte_voice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    qte_voice_label.add_theme_font_size_override("font_size", 16)
+    vbox.add_child(qte_voice_label)
+    
+    # 倒计时显示
+    qte_countdown_label = Label.new()
+    qte_countdown_label.text = ""
+    qte_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    qte_countdown_label.add_theme_font_size_override("font_size", 20)
+    qte_countdown_label.add_theme_color_override("font_color", Color.RED)
+    vbox.add_child(qte_countdown_label)
+    
+    # 动作按钮容器
+    var button_container = HBoxContainer.new()
+    button_container.alignment = BoxContainer.ALIGNMENT_CENTER
+    vbox.add_child(button_container)
+    
+    # 创建各种QTE动作按钮
+    create_qte_action_button(button_container, "brake", "🛑 刹车")
+    create_qte_action_button(button_container, "turn_left", "⬅️ 左转")
+    create_qte_action_button(button_container, "turn_right", "➡️ 右转")
+    create_qte_action_button(button_container, "wipers", "🌧️ 雨刷")
+    create_qte_action_button(button_container, "close_window", "🔇 关窗")
+    create_qte_action_button(button_container, "emergency_brake", "🚨 紧急刹车")
+    create_qte_action_button(button_container, "yield_right", "🚑 靠边")
+    
+    # 添加到驾驶界面
+    driving_ui.add_child(qte_ui_container)
+    
+    print("QTE UI创建完成")
+
+func create_qte_action_button(container: Container, action: String, text: String):
+    """创建QTE动作按钮"""
+    var button = Button.new()
+    button.text = text
+    button.custom_minimum_size = Vector2(80, 40)
+    button.visible = false
+    button.pressed.connect(_on_qte_action_pressed.bind(action))
+    
+    container.add_child(button)
+    qte_action_buttons[action] = button
+
 func setup_dialogue_fonts():
     """专门设置对话字体，解决乱码问题"""
     print("设置对话字体...")
@@ -106,9 +227,78 @@ func setup_dialogue_fonts():
         dialogue_label.scroll_active = false
         
         print("✅ 对话字体设置完成")
-    else:
-        print("❌ 对话标签或字体管理器未找到")
 
+func _process(delta):
+    """更新QTE倒计时显示"""
+    if qte_system != null and qte_system.is_qte_active:
+        var remaining = qte_system.countdown_timer
+        if qte_countdown_label != null:
+            qte_countdown_label.text = "⏰ %.1f 秒" % remaining
+
+func _on_qte_event_started(event):
+    """QTE事件开始"""
+    print("QTE事件UI启动：", event.prompt_text)
+    
+    if qte_ui_container != null:
+        qte_ui_container.visible = true
+        
+        # 隐藏所有按钮
+        for button in qte_action_buttons.values():
+            button.visible = false
+        
+        # 显示正确的按钮
+        if event.correct_action in qte_action_buttons:
+            qte_action_buttons[event.correct_action].visible = true
+            print("显示QTE按钮：", event.correct_action)
+
+func _on_qte_event_completed(event, success: bool):
+    """QTE事件完成"""
+    print("QTE事件UI完成：", "成功" if success else "失败")
+    
+    if qte_ui_container != null:
+        qte_ui_container.visible = false
+    
+    # 更新显示
+    update_all_displays()
+    
+    # 给NPC添加反应
+    add_npc_reaction_to_driving(event, success)
+
+func _on_voice_assistant_speaks(message: String):
+    """语音助手说话"""
+    print("ARIA: ", message)
+    
+    if qte_voice_label != null:
+        qte_voice_label.text = message
+
+func _on_qte_action_pressed(action: String):
+    """QTE动作按钮被按下"""
+    print("QTE按钮按下：", action)
+    qte_system.handle_qte_action(action)
+
+func add_npc_reaction_to_driving(event, success: bool):
+    """根据QTE结果添加NPC反应"""
+    if dialogue_label == null:
+        return
+    
+    var reaction_text = ""
+    if success:
+        reaction_text = event.npc_reaction_positive
+    else:
+        reaction_text = event.npc_reaction_negative
+    
+    # 添加NPC对驾驶的反应
+    if reaction_text != "":
+        dialogue_label.text += "\n\n「" + reaction_text + "」"
+
+# ============ 随机QTE触发 ============
+func maybe_trigger_qte_event():
+    """在对话间隙可能触发QTE事件"""
+    if qte_system != null and qte_system.should_trigger_event():
+        print("触发随机QTE事件")
+        qte_system.trigger_random_event()
+
+# ============ 原有的游戏逻辑保持不变 ============
 func _on_game_state_changed(new_state: GameManager.GameState):
     """响应游戏状态变化"""
     print("UI响应状态变化：", GameManager.GameState.keys()[new_state])
@@ -291,6 +481,10 @@ func show_next_dialogue():
         
         if continue_button != null:
             continue_button.visible = false
+        
+        # 随机触发QTE事件
+        maybe_trigger_qte_event()
+        
     else:
         # 对话结束
         dialogue_state = DialogueState.DIALOGUE_FINISHED
@@ -589,42 +783,79 @@ func _on_day_completed():
     """响应一天结束"""
     last_visited_area = current_area
 
-# ============ 驾驶控制事件处理 ============
+# ============ 驾驶控制事件处理 - 现在会影响NPC心情 ============
 func _on_music_off_pressed():
     print("关闭音乐")
     GameManager.update_player_attribute("self_connection", 0.3)
+    check_npc_music_preference("music_off")
     update_all_displays()
 
 func _on_music_soothing_pressed():
     print("播放轻音乐")
     GameManager.update_player_attribute("pressure", -0.5)
     GameManager.update_player_attribute("empathy", 0.2)
+    check_npc_music_preference("music_soothing")
     update_all_displays()
 
 func _on_music_energetic_pressed():
     print("播放流行音乐")
     GameManager.update_player_attribute("openness", 0.3)
     GameManager.update_player_attribute("pressure", 0.2)
+    check_npc_music_preference("music_energetic")
     update_all_displays()
 
 func _on_window_open_pressed():
     print("开窗")
     GameManager.update_player_attribute("openness", 0.3)
+    check_npc_preference("window_open")
     update_all_displays()
 
 func _on_window_close_pressed():
     print("关窗")
     GameManager.update_player_attribute("self_connection", 0.2)
+    check_npc_preference("window_closed")
     update_all_displays()
 
 func _on_smooth_driving_pressed():
     print("平稳驾驶")
     GameManager.update_player_attribute("pressure", -0.2)
     GameManager.update_player_attribute("empathy", 0.1)
+    check_npc_preference("smooth_driving")
     update_all_displays()
 
 func _on_fast_driving_pressed():
     print("快速驾驶")
     GameManager.update_player_attribute("pressure", 0.3)
     GameManager.update_player_attribute("openness", 0.2)
+    check_npc_preference("fast_driving")
     update_all_displays()
+
+# ============ NPC偏好系统 ============
+func check_npc_music_preference(music_type: String):
+    """检查NPC对音乐的偏好"""
+    check_npc_preference(music_type)
+
+func check_npc_preference(preference_key: String):
+    """检查NPC偏好并添加反应"""
+    if current_npc_index >= test_npcs.size():
+        return
+    
+    var npc = test_npcs[current_npc_index]
+    if not npc.has("driving_preferences"):
+        return
+    
+    var preferences = npc.driving_preferences
+    if preference_key in preferences:
+        var preference_value = preferences[preference_key]
+        var reaction = ""
+        
+        if preference_value >= 0.8:
+            reaction = "这样挺好的，我喜欢"
+        elif preference_value >= 0.5:
+            reaction = "嗯，还不错"
+        elif preference_value <= 0.3:
+            reaction = "这样我有点不太舒服..."
+        
+        if reaction != "" and dialogue_label != null:
+            dialogue_label.text += "\n\n「" + reaction + "」"
+            print("NPC偏好反应：", reaction)
