@@ -129,7 +129,7 @@ func _on_game_state_changed(new_state: GameManager.GameState):
 
 func show_ui(ui: Control):
     """显示指定UI，隐藏其他"""
-    print("准备显示UI：", ui.name if ui != null else "null")
+    # print("准备显示UI：", ui.name if ui != null else "null")
     
     hide_all_ui_except(ui)
     
