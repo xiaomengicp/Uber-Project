@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "last_updated": "2024-12-20",
+  "initial_attributes": {
+    "empathy": 50,
+    "self_connection": 40,
+    "openness": 45,
+    "pressure": 30
+  },
+  "interrupt_system": {
+    "basic_success_rate": 0.90,
+    "deep_interrupt_base_rate": 0.50,
+    "attribute_bonus_multiplier": 0.003,
+    "pressure_penalty_multiplier": 0.0045,
+    "npc_preference_range": {
+      "min": -0.20,
+      "max": 0.20
+    },
+    "success_rate_limits": {
+      "min": 0.10,
+      "max": 0.95
+    }
+  },
+  "attribute_changes": {
+    "interrupt_success": {
+      "basic": {
+        "empathy": 0.5,
+        "self_connection": 0.2,
+        "pressure": -0.1
+      },
+      "emotional": {
+        "empathy": 1.5,
+        "self_connection": 0.5,
+        "pressure": -0.2
+      },
+      "self_reflection": {
+        "self_connection": 1.5,
+        "empathy": 0.3,
+        "pressure": -0.3
+      },
+      "openness": {
+        "openness": 1.5,
+        "empathy": 0.3,
+        "pressure": -0.3
+      }
+    },
+    "interrupt_failure": {
+      "empathy": -0.3,
+      "self_connection": -0.5,
+      "pressure": 0.4
+    }
+  },
+  "ending_thresholds": {
+    "find_yourself": 75,
+    "connect_others": 65,
+    "continue_searching": 45,
+    "need_rest": 0
+  },
+  "score_calculation": {
+    "attribute_weight": 0.6,
+    "mood_weight": 0.3,
+    "economic_weight": 0.1,
+    "pressure_penalty_divisor": 2
+  }
+}

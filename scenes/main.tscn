@@ -1,0 +1,352 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8qxvxvxvxvx"]
+
+[ext_resource type="Script" uid="uid://cq240p30m2hrq" path="res://scripts/Main.gd" id="1_main"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="UIContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartUI" type="Control" parent="UIContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UIContainer/StartUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/StartUI/CenterContainer"]
+custom_minimum_size = Vector2(300, 400)
+layout_mode = 2
+
+[node name="GameTitle" type="Label" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "QPHU: Uber Project"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "开始游戏"
+
+[node name="ContinueButton" type="Button" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "继续游戏"
+
+[node name="SettingsButton" type="Button" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "设置"
+
+[node name="QuitButton" type="Button" parent="UIContainer/StartUI/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "退出游戏"
+
+[node name="AreaSelectionUI" type="Control" parent="UIContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/AreaSelectionUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DayLabel" type="Label" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+layout_mode = 2
+text = "第 1 天"
+horizontal_alignment = 1
+
+[node name="InstructionLabel" type="Label" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+layout_mode = 2
+text = "选择今晚要前往的区域："
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+layout_mode = 2
+
+[node name="BusinessButton" type="Button" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+text = "商业区
+高收入，高压力环境"
+
+[node name="ResidentialButton" type="Button" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+text = "居住区
+温馨但收入一般"
+
+[node name="EntertainmentButton" type="Button" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+disabled = true
+text = "娱乐区
+创意氛围，收入不稳定"
+
+[node name="SuburbanButton" type="Button" parent="UIContainer/AreaSelectionUI/VBoxContainer"]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+disabled = true
+text = "郊外区
+宁静自然，收入较低"
+
+[node name="DrivingUI" type="Control" parent="UIContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopPanel" type="Panel" parent="UIContainer/DrivingUI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 60.0
+grow_horizontal = 2
+
+[node name="AttributesContainer" type="HBoxContainer" parent="UIContainer/DrivingUI/TopPanel"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_right = 400.0
+grow_vertical = 2
+
+[node name="EmpathyLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+layout_mode = 2
+text = "共情: 50"
+
+[node name="SelfLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+layout_mode = 2
+text = "自省: 40"
+
+[node name="OpennessLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+layout_mode = 2
+text = "开放: 45"
+
+[node name="PressureLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+layout_mode = 2
+text = "压力: 30"
+
+[node name="MoneyLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "💰 100元"
+vertical_alignment = 1
+
+[node name="DialogueArea" type="Panel" parent="UIContainer/DrivingUI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -200.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="DialogueContainer" type="VBoxContainer" parent="UIContainer/DrivingUI/DialogueArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 10.0
+offset_right = -20.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NPCNameLabel" type="Label" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+layout_mode = 2
+text = "乘客姓名"
+
+[node name="DialogueLabel" type="RichTextLabel" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "乘客对话内容..."
+
+[node name="InterruptContainer" type="HBoxContainer" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+layout_mode = 2
+
+[node name="InterruptButton1" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "插话选项1"
+
+[node name="InterruptButton2" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "插话选项2"
+
+[node name="ContinueButton" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+layout_mode = 2
+text = "继续对话"
+
+[node name="HomeUI" type="Control" parent="UIContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="UIContainer/HomeUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/HomeUI/CenterContainer"]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 2
+
+[node name="WelcomeLabel" type="Label" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "回到家中"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "今日收入: 0元
+当前状态: 良好"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="DreamweaveButton" type="Button" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "浏览梦网"
+
+[node name="ShopButton" type="Button" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "购买物品"
+
+[node name="SleepButton" type="Button" parent="UIContainer/HomeUI/CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "睡觉 (开始新一天)"
+
+[node name="ShopUI" type="Control" parent="UIContainer"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/ShopUI"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopTitle" type="Label" parent="UIContainer/ShopUI/VBoxContainer"]
+layout_mode = 2
+text = "购买物品"
+horizontal_alignment = 1
+
+[node name="MoneyLabel" type="Label" parent="UIContainer/ShopUI/VBoxContainer"]
+layout_mode = 2
+text = "当前余额: 100元"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UIContainer/ShopUI/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UIContainer/ShopUI/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ItemList" type="VBoxContainer" parent="UIContainer/ShopUI/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ReturnButton" type="Button" parent="UIContainer/ShopUI/VBoxContainer"]
+layout_mode = 2
+text = "返回"
+
+[connection signal="pressed" from="UIContainer/StartUI/CenterContainer/VBoxContainer/StartButton" to="." method="_on_start_game_pressed"]
+[connection signal="pressed" from="UIContainer/StartUI/CenterContainer/VBoxContainer/ContinueButton" to="." method="_on_continue_game_pressed"]
+[connection signal="pressed" from="UIContainer/StartUI/CenterContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="UIContainer/StartUI/CenterContainer/VBoxContainer/QuitButton" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/BusinessButton" to="." method="_on_business_area_pressed"]
+[connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/ResidentialButton" to="." method="_on_residential_area_pressed"]
+[connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/EntertainmentButton" to="." method="_on_entertainment_area_pressed"]
+[connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/SuburbanButton" to="." method="_on_suburban_area_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton1" to="." method="_on_interrupt_button_1_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton2" to="." method="_on_interrupt_button_2_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/ContinueButton" to="." method="_on_continue_dialogue_pressed"]
+[connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/DreamweaveButton" to="." method="_on_browse_dreamweave_pressed"]
+[connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/ShopButton" to="." method="_on_go_shopping_pressed"]
+[connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/SleepButton" to="." method="_on_sleep_pressed"]
+[connection signal="pressed" from="UIContainer/ShopUI/VBoxContainer/ReturnButton" to="." method="_on_return_home_pressed"]
