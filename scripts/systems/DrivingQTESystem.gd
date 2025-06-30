@@ -1,270 +1,369 @@
-# DrivingQTESystem.gd - 驾驶QTE事件系统
-# 处理红绿灯、转弯、天气等驾驶事件
-
+# DrivingQTESystem.gd - 修复版本：解决属性赋值问题
 extends Node
 class_name DrivingQTESystem
 
 # QTE事件类型枚举
 enum QTEType {
-    RED_LIGHT,
-    TURN_LEFT,
-    TURN_RIGHT,
+    RED_LIGHT_BRAKE,
+    HEAVY_WIND_WINDOW,
     RAIN_WIPERS,
-    NOISE_WINDOW,
-    PEDESTRIAN_CROSSING,
-    AMBULANCE_YIELDING
+    NOISY_AREA,
+    PEDESTRIAN_BRAKE,
+    TRAFFIC_JAM_MUSIC,
+    URGENT_CALL,
 }
 
-# QTE事件数据结构
-class QTEEvent:
-    var type: QTEType
-    var prompt_text: String
-    var countdown_time: float
-    var correct_action: String
-    var success_feedback: String
-    var failure_feedback: String
-    var npc_reaction_positive: String
-    var npc_reaction_negative: String
-    var economic_penalty: int = 0
-    var attribute_effects: Dictionary = {}
-    
-    func _init(t: QTEType, prompt: String, time: float, action: String):
-        type = t
-        prompt_text = prompt
-        countdown_time = time
-        correct_action = action
+# 简化的QTE事件数据结构 - 使用Dictionary而不是类
+# 这样避免了GDScript内部类的属性赋值问题
+var qte_event_template = {
+    "type": QTEType.RED_LIGHT_BRAKE,
+    "ai_prompt": "",
+    "countdown_time": 0.0,
+    "expected_actions": [],
+    "success_feedback": "",
+    "failure_feedback": "",
+    "timeout_feedback": "",
+    "npc_positive_reaction": "",
+    "npc_negative_reaction": "",
+    "economic_penalty": 0,
+    "attribute_effects_success": {},
+    "attribute_effects_failure": {}
+}
 
 # 信号定义
-signal qte_event_started(event: QTEEvent)
-signal qte_event_completed(event: QTEEvent, success: bool)
-signal voice_assistant_speaks(message: String)
+signal qte_event_started(event: Dictionary)
+signal qte_event_completed(event: Dictionary, success: bool)
+signal ai_assistant_speaks(message: String, urgent: bool)
 
-# 当前QTE状态
-var current_event: QTEEvent = null
+# QTE状态
+var current_event: Dictionary = {}
 var is_qte_active: bool = false
 var countdown_timer: float = 0.0
-var qte_completed: bool = false
+var event_resolved: bool = false
 
-# QTE事件配置
-var qte_events: Array[QTEEvent] = []
-
-# 随机事件触发
-var base_event_probability: float = 0.3  # 每次对话段落后30%概率触发事件
+# 事件触发控制
+var events_this_trip: int = 0
+var max_events_per_trip: int = 2
+var event_probability: float = 0.4
+var min_event_interval: float = 15.0
 var last_event_time: float = 0.0
-var min_event_interval: float = 10.0  # 最小事件间隔
+
+# 可用的QTE事件
+var available_events: Array = []
 
 func _ready():
     setup_qte_events()
-    print("驾驶QTE系统初始化完成")
+    print("✅ 驾驶QTE系统初始化完成 - 使用Dictionary事件")
 
 func _process(delta):
-    if is_qte_active and current_event != null:
+    if is_qte_active and not current_event.is_empty() and not event_resolved:
         countdown_timer -= delta
-        if countdown_timer <= 0.0 and not qte_completed:
-            # 超时失败
-            complete_qte_event(false)
+        if countdown_timer <= 0.0:
+            handle_qte_timeout()
+
+func create_qte_event(data: Dictionary) -> Dictionary:
+    """创建QTE事件 - 使用Dictionary模板"""
+    var event = qte_event_template.duplicate(true)
+    for key in data.keys():
+        if key in event:
+            event[key] = data[key]
+    return event
 
 func setup_qte_events():
-    """初始化所有QTE事件"""
-    qte_events.clear()
     
-    # 红绿灯事件
-    var red_light = QTEEvent.new(QTEType.RED_LIGHT, "前方红灯，请减速停车", 3.0, "brake")
-    red_light.success_feedback = "安全停车，遵守交规"
-    red_light.failure_feedback = "闯红灯！被监控拍摄"
-    red_light.npc_reaction_positive = "司机很守规矩，让人安心"
-    red_light.npc_reaction_negative = "太危险了！这样开车让人害怕"
-    red_light.economic_penalty = 200
-    red_light.attribute_effects = {"pressure": 0.5, "empathy": -0.2}
-    qte_events.append(red_light)
+    # 强制设置触发参数
+    event_probability = 0.8  # 80%概率
+    min_event_interval = 3.0  # 3秒间隔
+    max_events_per_trip = 3   # 每次行程最多3个事件
     
-    # 左转事件
-    var turn_left = QTEEvent.new(QTEType.TURN_LEFT, "前方路口，请左转", 4.0, "turn_left")
-    turn_left.success_feedback = "转弯顺畅"
-    turn_left.failure_feedback = "错过路口，需要重新规划路线"
-    turn_left.npc_reaction_positive = "路线很熟悉呢"
-    turn_left.npc_reaction_negative = "是不是走错路了？"
-    turn_left.attribute_effects = {"pressure": 0.3}
-    qte_events.append(turn_left)
+    print("🎯 QTE触发参数设置:")
+    print("   event_probability: ", event_probability)
+    print("   min_event_interval: ", min_event_interval)
+    print("   max_events_per_trip: ", max_events_per_trip)
+
+
+    """设置所有QTE事件 - 使用Dictionary方式"""
+    available_events.clear()
     
-    # 右转事件
-    var turn_right = QTEEvent.new(QTEType.TURN_RIGHT, "前方路口，请右转", 4.0, "turn_right")
-    turn_right.success_feedback = "转弯顺畅"
-    turn_right.failure_feedback = "错过路口，需要重新规划路线"
-    turn_right.npc_reaction_positive = "司机技术不错"
-    turn_right.npc_reaction_negative = "这条路对吗？"
-    turn_right.attribute_effects = {"pressure": 0.3}
-    qte_events.append(turn_right)
+    # 红绿灯刹车事件
+    var red_light = create_qte_event({
+        "type": QTEType.RED_LIGHT_BRAKE,
+        "ai_prompt": "前方红灯，请减速",
+        "countdown_time": 4.0,
+        "expected_actions": ["smooth_driving"],
+        "success_feedback": "好的，安全停车",
+        "failure_feedback": "闯红灯了！注意安全",
+        "timeout_feedback": "反应太慢，差点闯红灯",
+        "npc_positive_reaction": "司机很守规矩呢",
+        "npc_negative_reaction": "刚才好危险！",
+        "economic_penalty": 200,
+        "attribute_effects_success": {"pressure": -0.2, "empathy": 0.1},
+        "attribute_effects_failure": {"pressure": 0.8, "empathy": -0.3}
+    })
+    available_events.append(red_light)
+    
+    # 大风关窗事件
+    var heavy_wind = create_qte_event({
+        "type": QTEType.HEAVY_WIND_WINDOW,
+        "ai_prompt": "外面风很大，建议关窗",
+        "countdown_time": 5.0,
+        "expected_actions": ["close_window"],
+        "success_feedback": "车内安静多了",
+        "failure_feedback": "风声影响对话",
+        "timeout_feedback": "没有关窗，车内有点吵",
+        "npc_positive_reaction": "这样舒服多了，谢谢",
+        "npc_negative_reaction": "有点吵，能关下窗吗？",
+        "attribute_effects_success": {"empathy": 0.3, "self_connection": 0.1},
+        "attribute_effects_failure": {"pressure": 0.2}
+    })
+    available_events.append(heavy_wind)
     
     # 下雨事件
-    var rain_event = QTEEvent.new(QTEType.RAIN_WIPERS, "开始下雨，建议使用雨刷", 5.0, "wipers")
-    rain_event.success_feedback = "雨刷启动，视线清晰"
-    rain_event.failure_feedback = "视线模糊，行驶危险度增加"
-    rain_event.npc_reaction_positive = "雨夜开车确实要小心"
-    rain_event.npc_reaction_negative = "这样看不清路很危险啊"
-    rain_event.attribute_effects = {"pressure": 0.4, "empathy": -0.1}
-    qte_events.append(rain_event)
+    var rain_event = create_qte_event({
+        "type": QTEType.RAIN_WIPERS,
+        "ai_prompt": "开始下雨了，注意安全",
+        "countdown_time": 4.0,
+        "expected_actions": ["smooth_driving", "close_window"],
+        "success_feedback": "雨天驾驶很稳当",
+        "failure_feedback": "雨天路滑，要小心",
+        "timeout_feedback": "雨天没有调整驾驶方式",
+        "npc_positive_reaction": "雨天开车确实要小心",
+        "npc_negative_reaction": "这个天气有点担心安全",
+        "attribute_effects_success": {"pressure": -0.3, "empathy": 0.2},
+        "attribute_effects_failure": {"pressure": 0.5}
+    })
+    available_events.append(rain_event)
     
-    # 噪音事件
-    var noise_event = QTEEvent.new(QTEType.NOISE_WINDOW, "外界噪音较大，建议关窗", 4.0, "close_window")
-    noise_event.success_feedback = "车内安静，适合对话"
-    noise_event.failure_feedback = "噪音干扰，对话受影响"
-    noise_event.npc_reaction_positive = "这样安静多了，谢谢"
-    noise_event.npc_reaction_negative = "太吵了，都听不清说话"
-    noise_event.attribute_effects = {"empathy": 0.2}
-    qte_events.append(noise_event)
+    # 噪音区域事件
+    var noisy_area = create_qte_event({
+        "type": QTEType.NOISY_AREA,
+        "ai_prompt": "经过施工区域，比较嘈杂",
+        "countdown_time": 4.0,
+        "expected_actions": ["close_window", "music_soothing"],
+        "success_feedback": "处理得当，环境安静了",
+        "failure_feedback": "外界噪音比较干扰",
+        "timeout_feedback": "施工噪音有点影响交流",
+        "npc_positive_reaction": "这样好多了",
+        "npc_negative_reaction": "太吵了，有点难受",
+        "attribute_effects_success": {"empathy": 0.3},
+        "attribute_effects_failure": {"pressure": 0.2}
+    })
+    available_events.append(noisy_area)
     
-    # 行人穿越事件（紧急）
-    var pedestrian = QTEEvent.new(QTEType.PEDESTRIAN_CROSSING, "注意！前方有行人穿越", 2.0, "emergency_brake")
-    pedestrian.success_feedback = "及时避让，安全第一"
-    pedestrian.failure_feedback = "险些撞到行人，请注意安全"
-    pedestrian.npc_reaction_positive = "反应真快，专业司机"
-    pedestrian.npc_reaction_negative = "刚才太险了！"
-    pedestrian.attribute_effects = {"pressure": 0.8, "empathy": -0.3}
-    qte_events.append(pedestrian)
+    # 行人穿马路紧急事件
+    var pedestrian = create_qte_event({
+        "type": QTEType.PEDESTRIAN_BRAKE,
+        "ai_prompt": "注意！前方有行人",
+        "countdown_time": 2.5,
+        "expected_actions": ["smooth_driving"],
+        "success_feedback": "及时避让，安全第一",
+        "failure_feedback": "险些撞到行人！",
+        "timeout_feedback": "反应太慢，很危险",
+        "npc_positive_reaction": "反应真快！专业",
+        "npc_negative_reaction": "刚才太险了！",
+        "attribute_effects_success": {"empathy": 0.4, "pressure": -0.1},
+        "attribute_effects_failure": {"pressure": 1.0, "empathy": -0.5}
+    })
+    available_events.append(pedestrian)
     
-    # 救护车让道事件
-    var ambulance = QTEEvent.new(QTEType.AMBULANCE_YIELDING, "后方救护车，请靠边让行", 3.0, "yield_right")
-    ambulance.success_feedback = "成功让行，体现公民素质"
-    ambulance.failure_feedback = "阻挡急救车辆，可能面临处罚"
-    ambulance.npc_reaction_positive = "做得对，救人要紧"
-    ambulance.npc_reaction_negative = "怎么能挡救护车呢？"
-    ambulance.economic_penalty = 300
-    ambulance.attribute_effects = {"empathy": 0.5, "pressure": 0.6}
-    qte_events.append(ambulance)
+    # 堵车音乐事件
+    var traffic_jam = create_qte_event({
+        "type": QTEType.TRAFFIC_JAM_MUSIC,
+        "ai_prompt": "前方道路拥堵，可能需要等待",
+        "countdown_time": 6.0,
+        "expected_actions": ["music_soothing", "music_energetic", "music_off"],
+        "success_feedback": "音乐缓解了等待的烦躁",
+        "failure_feedback": "安静等待也不错",
+        "timeout_feedback": "在安静中等待通行",
+        "npc_positive_reaction": "这个音乐不错",
+        "npc_negative_reaction": "堵车真烦人",
+        "attribute_effects_success": {"pressure": -0.3, "openness": 0.2},
+        "attribute_effects_failure": {"pressure": 0.1}
+    })
+    available_events.append(traffic_jam)
+    
+    # 紧急加速事件
+    var urgent_call = create_qte_event({
+        "type": QTEType.URGENT_CALL,
+        "ai_prompt": "乘客需要尽快到达，建议提速",
+        "countdown_time": 4.0,
+        "expected_actions": ["fast_driving"],
+        "success_feedback": "适当提速，注意安全",
+        "failure_feedback": "继续保持安全车速",
+        "timeout_feedback": "维持当前车速",
+        "npc_positive_reaction": "谢谢，这样快一点",
+        "npc_negative_reaction": "时间有点紧张",
+        "attribute_effects_success": {"openness": 0.3, "pressure": 0.1},
+        "attribute_effects_failure": {"self_connection": 0.2}
+    })
+    available_events.append(urgent_call)
+    
+    print("✅ 设置了", available_events.size(), "个QTE事件")
 
 func should_trigger_event() -> bool:
     """判断是否应该触发QTE事件"""
+    print("🎯 检查QTE触发条件:")
+    print("   is_qte_active: ", is_qte_active)
+    print("   events_this_trip: ", events_this_trip, "/", max_events_per_trip)
+    
+    # 基本条件检查
     if is_qte_active:
+        print("   ❌ QTE已激活，跳过")
+        return false
+        
+    if events_this_trip >= max_events_per_trip:
+        print("   ❌ 本次行程事件已达上限")
         return false
     
-    var current_time = Time.get_time_dict_from_system()
-    var time_since_last = current_time.get("second", 0) - last_event_time
+    # 时间间隔检查 - 放宽限制
+    var current_time = Time.get_time_dict_from_system().get("second", 0)
+    var time_since_last = current_time - last_event_time
+    print("   时间间隔: ", time_since_last, "秒 (最小:", min_event_interval, ")")
     
     if time_since_last < min_event_interval:
+        print("   ❌ 时间间隔不足")
         return false
     
-    return randf() < base_event_probability
+    # 概率检查
+    var random_value = randf()
+    var will_trigger = random_value < event_probability
+    print("   概率检查: ", random_value, " < ", event_probability, " = ", will_trigger)
+    
+    if will_trigger:
+        print("   ✅ 满足所有条件，将触发QTE事件")
+    else:
+        print("   ❌ 概率检查未通过")
+    
+    return will_trigger
 
 func trigger_random_event():
     """触发随机QTE事件"""
-    if qte_events.is_empty() or is_qte_active:
+    if available_events.is_empty() or is_qte_active:
         return
     
-    var event = qte_events[randi() % qte_events.size()]
+    var event = available_events[randi() % available_events.size()]
     start_qte_event(event)
 
-func start_qte_event(event: QTEEvent):
+func start_qte_event(event: Dictionary):
     """开始QTE事件"""
     if is_qte_active:
-        print("QTE事件已经在进行中")
         return
     
     current_event = event
     is_qte_active = true
-    qte_completed = false
+    event_resolved = false
     countdown_timer = event.countdown_time
+    events_this_trip += 1
     last_event_time = Time.get_time_dict_from_system().get("second", 0)
     
-    print("QTE事件开始：", event.prompt_text)
+    print("🚗 QTE事件开始：", event.ai_prompt)
+    print("   期望操作：", event.expected_actions)
+    print("   倒计时：%.1f秒" % event.countdown_time)
     
-    # 语音助手提示
-    voice_assistant_speaks.emit(event.prompt_text)
+    # AI助手发出提示
+    var is_urgent = event.countdown_time < 3.0
+    ai_assistant_speaks.emit(event.ai_prompt, is_urgent)
     
     # 发送事件开始信号
     qte_event_started.emit(event)
 
-func handle_qte_action(action: String) -> bool:
-    """处理QTE动作输入"""
-    if not is_qte_active or current_event == null or qte_completed:
-        print("没有活动的QTE事件，忽略输入：", action)
+func handle_driving_action(action: String) -> bool:
+    """处理驾驶控制板的操作"""
+    if not is_qte_active or current_event.is_empty() or event_resolved:
         return false
     
-    var success = (action == current_event.correct_action)
-    complete_qte_event(success)
-    return success
+    print("🎮 驾驶操作：", action)
+    
+    # 检查是否是期望的操作
+    var expected_actions = current_event.expected_actions as Array
+    var is_correct_action = action in expected_actions
+    complete_qte_event(is_correct_action, "action")
+    return is_correct_action
 
-func complete_qte_event(success: bool):
-    """完成QTE事件"""
-    if current_event == null or qte_completed:
+func handle_qte_timeout():
+    """处理QTE超时"""
+    if event_resolved:
         return
     
-    qte_completed = true
-    print("QTE事件完成，结果：", "成功" if success else "失败")
+    print("⏰ QTE事件超时")
+    complete_qte_event(false, "timeout")
+
+func complete_qte_event(success: bool, completion_type: String):
+    """完成QTE事件"""
+    if event_resolved or current_event.is_empty():
+        return
+    
+    event_resolved = true
+    print("🏁 QTE事件完成：", "成功" if success else "失败", " (", completion_type, ")")
     
     var feedback_message: String
     var npc_reaction: String
+    var attribute_effects: Dictionary
     
     if success:
         feedback_message = current_event.success_feedback
-        npc_reaction = current_event.npc_reaction_positive
-        voice_assistant_speaks.emit(feedback_message)
+        npc_reaction = current_event.npc_positive_reaction
+        attribute_effects = current_event.attribute_effects_success
     else:
-        feedback_message = current_event.failure_feedback
-        npc_reaction = current_event.npc_reaction_negative
-        voice_assistant_speaks.emit(feedback_message)
+        if completion_type == "timeout":
+            feedback_message = current_event.timeout_feedback
+        else:
+            feedback_message = current_event.failure_feedback
+        
+        npc_reaction = current_event.npc_negative_reaction
+        attribute_effects = current_event.attribute_effects_failure
         
         # 应用失败惩罚
-        if current_event.economic_penalty > 0:
-            apply_economic_penalty(current_event.economic_penalty)
-        
-        apply_attribute_effects(current_event.attribute_effects)
+        var penalty = current_event.economic_penalty as int
+        if penalty > 0:
+            apply_economic_penalty(penalty)
+    
+    # AI助手反馈
+    ai_assistant_speaks.emit(feedback_message, false)
+    
+    # 应用属性影响
+    apply_attribute_effects(attribute_effects)
     
     # 发送完成信号
     qte_event_completed.emit(current_event, success)
     
     # 清理状态
     is_qte_active = false
-    current_event = null
+    current_event = {}
 
 func apply_economic_penalty(penalty: int):
     """应用经济惩罚"""
     if GameManager.player_stats != null:
         GameManager.player_stats.money -= penalty
-        print("经济惩罚：-", penalty, "元")
+        print("💸 经济惩罚：-", penalty, "元")
 
 func apply_attribute_effects(effects: Dictionary):
     """应用属性影响"""
     for attribute in effects.keys():
         var change = effects[attribute]
         GameManager.update_player_attribute(attribute, change)
-        print("属性变化：", attribute, " ", ("+" if change >= 0 else ""), change)
 
-func get_voice_assistant_character() -> Dictionary:
-    """获取语音助手角色信息"""
-    return {
-        "name": "ARIA",
-        "full_name": "Automated Routing & Intelligence Assistant",
-        "personality": "机械化但友好，偶尔显露人性化特征",
-        "hidden_function": "可能在监控司机的行为和情绪状态"
-    }
+func reset_trip_events():
+    """重置行程事件计数和状态"""
+    events_this_trip = 0
+    is_qte_active = false
+    event_resolved = false
+    current_event = {}
+    countdown_timer = 0.0
+    
+    # 重置时间限制
+    last_event_time = 0.0
+    
+    print("🔄 完全重置行程事件状态")
+    print("   events_this_trip: ", events_this_trip)
+    print("   is_qte_active: ", is_qte_active)
+    print("   last_event_time: ", last_event_time)
 
 func get_qte_status() -> Dictionary:
-    """获取当前QTE状态信息"""
+    """获取QTE状态信息"""
     return {
         "is_active": is_qte_active,
-        "current_event_type": current_event.type if current_event != null else null,
+        "events_this_trip": events_this_trip,
         "countdown_remaining": countdown_timer if is_qte_active else 0.0,
-        "last_event_time": last_event_time
+        "expected_actions": current_event.get("expected_actions", []) if not current_event.is_empty() else []
     }
-
-# 特殊QTE事件触发器
-func trigger_weather_event():
-    """触发天气相关事件"""
-    var weather_events = qte_events.filter(func(event): return event.type == QTEType.RAIN_WIPERS)
-    if not weather_events.is_empty():
-        start_qte_event(weather_events[0])
-
-func trigger_traffic_event():
-    """触发交通相关事件"""
-    var traffic_events = qte_events.filter(func(event): return event.type in [QTEType.RED_LIGHT, QTEType.TURN_LEFT, QTEType.TURN_RIGHT])
-    if not traffic_events.is_empty():
-        var event = traffic_events[randi() % traffic_events.size()]
-        start_qte_event(event)
-
-func trigger_emergency_event():
-    """触发紧急事件"""
-    var emergency_events = qte_events.filter(func(event): return event.type in [QTEType.PEDESTRIAN_CROSSING, QTEType.AMBULANCE_YIELDING])
-    if not emergency_events.is_empty():
-        var event = emergency_events[randi() % emergency_events.size()]
-        start_qte_event(event)
