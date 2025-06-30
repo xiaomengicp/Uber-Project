@@ -1,40 +1,62 @@
-; Engine configuration file.
-; It's best edited using the editor UI and not directly,
-; since the parameters that go here are not all obvious.
-;
-; Format:
-;   [section] ; section goes between []
-;   param=value ; assign values to parameters
-
-config_version=5
-
-[application]
-
-config/name="QPHU Uber Project"
-run/main_scene="res://scenes/Main.tscn"
-config/features=PackedStringArray("4.2", "Forward Plus")
-config/icon="res://icon.svg"
-
-[autoload]
-
-GameManager="*res://scripts/autoload/GameManager.gd"
-
-[display]
-
-window/size/viewport_width=1280
-window/size/viewport_height=720
-window/size/resizable=false
-
-[input]
-
-ui_accept={
-"deadzone": 0.5,
-"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194309,"physical_keycode":0,"key_label":0,"unicode":0,"echo":false,"script":null)
-, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194310,"physical_keycode":0,"key_label":0,"unicode":0,"echo":false,"script":null)
-, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":32,"physical_keycode":0,"key_label":0,"unicode":32,"echo":false,"script":null)
-]
+{
+  "initial_money": 100,
+  "income": {
+    "base_income_per_passenger": 50,
+    "area_modifiers": {
+      "business": 1.2,
+      "residential": 1.0,
+      "entertainment": 0.9,
+      "suburban": 0.8
+    },
+    "performance_bonus": {
+      "mood_score_70_plus": 10,
+      "mood_score_80_plus": 15,
+      "successful_interrupt": 5
+    }
+  },
+  "expenses": {
+    "daily_fixed_cost": 30,
+    "fuel_cost_per_passenger": 5
+  },
+  "shop_items": [
+    {
+      "id": "coffee",
+      "name": "咖啡",
+      "price": 15,
+      "effects": {
+        "pressure": -2
+      },
+      "description": "提神醒脑，缓解疲劳"
+    },
+    {
+      "id": "simple_meal",
+      "name": "简餐",
+      "price": 25,
+      "effects": {
+        "pressure": -1,
+        "empathy": 0.5
+      },
+      "description": "填饱肚子，保持体力"
+    },
+    {
+      "id": "psychology_book",
+      "name": "心理学书籍",
+      "price": 40,
+      "effects": {
+        "self_connection": 2,
+        "empathy": 1
+      },
+      "description": "深入了解自己和他人"
+    },
+    {
+      "id": "music_album",
+      "name": "音乐专辑",
+      "price": 30,
+      "effects": {
+        "openness": 1.5,
+        "pressure": -1
+      },
+      "description": "音乐治愈心灵"
+    }
+  ]
 }
-
-[rendering]
-
-textures/canvas_textures/default_texture_filter=0

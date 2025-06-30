@@ -62,6 +62,10 @@ func _ready():
     # 应用字体主题
     if has_node("/root/FontManager"):
         FontManager.apply_theme_to_node(self)
+        # 等FontManager完全准备好后，强制应用字体到关键节点
+        await get_tree().process_frame
+        FontManager.force_apply_font_to_node(npc_name_label)
+        FontManager.force_apply_font_to_node(dialogue_label)
     
     # 连接GameManager信号
     GameManager.state_changed.connect(_on_game_state_changed)
@@ -88,7 +92,11 @@ func _on_game_state_changed(new_state: GameManager.GameState):
             update_area_selection_display()
         GameManager.GameState.DRIVING:
             show_ui(driving_ui)
-            start_driving_session()
+            # 只有从区域选择进入驾驶时才开始新会话
+            # 如果是从完成乘客后继续，不要重新开始
+            if GameManager.passengers_today == 0:
+                # 这是一天的第一个乘客
+                start_driving_session()
         GameManager.GameState.HOME:
             show_ui(home_ui)
             update_home_display()
@@ -159,37 +167,64 @@ func reset_area_buttons():
 func start_driving_session():
     """开始驾驶会话"""
     update_all_displays()
+    
+    # 确保对话区域也应用了字体主题
+    if has_node("/root/FontManager"):
+        FontManager.apply_theme_to_node(dialogue_label)
+    
     current_npc_index = randi() % test_npcs.size()
     current_dialogue_index = 0
     show_next_dialogue()
 
 func show_next_dialogue():
     """显示下一段对话"""
+    print("=== 显示对话函数开始 ===")
+    
     var npc = test_npcs[current_npc_index]
-    npc_name_label.text = npc.name
+    
+    # 显示乘客信息（包括当前是第几个）
+    npc_name_label.text = "%s (第%d位乘客)" % [npc.name, GameManager.passengers_today + 1]
+    
+    print("NPC: ", npc.name)
+    print("当前对话索引: ", current_dialogue_index)
+    print("NPC总对话数: ", npc.dialogues.size())
+    
+    # 强制应用字体到对话相关的节点
+    if has_node("/root/FontManager"):
+        FontManager.force_apply_font_to_node(npc_name_label)
+        FontManager.force_apply_font_to_node(dialogue_label)
     
     if current_dialogue_index < npc.dialogues.size():
         dialogue_label.text = npc.dialogues[current_dialogue_index]
+        print("显示对话内容：", npc.dialogues[current_dialogue_index])
         
         # 显示插话选项
         interrupt_button1.visible = true
         interrupt_button1.text = "嗯嗯"
+        interrupt_button1.disabled = false
         
         # 检查是否有深度插话选项
         if GameManager.player_stats.can_interrupt("emotional"):
             interrupt_button2.visible = true
             interrupt_button2.text = "听起来你很难过"
+            interrupt_button2.disabled = false
         else:
             interrupt_button2.visible = false
         
         continue_button.visible = false
+        print("插话按钮已显示，继续按钮隐藏")
     else:
         # 对话结束
+        print("对话索引超出范围，显示结束界面")
         dialogue_label.text = "谢谢你的陪伴，这次旅程很愉快。"
         interrupt_button1.visible = false
         interrupt_button2.visible = false
         continue_button.text = "结束行程"
         continue_button.visible = true
+        continue_button.disabled = false
+        print("结束按钮已显示")
+    
+    print("=== 显示对话函数结束 ===\n")
 
 func update_home_display():
     """更新家中界面显示"""
@@ -199,6 +234,12 @@ func update_home_display():
         stats.get_economic_status(),
         stats.get_pressure_status()
     ]
+    
+    # 检查是否应该触发结局（第7天完成后）
+    if GameManager.current_day >= 7:
+        # 延迟显示结局，让玩家看到当天总结
+        await get_tree().create_timer(1.0).timeout
+        show_ending()
 
 func update_shop_display():
     """更新商店界面显示"""
@@ -214,6 +255,9 @@ func _on_day_completed():
 func _on_start_game_pressed():
     """开始游戏按钮"""
     print("开始新游戏")
+    # 重新初始化游戏状态
+    GameManager.initialize_player_stats()
+    GameManager.current_day = 0  # 这样start_new_day()会设置为第1天
     GameManager.start_new_day()
 
 func _on_continue_game_pressed():
@@ -305,15 +349,49 @@ func _on_interrupt_button_2_pressed():
 
 func _on_continue_dialogue_pressed():
     """继续对话"""
+    print("=== 继续对话按钮被点击 ===")
+    print("当前对话索引：", current_dialogue_index)
+    print("NPC对话总数：", test_npcs[current_npc_index].dialogues.size())
+    print("当前乘客数：", GameManager.passengers_today)
+    
+    # 防止重复触发
+    continue_button.disabled = true
+    
     if current_dialogue_index < test_npcs[current_npc_index].dialogues.size() - 1:
         current_dialogue_index += 1
+        print("进入下一段对话，新索引：", current_dialogue_index)
+        continue_button.disabled = false
         show_next_dialogue()
     else:
         # 行程结束
+        print("对话已全部结束，开始结算流程")
         var income = randi_range(40, 80)  # 随机收入
         var mood_score = randf_range(40.0, 80.0)  # 随机心情分数
         
+        print("乘客下车，准备结算...")
+        
+        # 先结算这次行程
         GameManager.complete_passenger_trip(income, mood_score)
+        
+        # 如果还需要更多乘客，立即开始下一个乘客的会话
+        if GameManager.passengers_today < GameManager.max_passengers_per_day:
+            print("需要更多乘客，准备接下一位...")
+            # 隐藏当前按钮，防止重复点击
+            interrupt_button1.visible = false
+            interrupt_button2.visible = false
+            continue_button.visible = false
+            
+            # 显示等待信息
+            npc_name_label.text = "等待中..."
+            dialogue_label.text = "正在等待下一位乘客上车..."
+            
+            # 等待一点时间让玩家看到上一个乘客的结算
+            await get_tree().create_timer(2.0).timeout
+            print("等待结束，现在开始新乘客会话")
+            start_driving_session()  # 重新开始新的驾驶会话
+        
+        # 重新启用按钮
+        continue_button.disabled = false
 
 # ============ HomeUI 事件处理 ============
 func _on_browse_dreamweave_pressed():
@@ -329,7 +407,8 @@ func _on_go_shopping_pressed():
 
 func _on_sleep_pressed():
     """睡觉，开始新一天"""
-    if GameManager.should_game_end():
+    if GameManager.current_day >= 7:
+        # 如果已经是第7天，直接显示结局
         show_ending()
     else:
         GameManager.start_new_day()
@@ -348,12 +427,23 @@ func show_ending():
     print("结局类型：", ending_type)
     print("最终分数：%.1f" % score)
     
-    # 显示结局界面
-    var ending_text = get_ending_text(ending_type)
-    dialogue_label.text = ending_text
+    # 创建结局对话框
+    var ending_dialog = AcceptDialog.new()
+    ending_dialog.dialog_text = get_ending_text(ending_type) + "\n\n最终分数: %.1f" % score
+    ending_dialog.title = "游戏结束"
+    ending_dialog.size = Vector2(400, 300)
+    add_child(ending_dialog)
+    ending_dialog.popup_centered()
     
-    # 切换到开始界面
-    await get_tree().create_timer(3.0).timeout
+    # 连接确认按钮，返回主菜单
+    ending_dialog.confirmed.connect(_on_ending_confirmed)
+    ending_dialog.close_requested.connect(_on_ending_confirmed)
+
+func _on_ending_confirmed():
+    """结局确认后返回主菜单"""
+    print("返回主菜单")
+    # 重置游戏状态
+    GameManager.initialize_player_stats()
     GameManager.change_state(GameManager.GameState.MENU)
 
 func get_ending_text(ending_type: String) -> String:

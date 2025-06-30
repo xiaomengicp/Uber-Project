@@ -1,0 +1,51 @@
+{
+  "dialogue_structure": {
+    "base_segments_per_npc": 3,
+    "successful_interrupt_bonus_segments": 1,
+    "max_interrupts_per_dialogue": 2,
+    "interrupt_time_window": 5.0
+  },
+  "interrupt_types": {
+    "basic": {
+      "options": ["嗯嗯", "是的", "我理解"],
+      "unlock_condition": "none",
+      "success_rate_base": 0.90
+    },
+    "emotional": {
+      "options": ["听起来你很难过", "这一定不容易"],
+      "unlock_condition": {
+        "empathy": 60
+      },
+      "success_rate_base": 0.50
+    },
+    "self_reflection": {
+      "options": ["这让我想到自己...", "我也有过类似感受"],
+      "unlock_condition": {
+        "self_connection": 60
+      },
+      "success_rate_base": 0.50
+    },
+    "openness": {
+      "options": ["你愿意尝试新的方式吗？", "也许可以换个角度"],
+      "unlock_condition": {
+        "openness": 60
+      },
+      "success_rate_base": 0.50
+    }
+  },
+  "mood_system": {
+    "initial_mood_score": 50,
+    "mood_change_ranges": {
+      "interrupt_success": [3, 8],
+      "interrupt_failure": [-4, -1.5],
+      "driving_event": [-2, 5]
+    },
+    "mood_feedback_thresholds": {
+      "very_positive": 70,
+      "positive": 60,
+      "neutral": 40,
+      "negative": 30,
+      "very_negative": 0
+    }
+  }
+}

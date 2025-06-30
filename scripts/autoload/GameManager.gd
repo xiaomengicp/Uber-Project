@@ -46,25 +46,45 @@ func load_all_configs():
 
 func load_json_config(path: String) -> Dictionary:
     """加载JSON配置文件"""
+    print("尝试加载配置文件: ", path)
+    
+    # 检查文件是否存在
+    if not FileAccess.file_exists(path):
+        print("❌ 配置文件不存在: ", path)
+        return {}
+    
     var file = FileAccess.open(path, FileAccess.READ)
     if file == null:
-        print("警告：无法加载配置文件 ", path)
+        print("❌ 无法打开配置文件: ", path)
         return {}
     
     var json_string = file.get_as_text()
     file.close()
     
+    # 检查文件内容是否为空
+    if json_string.strip_edges() == "":
+        print("❌ 配置文件为空: ", path)
+        return {}
+    
     var json = JSON.new()
     var parse_result = json.parse(json_string)
     if parse_result != OK:
-        print("错误：JSON解析失败 ", path)
+        print("❌ JSON解析失败: ", path)
+        print("   错误信息: ", json.error_string)
+        print("   错误行号: ", json.error_line)
+        print("   文件内容预览: ", json_string.substr(0, 200))
         return {}
     
+    print("✅ 配置文件加载成功: ", path)
     return json.data
 
 func initialize_player_stats():
     """初始化玩家属性"""
     player_stats = PlayerStats.new()
+    current_day = 1  # 重置当前天数
+    passengers_today = 0
+    daily_income = 0
+    
     # 使用配置文件中的初始值
     if balance_config.has("initial_attributes"):
         var initial = balance_config.initial_attributes
@@ -104,18 +124,28 @@ func complete_passenger_trip(income: int, mood_score: float):
     player_stats.money += income
     
     print("完成载客，收入：", income, "元，心情分数：", mood_score)
+    print("今日已接乘客：", passengers_today, "/", max_passengers_per_day)
     
     if passengers_today >= max_passengers_per_day:
+        # 一天的客人接完了，结束一天
+        print("今日乘客已满，准备结束一天")
         end_day()
     else:
-        change_state(GameState.AREA_SELECTION)
+        # 还没接够客人，等待UI层面处理下一个乘客
+        print("等待下一位乘客...")
 
 func end_day():
     """结束一天"""
     print("第", current_day, "天结束")
     print("今日收入：", daily_income, "元")
     day_completed.emit()
-    change_state(GameState.HOME)
+    
+    # 检查是否应该结束游戏（第7天结束后）
+    if current_day >= 7:
+        print("游戏达到结束条件（完成7天）")
+        change_state(GameState.HOME)  # 先回到家中，然后在home界面触发结局
+    else:
+        change_state(GameState.HOME)
 
 func calculate_interrupt_success_rate(interrupt_type: String, npc_preference: float = 0.0) -> float:
     """计算插话成功率"""
@@ -176,7 +206,7 @@ func update_player_attribute(attribute: String, change: float):
 # 游戏进度检查
 func should_game_end() -> bool:
     """检查游戏是否应该结束"""
-    return current_day > 7  # 最多7天
+    return current_day >= 7  # 第7天结束后游戏结束
 
 func get_ending_type() -> String:
     """计算结局类型"""
