@@ -1,6 +1,4 @@
-# FontManager.gd - 修复版字体管理器
-# 优先加载项目中的中文字体
-
+# FontManager.gd - 改进版字体管理器，专门处理中文显示问题
 extends Node
 
 var default_font: FontFile
@@ -29,22 +27,16 @@ func setup_fonts():
     
     # 使用ResourceLoader加载项目中的字体
     for font_path in project_font_paths:
-        print("尝试加载项目字体: ", font_path)
         if ResourceLoader.exists(font_path):
             var loaded_font = ResourceLoader.load(font_path)
             if loaded_font is FontFile:
                 default_font = loaded_font
                 print("✅ 成功加载项目字体: ", font_path)
                 return
-            else:
-                print("❌ 字体格式不正确: ", font_path)
-        else:
-            print("❌ 项目字体文件不存在: ", font_path)
     
     # 如果项目字体失败，尝试直接读取文件数据
     for font_path in project_font_paths:
         var file_path = font_path.replace("res://", "")
-        print("尝试直接读取字体文件: ", file_path)
         if FileAccess.file_exists(file_path):
             var font_data = FileAccess.open(file_path, FileAccess.READ)
             if font_data:
@@ -55,10 +47,6 @@ func setup_fonts():
                     default_font.data = buffer
                     print("✅ 成功直接加载字体文件: ", file_path)
                     return
-                else:
-                    print("❌ 字体文件为空: ", file_path)
-            else:
-                print("❌ 无法打开字体文件: ", file_path)
     
     # 最后尝试系统字体（但跳过不支持中文的）
     var system_chinese_fonts = [
@@ -71,7 +59,6 @@ func setup_fonts():
     ]
     
     for font_path in system_chinese_fonts:
-        print("尝试加载系统中文字体: ", font_path)
         if FileAccess.file_exists(font_path):
             var font_data = FileAccess.open(font_path, FileAccess.READ)
             if font_data:
@@ -99,6 +86,7 @@ func create_ui_theme():
         ui_theme.set_font("font", "Button", default_font)
         ui_theme.set_font("font", "Label", default_font)
         ui_theme.set_font("font", "RichTextLabel", default_font)
+        ui_theme.set_font("normal_font", "RichTextLabel", default_font)
         print("✅ 字体主题创建成功，使用自定义字体")
     else:
         print("⚠️  使用默认字体主题")
@@ -143,49 +131,87 @@ func apply_theme_to_node(node: Node):
         for child in node.get_children():
             apply_theme_to_node(child)
 
-# 添加一个专门用于强制应用字体的函数
 func force_apply_font_to_node(node: Control):
-    """强制将字体应用到特定节点"""
-    if not ui_theme or not default_font:
+    """强制将字体应用到特定节点，专门解决RichTextLabel乱码问题"""
+    if not default_font:
+        print("❌ 没有可用字体，跳过强制应用")
         return
         
     if node is RichTextLabel:
-        # 对RichTextLabel特殊处理
+        # 对RichTextLabel特殊处理，解决中文乱码
         var rich_label = node as RichTextLabel
+        
+        # 多种方式确保字体生效
         rich_label.add_theme_font_override("normal_font", default_font)
+        rich_label.add_theme_font_override("bold_font", default_font)
+        rich_label.add_theme_font_override("italics_font", default_font)
+        rich_label.add_theme_font_override("bold_italics_font", default_font)
+        rich_label.add_theme_font_override("mono_font", default_font)
+        
+        # 设置字体大小
         rich_label.add_theme_font_size_override("normal_font_size", 16)
-        print("强制应用字体到RichTextLabel：", node.name)
+        rich_label.add_theme_font_size_override("bold_font_size", 16)
+        rich_label.add_theme_font_size_override("italics_font_size", 16)
+        rich_label.add_theme_font_size_override("bold_italics_font_size", 16)
+        rich_label.add_theme_font_size_override("mono_font_size", 16)
+        
+        # 确保显示设置正确
+        rich_label.fit_content = true
+        rich_label.scroll_active = false
+        rich_label.bbcode_enabled = false  # 关闭BBCode避免解析问题
+        
+        print("✅ 强制应用字体到RichTextLabel：", node.name)
+        
     elif node is Label:
         # 对Label特殊处理
         var label = node as Label
         label.add_theme_font_override("font", default_font)
         label.add_theme_font_size_override("font_size", 16)
-        print("强制应用字体到Label：", node.name)
+        print("✅ 强制应用字体到Label：", node.name)
+        
     elif node is Button:
         # 对Button特殊处理
         var button = node as Button
         button.add_theme_font_override("font", default_font)
         button.add_theme_font_size_override("font_size", 18)
-        print("强制应用字体到Button：", node.name)
+        print("✅ 强制应用字体到Button：", node.name)
 
-func debug_font_paths():
-    """调试：列出可能的字体文件"""
-    print("=== 调试字体路径 ===")
-    var paths_to_check = [
-        "assets/fonts/",
-        "res://assets/fonts/",
-        "./assets/fonts/"
-    ]
+func fix_richtext_font(rich_text_label: RichTextLabel):
+    """专门修复RichTextLabel的字体显示问题"""
+    if not rich_text_label or not default_font:
+        return
     
-    for path in paths_to_check:
-        print("检查路径: ", path)
-        var dir = DirAccess.open(path)
-        if dir:
-            dir.list_dir_begin()
-            var file_name = dir.get_next()
-            while file_name != "":
-                print("  发现文件: ", file_name)
-                file_name = dir.get_next()
-        else:
-            print("  路径不存在")
+    print("修复RichTextLabel字体显示: ", rich_text_label.name)
+    
+    # 清除所有现有的字体覆盖
+    rich_text_label.remove_theme_font_override("normal_font")
+    rich_text_label.remove_theme_font_override("bold_font")
+    rich_text_label.remove_theme_font_override("italics_font")
+    
+    # 重新应用字体
+    rich_text_label.add_theme_font_override("normal_font", default_font)
+    rich_text_label.add_theme_font_size_override("normal_font_size", 16)
+    
+    # 禁用可能导致问题的功能
+    rich_text_label.bbcode_enabled = false
+    rich_text_label.fit_content = true
+    rich_text_label.scroll_active = false
+    
+    # 强制刷新
+    rich_text_label.queue_redraw()
+    
+    print("✅ RichTextLabel字体修复完成")
+
+func create_chinese_test_text() -> String:
+    """创建中文测试文本"""
+    return "测试中文显示：你好世界！This is a test. 123"
+
+func debug_font_info():
+    """调试字体信息"""
+    print("=== 字体调试信息 ===")
+    if default_font:
+        print("字体数据大小: ", default_font.data.size() if default_font.data else "无数据")
+        print("字体有效: ", default_font != null)
+    else:
+        print("没有加载字体")
     print("===================")
