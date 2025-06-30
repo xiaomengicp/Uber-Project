@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8qxvxvxvxvx"]
+[gd_scene load_steps=2 format=3 uid="uid://cj08dxe2w8vdb"]
 
 [ext_resource type="Script" uid="uid://cq240p30m2hrq" path="res://scripts/Main.gd" id="1_main"]
 
@@ -140,7 +140,6 @@ text = "郊外区
 宁静自然，收入较低"
 
 [node name="DrivingUI" type="Control" parent="UIContainer"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -148,95 +147,212 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TopPanel" type="Panel" parent="UIContainer/DrivingUI"]
+[node name="CarWindowView" type="Panel" parent="UIContainer/DrivingUI"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 60.0
+offset_bottom = 432.0
 grow_horizontal = 2
 
-[node name="AttributesContainer" type="HBoxContainer" parent="UIContainer/DrivingUI/TopPanel"]
+[node name="BackgroundCity" type="ColorRect" parent="UIContainer/DrivingUI/CarWindowView"]
 layout_mode = 1
-anchors_preset = 9
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0.3, 0.5, 1)
+
+[node name="CityLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -20.0
+offset_right = 100.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "城市夜景"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttributesPanel" type="Panel" parent="UIContainer/DrivingUI/CarWindowView"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_bottom = 80.0
+grow_horizontal = 0
+
+[node name="AttributesContainer" type="VBoxContainer" parent="UIContainer/DrivingUI/CarWindowView/AttributesPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 10.0
-offset_right = 400.0
+offset_top = 5.0
+offset_right = -10.0
+offset_bottom = -5.0
+grow_horizontal = 2
 grow_vertical = 2
 
-[node name="EmpathyLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+[node name="EmpathyLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView/AttributesPanel/AttributesContainer"]
 layout_mode = 2
 text = "共情: 50"
 
-[node name="SelfLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+[node name="SelfLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView/AttributesPanel/AttributesContainer"]
 layout_mode = 2
 text = "自省: 40"
 
-[node name="OpennessLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+[node name="OpennessLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView/AttributesPanel/AttributesContainer"]
 layout_mode = 2
 text = "开放: 45"
 
-[node name="PressureLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel/AttributesContainer"]
+[node name="PressureLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView/AttributesPanel/AttributesContainer"]
 layout_mode = 2
 text = "压力: 30"
 
-[node name="MoneyLabel" type="Label" parent="UIContainer/DrivingUI/TopPanel"]
+[node name="MoneyLabel" type="Label" parent="UIContainer/DrivingUI/CarWindowView"]
 layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
+anchors_preset = 2
+anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = -100.0
-grow_horizontal = 0
+offset_left = 20.0
+offset_top = -30.0
+offset_right = 120.0
 grow_vertical = 0
 text = "💰 100元"
 vertical_alignment = 1
 
-[node name="DialogueArea" type="Panel" parent="UIContainer/DrivingUI"]
+[node name="ControlArea" type="Panel" parent="UIContainer/DrivingUI"]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -200.0
+offset_top = -288.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="DialogueContainer" type="VBoxContainer" parent="UIContainer/DrivingUI/DialogueArea"]
+[node name="DrivingControls" type="VBoxContainer" parent="UIContainer/DrivingUI/ControlArea"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 20.0
+offset_top = -100.0
+offset_right = 300.0
+offset_bottom = 100.0
+grow_vertical = 2
+
+[node name="ControlLabel" type="Label" parent="UIContainer/DrivingUI/ControlArea/DrivingControls"]
+layout_mode = 2
+text = "驾驶控制"
+horizontal_alignment = 1
+
+[node name="MusicControls" type="HBoxContainer" parent="UIContainer/DrivingUI/ControlArea/DrivingControls"]
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls"]
+layout_mode = 2
+text = "音乐:"
+
+[node name="MusicOffButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls"]
+layout_mode = 2
+text = "关闭"
+
+[node name="MusicSoothingButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls"]
+layout_mode = 2
+text = "轻音乐"
+
+[node name="MusicEnergeticButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls"]
+layout_mode = 2
+text = "流行音乐"
+
+[node name="WindowControls" type="HBoxContainer" parent="UIContainer/DrivingUI/ControlArea/DrivingControls"]
+layout_mode = 2
+
+[node name="WindowLabel" type="Label" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/WindowControls"]
+layout_mode = 2
+text = "车窗:"
+
+[node name="WindowOpenButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/WindowControls"]
+layout_mode = 2
+text = "开窗"
+
+[node name="WindowCloseButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/WindowControls"]
+layout_mode = 2
+text = "关窗"
+
+[node name="DrivingStyleControls" type="HBoxContainer" parent="UIContainer/DrivingUI/ControlArea/DrivingControls"]
+layout_mode = 2
+
+[node name="StyleLabel" type="Label" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/DrivingStyleControls"]
+layout_mode = 2
+text = "驾驶:"
+
+[node name="SmoothDrivingButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/DrivingStyleControls"]
+layout_mode = 2
+text = "平稳"
+
+[node name="FastDrivingButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DrivingControls/DrivingStyleControls"]
+layout_mode = 2
+text = "快速"
+
+[node name="DialogueArea" type="Panel" parent="UIContainer/DrivingUI/ControlArea"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -120.0
+offset_bottom = 120.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="DialogueContainer" type="VBoxContainer" parent="UIContainer/DrivingUI/ControlArea/DialogueArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
+offset_left = 10.0
 offset_top = 10.0
-offset_right = -20.0
+offset_right = -10.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="NPCNameLabel" type="Label" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+[node name="NPCNameLabel" type="Label" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer"]
 layout_mode = 2
 text = "乘客姓名"
 
-[node name="DialogueLabel" type="RichTextLabel" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+[node name="DialogueLabel" type="RichTextLabel" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 text = "乘客对话内容..."
 
-[node name="InterruptContainer" type="HBoxContainer" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+[node name="InterruptContainer" type="HBoxContainer" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer"]
 layout_mode = 2
 
-[node name="InterruptButton1" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer"]
+[node name="InterruptButton1" type="Button" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/InterruptContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "插话选项1"
 
-[node name="InterruptButton2" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer"]
+[node name="InterruptButton2" type="Button" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/InterruptContainer"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = "插话选项2"
 
-[node name="ContinueButton" type="Button" parent="UIContainer/DrivingUI/DialogueArea/DialogueContainer"]
+[node name="ContinueButton" type="Button" parent="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer"]
 layout_mode = 2
 text = "继续对话"
 
@@ -343,9 +459,16 @@ text = "返回"
 [connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/ResidentialButton" to="." method="_on_residential_area_pressed"]
 [connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/EntertainmentButton" to="." method="_on_entertainment_area_pressed"]
 [connection signal="pressed" from="UIContainer/AreaSelectionUI/VBoxContainer/SuburbanButton" to="." method="_on_suburban_area_pressed"]
-[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton1" to="." method="_on_interrupt_button_1_pressed"]
-[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton2" to="." method="_on_interrupt_button_2_pressed"]
-[connection signal="pressed" from="UIContainer/DrivingUI/DialogueArea/DialogueContainer/ContinueButton" to="." method="_on_continue_dialogue_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls/MusicOffButton" to="." method="_on_music_off_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls/MusicSoothingButton" to="." method="_on_music_soothing_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/MusicControls/MusicEnergeticButton" to="." method="_on_music_energetic_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/WindowControls/WindowOpenButton" to="." method="_on_window_open_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/WindowControls/WindowCloseButton" to="." method="_on_window_close_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/DrivingStyleControls/SmoothDrivingButton" to="." method="_on_smooth_driving_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DrivingControls/DrivingStyleControls/FastDrivingButton" to="." method="_on_fast_driving_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton1" to="." method="_on_interrupt_button_1_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/InterruptContainer/InterruptButton2" to="." method="_on_interrupt_button_2_pressed"]
+[connection signal="pressed" from="UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/ContinueButton" to="." method="_on_continue_dialogue_pressed"]
 [connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/DreamweaveButton" to="." method="_on_browse_dreamweave_pressed"]
 [connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/ShopButton" to="." method="_on_go_shopping_pressed"]
 [connection signal="pressed" from="UIContainer/HomeUI/CenterContainer/VBoxContainer/SleepButton" to="." method="_on_sleep_pressed"]
