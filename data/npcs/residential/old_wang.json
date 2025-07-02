@@ -1,0 +1,55 @@
+{
+    "events": [
+        {
+            "area": "residential",
+            "dialogue": [
+                "年轻人，我经历过'模糊时期'前的日子...那时候人们会用诗歌表达复杂的情感。",
+                "有些美好的东西，只存在于记忆中了。但我想把这些留给还记得如何感受的人。",
+                "这个城市变化太快，但人心中对真实的渴望从未改变。"
+            ],
+            "encounter_type": "first",
+            "game_effects": {
+                "attributes": {
+                    "successful_interaction": {
+                        "openness": 1.0,
+                        "self_connection": 0.5
+                    }
+                },
+                "driving_preferences": {
+                    "music_off": 0.8,
+                    "smooth_driving": 1.0
+                },
+                "economic": {
+                    "base_fee": 45,
+                    "tip_range": [
+                        5,
+                        15
+                    ]
+                }
+            },
+            "id": "wang_residential_1",
+            "interrupt_responses": {
+                "basic": "是啊，时代不同了",
+                "empathy": "你有一颗善良的心，这在现在很珍贵",
+                "openness": "愿意学习古老智慧的年轻人不多了"
+            },
+            "trigger_conditions": {
+                "time_range": [
+                    "20:00",
+                    "23:00"
+                ],
+                "weather": [
+                    "any"
+                ]
+            },
+            "unlock_day": 1
+        }
+    ],
+    "npc_info": {
+        "archetype": "记忆守护者",
+        "background": "经历过'模糊时期'的退休教师，暗中保存古老的情感表达方式",
+        "npc_id": "old_wang",
+        "npc_name": "老王",
+        "primary_area": "residential"
+    }
+}

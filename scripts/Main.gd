@@ -1,4 +1,4 @@
-# Main.gd - 完整版本，集成商店系统
+# Main.gd - 完整版本，集成NPCEventManager系统
 extends Control
 
 # 管理器引用
@@ -10,7 +10,7 @@ var shop_system: ShopSystem
 var current_area: String = ""
 var last_visited_area: String = ""
 
-# 简化的对话状态
+# NPC对话状态（新系统）
 enum DialogueState {
     WAITING_FOR_PASSENGER,
     IN_DIALOGUE,
@@ -19,92 +19,42 @@ enum DialogueState {
 }
 
 var dialogue_state: DialogueState = DialogueState.WAITING_FOR_PASSENGER
+var current_npc_event: NPCEvent = null
+var current_dialogue_index: int = 0
+var successful_interrupts: int = 0
+var failed_interrupts: int = 0
 
-# 增强的测试NPC数据
-var enhanced_test_npcs = [
+# 备用测试数据（fallback）
+var fallback_test_npcs = [
     {
-        "name": "Sarah",
+        "name": "测试NPC",
         "area": "business_district", 
         "dialogues": [
-            "又是一个加班到深夜的日子...我得到了想要的一切，为什么还是觉得空虚？",
-            "有时候我觉得自己像个机器人，每天重复着同样的动作和表情",
-            "你说，我还能找回真正的自己吗？那个在影子学院之前的我？"
+            "这是一个测试对话，如果你看到这个说明NPCEventManager没有正常工作。",
+            "请检查NPCEventManager是否正确加载了NPC数据文件。",
+            "这只是备用的测试对话。"
         ],
         "interrupt_responses": {
-            "empathy": "谢谢你理解...很少有人愿意听我说这些",
-            "self_reflection": "你也有过这种感受吗？感觉像是活在别人设计的程序里",
-            "basic": "嗯...也许这就是成年人的生活吧"
+            "empathy": "谢谢理解（测试回应）",
+            "self_reflection": "是的我也这样想（测试回应）",
+            "basic": "嗯嗯（测试回应）"
         },
-        "driving_preferences": {
-            "smooth_driving": 1.0,
-            "music_soothing": 0.8,
-            "close_window": 0.9,
-            "music_off": 0.7
-        },
-        "economic_impact": {
-            "base_fee": 75,
-            "tip_range": [10, 25]
-        },
-        "story_significance": "代表被系统成功规训但内心空虚的群体"
-    },
-    {
-        "name": "老王",
-        "area": "residential",
-        "dialogues": [
-            "年轻人，我经历过'模糊时期'前的日子...那时候人们会用诗歌表达复杂的情感",
-            "有些美好的东西，只存在于记忆中了。但我想把这些留给还记得如何感受的人",
-            "这个城市变化太快，但人心中对真实的渴望从未改变"
-        ],
-        "interrupt_responses": {
-            "empathy": "你有一颗善良的心，这在现在很珍贵",
-            "openness": "愿意学习古老智慧的年轻人不多了",
-            "basic": "是啊，时代不同了"
-        },
-        "driving_preferences": {
-            "smooth_driving": 1.0,
-            "music_off": 0.8,
-            "open_window": 0.6
-        },
-        "economic_impact": {
-            "base_fee": 45,
-            "tip_range": [5, 15],
-            "special_reward": "ancient_wisdom"
-        },
-        "story_significance": "模糊时期的见证者，文化记忆的守护者"
-    },
-    {
-        "name": "Jamie",
-        "area": "entertainment",
-        "dialogues": [
-            "音乐是他们还没学会完全控制的语言...我在深夜的酒吧里传递着被禁止的情感密码",
-            "有些歌只能在深夜唱给懂的人听，你明白那种感觉吗？",
-            "艺术家的使命就是让真实的东西活下去，即使要冒险"
-        ],
-        "interrupt_responses": {
-            "empathy": "你能理解艺术家的孤独，这很难得",
-            "openness": "是的，真实的表达总是伴随着风险",
-            "basic": "嗯，生活不容易"
-        },
-        "driving_preferences": {
-            "music_energetic": 0.9,
-            "open_window": 0.8,
-            "music_soothing": 0.6
-        },
-        "economic_impact": {
-            "base_fee": 55,
-            "tip_range": [0, 20]  # 收入不稳定
-        },
-        "story_significance": "地下文化网络的传递者"
+        "economic_impact": {"base_fee": 50, "tip_range": [5, 15]}
     }
 ]
 
-var current_npc_index = 0
-var current_dialogue_index = 0
-var successful_interrupts = 0
-var failed_interrupts = 0
+var fallback_npc_index = 0
 
 func _ready():
     print("=== 主场景初始化 ===")
+    
+    # 等待NPCEventManager加载完成
+    if NPCEventManager == null:
+        print("⚠️  NPCEventManager未找到，将使用fallback模式")
+    else:
+        # 连接NPCEventManager信号
+        if not NPCEventManager.npc_events_loaded.is_connected(_on_npc_events_loaded):
+            NPCEventManager.npc_events_loaded.connect(_on_npc_events_loaded)
     
     # 初始化管理器
     await initialize_managers()
@@ -122,6 +72,10 @@ func _ready():
     
     print("=== 初始化完成 ===")
     print_debug_info()
+
+func _on_npc_events_loaded():
+    """响应NPCEventManager加载完成"""
+    print("✅ NPCEventManager加载完成，可以使用真实NPC数据")
 
 func initialize_managers():
     """初始化所有管理器"""
@@ -242,7 +196,7 @@ func connect_driving_controls():
         var continue_btn = dialogue_area.get_node_or_null("ContinueButton")
         
         if interrupt_btn1: interrupt_btn1.pressed.connect(_on_interrupt_pressed.bind("basic"))
-        if interrupt_btn2: interrupt_btn2.pressed.connect(_on_interrupt_pressed.bind("empathy"))
+        if interrupt_btn2: interrupt_btn2.pressed.connect(_on_interrupt_pressed.bind("deep"))
         if continue_btn: continue_btn.pressed.connect(_on_continue_dialogue_pressed)
 
 func _process(delta):
@@ -256,7 +210,7 @@ func _input(event):
     if event is InputEventKey and event.pressed:
         match event.keycode:
             KEY_F1:
-                debug_shop_system()
+                debug_npc_system()
             KEY_F2:
                 # 快速添加金钱用于测试
                 if GameManager.player_stats != null:
@@ -267,11 +221,12 @@ func _input(event):
                 # 快速前进一天用于测试解锁
                 GameManager.current_day += 1
                 print("📅 前进到第", GameManager.current_day, "天")
-                if GameManager.current_state == GameManager.GameState.SHOP:
-                    update_shop_display()
             KEY_F4:
                 # 测试购买功能
                 test_shop_purchase()
+            KEY_F5:
+                # 调试属性
+                debug_player_attributes()
 
 # ============ 信号处理方法 ============
 func _on_game_state_changed(new_state: GameManager.GameState):
@@ -305,6 +260,8 @@ func _on_ui_button_pressed(button_id: String, data: Dictionary):
             GameManager.current_day = 0
             if shop_system != null:
                 shop_system.reset_shop()
+            if NPCEventManager != null:
+                NPCEventManager.reset_progress()
             GameManager.start_new_day()
         "continue_game":
             GameManager.change_state(GameManager.GameState.AREA_SELECTION)
@@ -331,8 +288,468 @@ func _on_ui_button_pressed(button_id: String, data: Dictionary):
 
 func _on_area_selected(area_name: String):
     """处理区域选择"""
-    current_area = area_name
+    # 修复区域名称映射
+    var area_mapping = {
+        "business": "business_district",
+        "residential": "residential", 
+        "entertainment": "entertainment",
+        "suburban": "suburban"
+    }
+    
+    current_area = area_mapping.get(area_name, area_name)
+    print("🗺️ 区域选择：UI名称=", area_name, " 映射到=", current_area)
+    
     GameManager.change_state(GameManager.GameState.DRIVING)
+    
+# ============ NPC对话系统（新版本）============
+func start_driving_session():
+    """开始驾驶会话"""
+    print("=== 开始驾驶会话 ===")
+    
+    dialogue_state = DialogueState.WAITING_FOR_PASSENGER
+    successful_interrupts = 0
+    failed_interrupts = 0
+    current_npc_event = null
+    
+    if qte_system != null:
+        qte_system.reset_trip_events()
+    
+    show_waiting_for_passenger()
+    
+    # 等待2秒模拟乘客上车
+    await get_tree().create_timer(2.0).timeout
+    start_npc_dialogue()
+
+func show_waiting_for_passenger():
+    """显示等待乘客状态"""
+    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
+    
+    if npc_name_label: npc_name_label.text = "等待乘客中..."
+    if dialogue_label: dialogue_label.text = "正在等待乘客上车..."
+    
+    # 隐藏所有按钮
+    if buttons.button1: buttons.button1.visible = false
+    if buttons.button2: buttons.button2.visible = false
+    if continue_button: continue_button.visible = false
+
+func start_npc_dialogue():
+    """开始NPC对话 - 使用NPCEventManager"""
+    print("=== 开始NPC对话 ===")
+    
+    dialogue_state = DialogueState.IN_DIALOGUE
+    current_dialogue_index = 0
+    
+    # 尝试从NPCEventManager获取事件
+    if NPCEventManager != null:
+        var selected_event = NPCEventManager.select_random_event_for_area(
+            current_area, 
+            GameManager.current_day, 
+            GameManager.player_stats
+        )
+        
+        if selected_event != null:
+            current_npc_event = selected_event
+            print("✅ 使用NPCEventManager事件：", current_npc_event.id, " (", current_npc_event.npc_name, ")")
+            await get_tree().process_frame
+            show_npc_dialogue()
+            return
+    
+    # Fallback到测试数据
+    print("⚠️  NPCEventManager不可用，使用fallback数据")
+    start_fallback_dialogue()
+
+func show_npc_dialogue():
+    """显示NPC对话内容"""
+    if dialogue_state != DialogueState.IN_DIALOGUE or current_npc_event == null:
+        return
+    
+    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
+    
+    if npc_name_label:
+        npc_name_label.text = "%s (第%d位乘客)" % [current_npc_event.npc_name, GameManager.passengers_today + 1]
+    
+    if current_dialogue_index < current_npc_event.dialogue_segments.size():
+        # 显示当前对话
+        if dialogue_label:
+            var dialogue_text = current_npc_event.dialogue_segments[current_dialogue_index]
+            dialogue_label.text = dialogue_text
+            print("✅ 显示NPC对话[%d]: %s..." % [current_dialogue_index, dialogue_text.substr(0, 50)])
+        
+        # 显示插话选项
+        setup_interrupt_options(buttons)
+        if continue_button: continue_button.visible = false
+        
+        # 每段对话都尝试触发QTE事件
+        maybe_trigger_qte_event()
+    else:
+        print("❌ 对话索引超出范围")
+
+func setup_interrupt_options(buttons: Dictionary):
+    """设置插话选项"""
+    if buttons.button1:
+        buttons.button1.visible = true
+        buttons.button1.text = "嗯嗯"
+        buttons.button1.disabled = false
+    
+    # 根据玩家属性设置第二个插话选项
+    if buttons.button2:
+        var player_stats = GameManager.player_stats
+        if player_stats != null:
+            var available_interrupt = get_available_deep_interrupt()
+            if available_interrupt != "":
+                buttons.button2.visible = true
+                buttons.button2.text = get_interrupt_display_text(available_interrupt)
+                buttons.button2.disabled = false
+                buttons.button2.set_meta("interrupt_type", available_interrupt)
+            else:
+                buttons.button2.visible = false
+        else:
+            buttons.button2.visible = false
+
+func get_available_deep_interrupt() -> String:
+    """获取可用的深度插话类型"""
+    var player_stats = GameManager.player_stats
+    if player_stats == null:
+        return ""
+    
+    # 按优先级检查
+    if player_stats.empathy >= 60:
+        return "empathy"
+    elif player_stats.self_connection >= 60:
+        return "self_reflection"
+    elif player_stats.openness >= 60:
+        return "openness"
+    
+    return ""
+
+func get_interrupt_display_text(interrupt_type: String) -> String:
+    """获取插话选项的显示文本"""
+    match interrupt_type:
+        "empathy":
+            return "我理解你的感受"
+        "self_reflection":
+            return "这让我想到自己..."
+        "openness":
+            return "也许可以换个角度"
+        _:
+            return "嗯嗯"
+
+func _on_interrupt_pressed(interrupt_type: String):
+    """处理插话按钮"""
+    print("💬 插话类型：", interrupt_type)
+    
+    if dialogue_state != DialogueState.IN_DIALOGUE:
+        print("❌ 对话状态不正确，忽略插话")
+        return
+    
+    # 如果是深度插话，获取实际的插话类型
+    if interrupt_type == "deep":
+        var button2 = get_interrupt_buttons().button2
+        if button2 and button2.has_meta("interrupt_type"):
+            interrupt_type = button2.get_meta("interrupt_type")
+        else:
+            interrupt_type = "basic"  # fallback
+    
+    var success_rate = GameManager.calculate_interrupt_success_rate(interrupt_type)
+    var success = randf() < success_rate
+    
+    print("插话成功率：%.1f%%, 结果：%s" % [success_rate * 100, "成功" if success else "失败"])
+    
+    apply_interrupt_result(interrupt_type, success)
+    
+    var buttons = get_interrupt_buttons()
+    if buttons.button1: buttons.button1.visible = false
+    if buttons.button2: buttons.button2.visible = false
+    
+    var continue_button = get_continue_button()
+    if continue_button:
+        continue_button.visible = true
+        continue_button.text = "继续对话"
+        continue_button.disabled = false
+    
+    update_all_displays()
+
+func apply_interrupt_result(interrupt_type: String, success: bool):
+    """应用插话结果"""
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    
+    if success:
+        successful_interrupts += 1
+        
+        # 根据插话类型给予不同的属性奖励
+        match interrupt_type:
+            "empathy":
+                GameManager.update_player_attribute("empathy", 1.0)
+                GameManager.update_player_attribute("pressure", -0.3)
+            "self_reflection":
+                GameManager.update_player_attribute("self_connection", 1.2)
+                GameManager.update_player_attribute("empathy", 0.4)
+            "openness":
+                GameManager.update_player_attribute("openness", 1.0)
+                GameManager.update_player_attribute("self_connection", 0.3)
+            "basic":
+                GameManager.update_player_attribute("empathy", 0.3)
+                GameManager.update_player_attribute("self_connection", 0.2)
+                GameManager.update_player_attribute("pressure", -0.1)
+        
+        # 显示NPC的回应
+        if dialogue_label != null:
+            var response = ""
+            if current_npc_event != null:
+                response = current_npc_event.get_interrupt_response(interrupt_type)
+            
+            if response != "":
+                dialogue_label.text += "\n\n「" + response + "」"
+            else:
+                dialogue_label.text += "\n\n（乘客点了点头）"
+            
+        print("✅ 插话成功！获得属性奖励")
+    else:
+        failed_interrupts += 1
+        
+        # 失败惩罚
+        GameManager.update_player_attribute("empathy", -0.2)
+        GameManager.update_player_attribute("pressure", 0.4)
+        
+        # 添加失败反应
+        if dialogue_label != null:
+            dialogue_label.text += "\n\n（对方似乎没有回应...）"
+            
+        print("❌ 插话失败")
+
+func _on_continue_dialogue_pressed():
+    """继续对话"""
+    print("▶️ 继续对话，当前状态：", DialogueState.keys()[dialogue_state])
+    
+    match dialogue_state:
+        DialogueState.IN_DIALOGUE:
+            if current_npc_event != null and current_dialogue_index < current_npc_event.dialogue_segments.size() - 1:
+                current_dialogue_index += 1
+                show_npc_dialogue()
+            elif fallback_npc_index >= 0 and current_dialogue_index < fallback_test_npcs[fallback_npc_index].dialogues.size() - 1:
+                # fallback模式
+                current_dialogue_index += 1
+                show_fallback_dialogue()
+            else:
+                dialogue_state = DialogueState.DIALOGUE_FINISHED
+                show_dialogue_finished()
+        DialogueState.DIALOGUE_FINISHED:
+            complete_current_trip()
+
+func show_dialogue_finished():
+    """显示对话结束"""
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
+    
+    if dialogue_label:
+        dialogue_label.text = "谢谢你的陪伴，这次旅程很愉快。"
+    
+    if buttons.button1: buttons.button1.visible = false
+    if buttons.button2: buttons.button2.visible = false
+    if continue_button:
+        continue_button.text = "结束行程"
+        continue_button.visible = true
+        continue_button.disabled = false
+
+func complete_current_trip():
+    """完成当前行程"""
+    print("=== 完成当前行程 ===")
+    
+    dialogue_state = DialogueState.TRIP_COMPLETED
+    
+    var base_income = 50
+    var tip_range = [5, 15]
+    
+    # 从NPCEvent获取经济数据
+    if current_npc_event != null:
+        var economic_impact = current_npc_event.economic_impact
+        base_income = economic_impact.get("base_fee", 50)
+        tip_range = economic_impact.get("tip_range", [5, 15])
+        
+        # 标记事件已遇见
+        NPCEventManager.mark_event_encountered(current_npc_event, GameManager.current_day)
+    elif fallback_npc_index >= 0:
+        # fallback模式
+        var npc = fallback_test_npcs[fallback_npc_index]
+        var economic = npc.get("economic_impact", {"base_fee": 50, "tip_range": [5, 15]})
+        base_income = economic.base_fee
+        tip_range = economic.tip_range
+    
+    # 根据插话成功次数计算奖励
+    var mood_bonus = 0
+    if successful_interrupts > 0:
+        mood_bonus = randi_range(tip_range[0], tip_range[1])
+    
+    var total_income = base_income + mood_bonus
+    var mood_score = 50.0 + (successful_interrupts * 15) - (failed_interrupts * 8)
+    
+    print("基础费用：%d元" % base_income)
+    if mood_bonus > 0:
+        print("满意度奖励：%d元" % mood_bonus)
+    print("总收入：%d元" % total_income)
+    print("NPC心情：%.1f" % mood_score)
+    
+    GameManager.complete_passenger_trip(total_income, mood_score)
+    
+    # 清理状态
+    current_npc_event = null
+    fallback_npc_index = -1
+    
+    # 如果还需要更多乘客
+    if GameManager.passengers_today < GameManager.max_passengers_per_day:
+        print("需要接更多乘客...")
+        start_driving_session()
+    else:
+        print("今日乘客已满，前往家中")
+
+# ============ Fallback对话系统 ============
+func start_fallback_dialogue():
+    """开始fallback对话（使用测试数据）"""
+    print("⚠️  使用fallback对话系统")
+    
+    # 选择合适的fallback NPC
+    fallback_npc_index = 0  # 目前只有一个测试NPC
+    current_dialogue_index = 0
+    
+    await get_tree().process_frame
+    show_fallback_dialogue()
+
+func show_fallback_dialogue():
+    """显示fallback对话"""
+    if fallback_npc_index < 0 or fallback_npc_index >= fallback_test_npcs.size():
+        return
+    
+    var npc = fallback_test_npcs[fallback_npc_index]
+    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
+    
+    if npc_name_label:
+        npc_name_label.text = "%s (第%d位乘客)" % [npc.name, GameManager.passengers_today + 1]
+    
+    if current_dialogue_index < npc.dialogues.size():
+        if dialogue_label:
+            dialogue_label.text = npc.dialogues[current_dialogue_index]
+            print("✅ 显示fallback对话[%d]: %s..." % [current_dialogue_index, npc.dialogues[current_dialogue_index].substr(0, 50)])
+        
+        # 显示插话选项
+        setup_interrupt_options(buttons)
+        if continue_button: continue_button.visible = false
+        
+        # 尝试触发QTE事件
+        maybe_trigger_qte_event()
+
+func maybe_trigger_qte_event():
+    """可能触发QTE事件"""
+    if qte_system != null and qte_system.should_trigger_event():
+        print("✅ 触发QTE事件")
+        qte_system.trigger_random_event()
+    else:
+        print("❌ 未触发QTE事件")
+
+# ============ 驾驶系统处理 ============
+func _on_driving_action(action: String):
+    """处理驾驶控制操作"""
+    print("🚗 驾驶操作：", action)
+    
+    var qte_handled = qte_system.handle_driving_action(action) if qte_system != null else false
+    
+    if not qte_handled:
+        apply_driving_action_effects(action)
+        check_npc_preference(action)
+    
+    update_all_displays()
+
+func apply_driving_action_effects(action: String):
+    """应用驾驶操作的属性效果"""
+    match action:
+        "music_off":
+            GameManager.update_player_attribute("self_connection", 0.3)
+        "music_soothing":
+            GameManager.update_player_attribute("pressure", -0.5)
+            GameManager.update_player_attribute("empathy", 0.2)
+        "music_energetic":
+            GameManager.update_player_attribute("openness", 0.3)
+            GameManager.update_player_attribute("pressure", 0.2)
+        "open_window":
+            GameManager.update_player_attribute("openness", 0.3)
+        "close_window":
+            GameManager.update_player_attribute("self_connection", 0.2)
+        "smooth_driving":
+            GameManager.update_player_attribute("pressure", -0.2)
+            GameManager.update_player_attribute("empathy", 0.1)
+        "fast_driving":
+            GameManager.update_player_attribute("pressure", 0.3)
+            GameManager.update_player_attribute("openness", 0.2)
+
+func check_npc_preference(action: String):
+    """检查NPC偏好并添加反应"""
+    if dialogue_state != DialogueState.IN_DIALOGUE:
+        return
+    
+    var preferences = {}
+    var reaction = ""
+    
+    # 从NPCEvent获取偏好
+    if current_npc_event != null:
+        preferences = current_npc_event.driving_preferences
+    elif fallback_npc_index >= 0:
+        # fallback模式下可以添加一些基本偏好
+        preferences = {
+            "smooth_driving": 0.8,
+            "music_soothing": 0.7,
+            "close_window": 0.6
+        }
+    
+    if action in preferences:
+        var preference_value = preferences[action]
+        
+        if preference_value >= 0.8:
+            reaction = "这样挺好的，我喜欢"
+        elif preference_value >= 0.5:
+            reaction = "嗯，还不错"
+        elif preference_value <= 0.3:
+            reaction = "这样我有点不太舒服..."
+    
+    if reaction != "":
+        add_npc_reaction_to_dialogue(reaction)
+
+func add_npc_reaction_to_dialogue(reaction: String):
+    """在对话中添加NPC反应"""
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    if dialogue_label != null:
+        dialogue_label.text += "\n\n「" + reaction + "」"
+        print("💬 NPC反应：", reaction)
+
+# ============ QTE事件处理 ============
+func _on_qte_event_started(event):
+    """QTE事件开始"""
+    print("🚗 QTE事件开始：", event.ai_prompt)
+    var is_urgent = event.countdown_time < 3.0
+    ui_manager.show_ai_assistant(event.ai_prompt, is_urgent)
+
+func _on_qte_event_completed(event, success: bool):
+    """QTE事件完成"""
+    print("🏁 QTE事件完成：", "成功" if success else "失败")
+    await get_tree().create_timer(2.0).timeout
+    ui_manager.hide_ai_assistant()
+    update_all_displays()
+    
+    var reaction = event.npc_positive_reaction if success else event.npc_negative_reaction
+    if reaction != "":
+        add_npc_reaction_to_dialogue(reaction)
+
+func _on_ai_assistant_speaks(message: String, urgent: bool):
+    """AI助手说话"""
+    ui_manager.show_ai_assistant(message, urgent)
 
 # ============ 商店系统处理 ============
 func handle_item_purchase(item_id: String):
@@ -367,8 +784,6 @@ func show_purchase_success(item_name: String, story_text: String, remaining_mone
     print("🎉 购买成功：", item_name)
     print("📖 ", story_text)
     print("💰 剩余金额：", remaining_money, "元")
-    
-    # 可以在这里添加更好的UI反馈
 
 func update_shop_display():
     """更新商店显示"""
@@ -531,343 +946,6 @@ func handle_special_item_effects(item_id: String, item_data: Dictionary):
             print("🌗 真正的影子整合开始")
             GameManager.player_stats.purchased_items.append("true_shadow_work")
 
-# ============ 驾驶系统处理 ============
-func _on_driving_action(action: String):
-    """处理驾驶控制操作"""
-    print("🚗 驾驶操作：", action)
-    
-    var qte_handled = qte_system.handle_driving_action(action) if qte_system != null else false
-    
-    if not qte_handled:
-        apply_driving_action_effects(action)
-        check_npc_preference(action)
-    
-    update_all_displays()
-
-func apply_driving_action_effects(action: String):
-    """应用驾驶操作的属性效果"""
-    match action:
-        "music_off":
-            GameManager.update_player_attribute("self_connection", 0.3)
-        "music_soothing":
-            GameManager.update_player_attribute("pressure", -0.5)
-            GameManager.update_player_attribute("empathy", 0.2)
-        "music_energetic":
-            GameManager.update_player_attribute("openness", 0.3)
-            GameManager.update_player_attribute("pressure", 0.2)
-        "open_window":
-            GameManager.update_player_attribute("openness", 0.3)
-        "close_window":
-            GameManager.update_player_attribute("self_connection", 0.2)
-        "smooth_driving":
-            GameManager.update_player_attribute("pressure", -0.2)
-            GameManager.update_player_attribute("empathy", 0.1)
-        "fast_driving":
-            GameManager.update_player_attribute("pressure", 0.3)
-            GameManager.update_player_attribute("openness", 0.2)
-
-func check_npc_preference(action: String):
-    """检查NPC偏好并添加反应"""
-    if current_npc_index >= enhanced_test_npcs.size() or dialogue_state != DialogueState.IN_DIALOGUE:
-        return
-    
-    var npc = enhanced_test_npcs[current_npc_index]
-    var preferences = npc.get("driving_preferences", {})
-    
-    if action in preferences:
-        var preference_value = preferences[action]
-        var reaction = ""
-        
-        if preference_value >= 0.8:
-            reaction = "这样挺好的，我喜欢"
-        elif preference_value >= 0.5:
-            reaction = "嗯，还不错"
-        elif preference_value <= 0.3:
-            reaction = "这样我有点不太舒服..."
-        
-        if reaction != "":
-            add_npc_reaction_to_dialogue(reaction)
-
-func add_npc_reaction_to_dialogue(reaction: String):
-    """在对话中添加NPC反应"""
-    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
-    if dialogue_label != null:
-        dialogue_label.text += "\n\n「" + reaction + "」"
-        print("💬 NPC反应：", reaction)
-
-# ============ QTE事件处理 ============
-func _on_qte_event_started(event):
-    """QTE事件开始"""
-    print("🚗 QTE事件开始：", event.ai_prompt)
-    var is_urgent = event.countdown_time < 3.0
-    ui_manager.show_ai_assistant(event.ai_prompt, is_urgent)
-
-func _on_qte_event_completed(event, success: bool):
-    """QTE事件完成"""
-    print("🏁 QTE事件完成：", "成功" if success else "失败")
-    await get_tree().create_timer(2.0).timeout
-    ui_manager.hide_ai_assistant()
-    update_all_displays()
-    
-    var reaction = event.npc_positive_reaction if success else event.npc_negative_reaction
-    if reaction != "":
-        add_npc_reaction_to_dialogue(reaction)
-
-func _on_ai_assistant_speaks(message: String, urgent: bool):
-    """AI助手说话"""
-    ui_manager.show_ai_assistant(message, urgent)
-
-# ============ 对话系统处理 ============
-func _on_interrupt_pressed(interrupt_type: String):
-    """处理插话按钮"""
-    print("💬 插话类型：", interrupt_type)
-    
-    if dialogue_state != DialogueState.IN_DIALOGUE:
-        print("❌ 对话状态不正确，忽略插话")
-        return
-    
-    var success_rate = GameManager.calculate_interrupt_success_rate(interrupt_type)
-    var success = randf() < success_rate
-    
-    print("插话成功率：%.1f%%, 结果：%s" % [success_rate * 100, "成功" if success else "失败"])
-    
-    apply_interrupt_result(interrupt_type, success)
-    
-    var buttons = get_interrupt_buttons()
-    if buttons.button1: buttons.button1.visible = false
-    
-    var continue_button = get_continue_button()
-    if continue_button:
-        continue_button.visible = true
-        continue_button.text = "继续对话"
-        continue_button.disabled = false
-    
-    update_all_displays()
-
-func apply_interrupt_result(interrupt_type: String, success: bool):
-    """应用插话结果"""
-    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
-    
-    if success:
-        successful_interrupts += 1
-        
-        # 根据插话类型给予不同的属性奖励
-        match interrupt_type:
-            "empathy":
-                GameManager.update_player_attribute("empathy", 1.0)
-                GameManager.update_player_attribute("pressure", -0.3)
-            "self_reflection":
-                GameManager.update_player_attribute("self_connection", 1.2)
-                GameManager.update_player_attribute("empathy", 0.4)
-            "openness":
-                GameManager.update_player_attribute("openness", 1.0)
-                GameManager.update_player_attribute("self_connection", 0.3)
-            "basic":
-                GameManager.update_player_attribute("empathy", 0.3)
-                GameManager.update_player_attribute("self_connection", 0.2)
-                GameManager.update_player_attribute("pressure", -0.1)
-        
-        # 显示NPC的深度回应
-        if dialogue_label != null and current_npc_index < enhanced_test_npcs.size():
-            var npc = enhanced_test_npcs[current_npc_index]
-            var responses = npc.get("interrupt_responses", {})
-            if interrupt_type in responses:
-                dialogue_label.text += "\n\n" + responses[interrupt_type]
-            
-        print("✅ 插话成功！获得属性奖励")
-    else:
-        failed_interrupts += 1
-        
-        # 失败惩罚
-        GameManager.update_player_attribute("empathy", -0.2)
-        GameManager.update_player_attribute("pressure", 0.4)
-        
-        # 添加失败反应
-        if dialogue_label != null:
-            dialogue_label.text += "\n\n对方似乎没有回应..."
-            
-        print("❌ 插话失败")
-
-func _on_continue_dialogue_pressed():
-    """继续对话"""
-    print("▶️ 继续对话，当前状态：", DialogueState.keys()[dialogue_state])
-    
-    match dialogue_state:
-        DialogueState.IN_DIALOGUE:
-            if current_dialogue_index < enhanced_test_npcs[current_npc_index].dialogues.size() - 1:
-                current_dialogue_index += 1
-                show_next_dialogue()
-            else:
-                dialogue_state = DialogueState.DIALOGUE_FINISHED
-                show_dialogue_finished()
-        DialogueState.DIALOGUE_FINISHED:
-            complete_current_trip()
-
-# ============ 驾驶会话管理 ============
-func start_driving_session():
-    """开始驾驶会话"""
-    print("=== 开始驾驶会话 ===")
-    
-    dialogue_state = DialogueState.WAITING_FOR_PASSENGER
-    successful_interrupts = 0
-    failed_interrupts = 0
-    
-    if qte_system != null:
-        qte_system.reset_trip_events()
-    
-    show_waiting_for_passenger()
-    
-    # 等待2秒模拟乘客上车
-    await get_tree().create_timer(2.0).timeout
-    start_npc_dialogue()
-
-func show_waiting_for_passenger():
-    """显示等待乘客状态"""
-    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
-    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
-    var buttons = get_interrupt_buttons()
-    var continue_button = get_continue_button()
-    
-    if npc_name_label: npc_name_label.text = "等待乘客中..."
-    if dialogue_label: dialogue_label.text = "正在等待乘客上车..."
-    
-    # 隐藏所有按钮
-    if buttons.button1: buttons.button1.visible = false
-    if buttons.button2: buttons.button2.visible = false
-    if continue_button: continue_button.visible = false
-
-func start_npc_dialogue():
-    """开始NPC对话"""
-    print("=== 开始NPC对话 ===")
-    
-    dialogue_state = DialogueState.IN_DIALOGUE
-    
-    # 根据当前区域选择合适的NPC
-    current_npc_index = select_npc_for_area(current_area)
-    current_dialogue_index = 0
-    
-    print("选择NPC：", enhanced_test_npcs[current_npc_index].name, " (区域：", current_area, ")")
-    
-    await get_tree().process_frame
-    show_next_dialogue()
-
-func select_npc_for_area(area: String) -> int:
-    """根据区域选择合适的NPC"""
-    var suitable_npcs = []
-    for i in range(enhanced_test_npcs.size()):
-        var npc = enhanced_test_npcs[i]
-        if npc.get("area", "") == area or npc.get("area", "") == "":
-            suitable_npcs.append(i)
-    
-    if suitable_npcs.size() > 0:
-        return suitable_npcs[randi() % suitable_npcs.size()]
-    else:
-        return randi() % enhanced_test_npcs.size()
-
-func show_next_dialogue():
-    """显示下一段对话"""
-    if dialogue_state != DialogueState.IN_DIALOGUE:
-        return
-    
-    var npc = enhanced_test_npcs[current_npc_index]
-    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
-    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
-    var buttons = get_interrupt_buttons()
-    var continue_button = get_continue_button()
-    
-    if npc_name_label:
-        npc_name_label.text = "%s (第%d位乘客)" % [npc.name, GameManager.passengers_today + 1]
-    
-    if current_dialogue_index < npc.dialogues.size():
-        # 显示当前对话
-        if dialogue_label:
-            dialogue_label.text = npc.dialogues[current_dialogue_index]
-            print("✅ 显示对话[%d]: %s" % [current_dialogue_index, npc.dialogues[current_dialogue_index]])
-        
-        # 显示插话选项
-        setup_interrupt_options(npc, buttons)
-        if continue_button: continue_button.visible = false
-        
-        # 每段对话都尝试触发QTE事件
-        maybe_trigger_qte_event()
-    else:
-        print("❌ 对话索引超出范围")
-
-func setup_interrupt_options(npc: Dictionary, buttons: Dictionary):
-    """设置插话选项"""
-    if buttons.button1:
-        buttons.button1.visible = true
-        buttons.button1.text = "嗯嗯"
-        buttons.button1.disabled = false
-    
-    # 根据玩家属性和NPC类型动态设置第二个插话选项
-    if buttons.button2:
-        var player_stats = GameManager.player_stats
-        if player_stats != null and player_stats.empathy >= 60:
-            buttons.button2.visible = true
-            buttons.button2.text = "我理解你的感受"
-            buttons.button2.disabled = false
-        else:
-            buttons.button2.visible = false
-
-func maybe_trigger_qte_event():
-    """可能触发QTE事件"""
-    if qte_system != null and qte_system.should_trigger_event():
-        print("✅ 触发QTE事件")
-        qte_system.trigger_random_event()
-    else:
-        print("❌ 未触发QTE事件")
-
-func show_dialogue_finished():
-    """显示对话结束"""
-    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
-    var buttons = get_interrupt_buttons()
-    var continue_button = get_continue_button()
-    
-    if dialogue_label:
-        dialogue_label.text = "谢谢你的陪伴，这次旅程很愉快。"
-    
-    if buttons.button1: buttons.button1.visible = false
-    if buttons.button2: buttons.button2.visible = false
-    if continue_button:
-        continue_button.text = "结束行程"
-        continue_button.visible = true
-        continue_button.disabled = false
-
-func complete_current_trip():
-    """完成当前行程"""
-    print("=== 完成当前行程 ===")
-    
-    dialogue_state = DialogueState.TRIP_COMPLETED
-    
-    var npc = enhanced_test_npcs[current_npc_index]
-    var economic_impact = npc.get("economic_impact", {"base_fee": 50, "tip_range": [0, 10]})
-    var base_income = economic_impact.base_fee
-    var tip_range = economic_impact.get("tip_range", [0, 5])
-    
-    # 根据插话成功次数计算奖励
-    var mood_bonus = 0
-    if successful_interrupts > 0:
-        mood_bonus = randi_range(tip_range[0], tip_range[1])
-    
-    var total_income = base_income + mood_bonus
-    var mood_score = 50.0 + (successful_interrupts * 15) - (failed_interrupts * 8)
-    
-    print("基础费用：%d元" % base_income)
-    if mood_bonus > 0:
-        print("满意度奖励：%d元" % mood_bonus)
-    print("总收入：%d元" % total_income)
-    print("NPC心情：%.1f" % mood_score)
-    
-    GameManager.complete_passenger_trip(total_income, mood_score)
-    
-    # 如果还需要更多乘客
-    if GameManager.passengers_today < GameManager.max_passengers_per_day:
-        print("需要接更多乘客...")
-        start_driving_session()
-    else:
-        print("今日乘客已满，前往家中")
-
 # ============ 显示更新方法 ============
 func update_all_displays():
     """更新所有显示"""
@@ -1010,9 +1088,11 @@ func restart_game():
     GameManager.initialize_player_stats()
     GameManager.current_day = 0
     
-    # 重置商店系统
+    # 重置各个系统
     if shop_system != null:
         shop_system.reset_shop()
+    if NPCEventManager != null:
+        NPCEventManager.reset_progress()
     
     GameManager.change_state(GameManager.GameState.MENU)
 
@@ -1021,34 +1101,44 @@ func _on_day_completed():
     last_visited_area = current_area
 
 # ============ 调试方法 ============
-func debug_shop_system():
-    """调试商店系统状态"""
-    print("=== 商店系统调试信息 ===")
+func debug_npc_system():
+    """调试NPC系统状态"""
+    print("=== NPC系统调试信息 ===")
     
-    if shop_system == null:
-        print("❌ shop_system为null")
+    if NPCEventManager == null:
+        print("❌ NPCEventManager为null")
         return
     
-    if GameManager.player_stats == null:
-        print("❌ player_stats为null")
-        return
+    var debug_info = NPCEventManager.get_debug_info()
+    print("总事件数量：", debug_info.total_events)
+    print("各区域事件数量：", debug_info.events_by_area)
+    print("各NPC事件数量：", debug_info.events_by_npc)
+    print("已遇见事件数量：", debug_info.encountered_events)
+    print("NPC遇见次数：", debug_info.npc_encounter_counts)
     
-    var current_day = GameManager.current_day
-    var player_money = GameManager.player_stats.money
-    var available_items = shop_system.get_available_items(current_day, GameManager.player_stats)
+    if GameManager.player_stats != null:
+        print("\n当前玩家状态：")
+        print("天数：", GameManager.current_day)
+        print("区域：", current_area)
+        print("共情：", GameManager.player_stats.empathy)
+        print("自省：", GameManager.player_stats.self_connection)
+        print("开放：", GameManager.player_stats.openness)
+        print("压力：", GameManager.player_stats.pressure)
     
-    print("当前天数：", current_day)
-    print("玩家金额：", player_money, "元")
-    print("可用物品数量：", available_items.size())
-    
-    print("\n可用物品列表：")
-    for i in range(available_items.size()):
-        var item = available_items[i]
-        var affordable = "💰" if player_money >= item.price else "❌"
-        print("  [%d] %s %s - %d元 (%s)" % [i, affordable, item.name, item.price, item.category])
-    
-    print("\n已购买物品：", GameManager.player_stats.purchased_items)
     print("==========================")
+
+func debug_player_attributes():
+    """调试玩家属性"""
+    if GameManager.player_stats == null:
+        print("❌ 玩家数据为null")
+        return
+    
+    print("=== 玩家属性调试 ===")
+    print("共情：%.1f (解锁深度插话：%s)" % [GameManager.player_stats.empathy, "是" if GameManager.player_stats.empathy >= 60 else "否"])
+    print("自省：%.1f (解锁深度插话：%s)" % [GameManager.player_stats.self_connection, "是" if GameManager.player_stats.self_connection >= 60 else "否"])
+    print("开放：%.1f (解锁深度插话：%s)" % [GameManager.player_stats.openness, "是" if GameManager.player_stats.openness >= 60 else "否"])
+    print("压力：%.1f (影响成功率：%.1f%%)" % [GameManager.player_stats.pressure, GameManager.player_stats.pressure * 0.45])
+    print("===================")
 
 func test_shop_purchase():
     """测试商店购买功能"""
@@ -1073,8 +1163,9 @@ func print_debug_info():
     """打印调试信息"""
     print("\n=== 调试信息 ===")
     print("调试快捷键：")
-    print("  F1 - 显示商店调试信息")
+    print("  F1 - 显示NPC系统调试信息")
     print("  F2 - 添加100元金钱")
     print("  F3 - 前进一天")
     print("  F4 - 测试购买功能")
+    print("  F5 - 调试玩家属性")
     print("===================")

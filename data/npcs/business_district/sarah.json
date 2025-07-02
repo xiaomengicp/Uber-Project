@@ -1,0 +1,146 @@
+{
+  "npc_info": {
+    "npc_id": "sarah",
+    "npc_name": "Sarah",
+    "archetype": "伪装白领",
+    "primary_area": "business_district",
+    "background": "影子学院3年前的优秀毕业生，被作为宣传样本，实际内心极度空虚",
+    "story_role": "代表被系统成功规训但内心空虚的群体"
+  },
+  "events": [
+    {
+      "id": "sarah_business_1",
+      "encounter_type": "first",
+      "area": "business_district",
+      "unlock_day": 1,
+      "trigger_conditions": {
+        "time_range": ["22:00", "02:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "又是一个加班到深夜的日子...师傅，去滨江国际，谢谢。",
+        "我刚刚完成了一份价值八百万的并购报告，老板很满意，说我是公司最有潜力的分析师。",
+        "可是你知道吗？我完全感受不到任何满足感。",
+        "三年前我从影子学院毕业，他们说我是'优秀整合案例'，说我成功地将影子部分融入了功能性人格。",
+        "我得到了想要的一切——高薪工作、别人的羡慕、社会认可。",
+        "但为什么我总觉得自己像个机器人？每天重复着同样的动作，说着同样的话，连笑容都是程序化的。",
+        "有时候我会想，那个在学院之前的我，那个会为了一首诗哭泣、会为了朋友的痛苦彻夜难眠的我，还在吗？"
+      ],
+      "interrupt_responses": {
+        "empathy": "谢谢你理解...很少有人愿意听我说这些。",
+        "self_reflection": "你也有过这种感受吗？",
+        "openness": "也许我真的需要改变什么。",
+        "basic": "嗯...也许这就是成年人的生活吧。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "music_soothing": 0.8,
+          "close_window": 0.7,
+          "music_off": 0.6
+        },
+        "economic": {
+          "base_fee": 75,
+          "tip_range": [10, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "self_connection": 0.5},
+          "completion_bonus": {"openness": 0.3}
+        }
+      }
+    },
+    {
+      "id": "sarah_business_2", 
+      "encounter_type": "second",
+      "area": "business_district",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["23:00", "01:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 55},
+        "previous_encounters": ["sarah_business_1"]
+      },
+      "dialogue": [
+        "是你啊，上次的司机。我一直在想你说的话...关于找回自己的事情。",
+        "这几天我做了一些...实验。我试着在没人的时候哭泣，想看看眼泪是什么感觉。",
+        "结果很奇怪——我能让眼泪流出来，但内心依然空洞。就像在演戏，连对自己都在演戏。",
+        "不过我发现了一件有趣的事情。昨天我路过一家旧书店，看到一本诗集，居然产生了想买下它的冲动。",
+        "虽然我最终没有进去，但那一瞬间的冲动...感觉很真实。",
+        "我想知道，这是不是就是他们说的'影子'在苏醒？那些被压抑的部分在试图重新浮出水面？"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的理解给了我很大的勇气。",
+        "self_reflection": "是的，我们都在寻找自己的路。",
+        "openness": "你说得对，改变总是伴随着风险。",
+        "basic": "嗯，至少我开始行动了。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.8,
+          "music_soothing": 0.9,
+          "open_window": 0.6,
+          "music_energetic": 0.4
+        },
+        "economic": {
+          "base_fee": 80,
+          "tip_range": [15, 30]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.0, "openness": 0.5},
+          "completion_bonus": {"openness": 0.8, "pressure": -1.0}
+        }
+      }
+    },
+    {
+      "id": "sarah_business_3",
+      "encounter_type": "third", 
+      "area": "business_district",
+      "unlock_day": 5,
+      "trigger_conditions": {
+        "time_range": ["21:00", "00:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 65, "self_connection": 60},
+        "previous_encounters": ["sarah_business_1", "sarah_business_2"]
+      },
+      "dialogue": [
+        "司机！真的很高兴又遇到你。我有好消息要告诉你——我找到了那个治愈师。",
+        "她叫林医生，在城市边缘开了一个小诊所。你知道吗，第一次见面她就告诉我，学院的整合方法是错误的。",
+        "她说影子不是需要被消除的东西，而是需要被理解和拥抱的自己的一部分。",
+        "我们开始做一种叫做'影子对话'的练习，我试着和那个被压抑的自己对话。",
+        "开始很困难，我甚至不知道她长什么样子，但慢慢地...慢慢地我开始听到她的声音。",
+        "她很愤怒，愤怒于被忽视了这么久；她也很害怕，害怕重新出现会毁掉一切。",
+        "但你知道最神奇的是什么吗？当我真正开始倾听她的时候，我第一次感受到了内心的平静。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你一直都能看到我内心真正的需要。",
+        "self_reflection": "是的，我们都在这条路上。",
+        "openness": "改变真的是可能的，虽然很难，但绝对值得。",
+        "basic": "是啊，生活开始有了不同的颜色。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.7,
+          "music_soothing": 0.9,
+          "music_energetic": 0.7,
+          "open_window": 0.8,
+          "music_off": 0.4
+        },
+        "economic": {
+          "base_fee": 60,
+          "tip_range": [20, 40]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.0, "self_connection": 2.0, "openness": 1.5, "pressure": -1.0},
+          "completion_bonus": {"empathy": 1.0, "self_connection": 1.5, "pressure": -2.0}
+        },
+        "special_rewards": {
+          "story_progress": "sarah_complete",
+          "unlock_hint": "林医生咨询线索",
+          "inspiration": "真正的影子整合可能性"
+        }
+      }
+    }
+  ]
+}

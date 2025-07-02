@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scripts/autoload/GameManager.gd"
 FontManager="*res://scripts/autoload/FontManager.gd"
+NPCEventManager="*res://scripts/autoload/NPCEventManager.gd"
 
 [rendering]
 
