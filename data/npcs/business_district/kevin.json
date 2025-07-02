@@ -1,0 +1,107 @@
+{
+  "npc_info": {
+    "npc_id": "kevin",
+    "npc_name": "Kevin",
+    "archetype": "适应者CEO",
+    "primary_area": "business_district",
+    "background": "35岁科技公司CEO，情绪评分系统中的高分者，但内心极度空虚。可能隐藏着真实身份认同的困扰",
+    "story_role": "代表成功适应系统但付出巨大代价的群体，展现表面完美背后的深层孤独"
+  },
+  "events": [
+    {
+      "id": "kevin_business_1",
+      "encounter_type": "first",
+      "area": "business_district",
+      "unlock_day": 1,
+      "trigger_conditions": {
+        "time_range": ["23:30", "02:30"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "师傅，去滨海豪庭，谢谢。刚结束一个跨国并购的视频会议，时差让我已经分不清现在是白天还是黑夜了。",
+        "我是TechNova的CEO，今年35岁，公司估值50亿，员工3000人。《商业周刊》说我是'新一代商业领袖的典范'，情绪评分系统给我打了98分。",
+        "按理说我应该很满足，我拥有了所有人梦想的东西：财富、权力、社会地位、完美的情绪控制能力。我的生活看起来就像是成功学教科书里的案例。",
+        "每天早上5点起床，冥想、健身、看财经新闻。7点到公司，处理邮件，开会，做决策，见投资人。晚上回到空荡荡的豪宅，吃精心搭配的健康餐，然后继续工作到深夜。",
+        "我的情绪管理非常出色，从不在公开场合失态，即使面对最大的压力也能保持冷静和理性。董事会、媒体、员工都很信任我，认为我是一个'稳定可靠的领导者'。",
+        "但你知道吗？有时候我觉得自己就像一台高级的AI，执行着复杂的商业逻辑，但内心深处...什么都没有。我拥有了一切，却失去了自己。",
+        "昨晚我站在办公室的落地窗前，看着城市的灯火，突然想起一个问题：如果明天我消失了，除了股价会波动，还有谁会真正想念'我'这个人？",
+        "我开始怀疑，这种被所有人称赞的'完美生活'，真的是我想要的吗？还是只是系统为我设计的一个精美陷阱？"
+      ],
+      "interrupt_responses": {
+        "empathy": "谢谢你的理解，很少有人能看到成功背后的孤独。",
+        "self_reflection": "是的，有时候成功本身就是最大的迷惑。",
+        "openness": "也许我需要重新思考什么是真正的成功。",
+        "basic": "嗯...也许这就是成功的代价吧。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "fast_driving": 0.7,
+          "music_off": 0.8,
+          "music_classical": 0.6,
+          "close_window": 0.9
+        },
+        "economic": {
+          "base_fee": 80,
+          "tip_range": [20, 40]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "self_connection": 0.8},
+          "completion_bonus": {"openness": 0.5}
+        }
+      }
+    },
+    {
+      "id": "kevin_business_2", 
+      "encounter_type": "second",
+      "area": "business_district",
+      "unlock_day": 4,
+      "trigger_conditions": {
+        "time_range": ["00:00", "03:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 60},
+        "previous_encounters": ["kevin_business_1"]
+      },
+      "dialogue": [
+        "又是你，那个深夜的司机。我一直在想我们上次的对话...关于成功和孤独的事情。这几天发生了一些事，让我开始重新审视自己的生活。",
+        "昨天公司的一个年轻程序员因为过劳住院了，只有22岁。我去医院看他，他躺在病床上对我说：'Kevin总，我想成为像您一样成功的人。'那一刻我心里很复杂。",
+        "我看着他苍白的脸，想起了十年前的自己。那时候我也是一个充满理想的年轻人，想要改变世界，想要通过技术让生活变得更美好。什么时候开始，我变成了只关心数字的机器？",
+        "回到公司后，我偷偷查看了员工的内部反馈。很多人说我'专业但冰冷'，'有能力但缺乏人情味'。有人甚至说：'和Kevin开会就像和一台高级计算机对话。'",
+        "这让我想起一个被我埋藏很久的秘密。大学时候，我曾经想过做一名音乐制作人。我会在深夜里写歌，会为了一段旋律激动到失眠。但后来...后来我选择了更'实际'的道路。",
+        "更复杂的是，我一直在隐藏另一个自己。在这个讲究'标准形象'的商业世界里，我从来不敢表达真实的情感偏好，不敢展现那些被认为'不够稳重'的一面。",
+        "有时候我会想，如果我当初坚持做音乐，如果我勇敢地做真实的自己，现在会是什么样？也许不会这么成功，但至少...至少我还能感受到创作的快乐。",
+        "最近我开始偷偷重新听音乐，发现自己对旋律的敏感度还在。那种久违的感动让我意识到，原来我的心还没有完全死掉。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解这种分裂的感觉，真的让我很感激。",
+        "self_reflection": "也许我们都在扮演别人期望的角色，而忘了自己是谁。",
+        "openness": "改变从来不晚，即使要付出一些代价。",
+        "basic": "是啊，人生就是一系列的选择和妥协。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.8,
+          "music_off": 0.4,
+          "music_classical": 0.8,
+          "music_energetic": 0.6,
+          "open_window": 0.5
+        },
+        "economic": {
+          "base_fee": 90,
+          "tip_range": [25, 50]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.8, "openness": 1.0, "pressure": -0.8},
+          "completion_bonus": {"self_connection": 1.2, "pressure": -1.5}
+        },
+        "special_rewards": {
+          "story_progress": "kevin_awakening",
+          "unlock_hint": "音乐治疗线索",
+          "identity_exploration": "隐藏身份认同觉醒"
+        }
+      }
+    }
+  ]
+}

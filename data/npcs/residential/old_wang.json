@@ -1,55 +1,156 @@
 {
-    "events": [
-        {
-            "area": "residential",
-            "dialogue": [
-                "年轻人，我经历过'模糊时期'前的日子...那时候人们会用诗歌表达复杂的情感。",
-                "有些美好的东西，只存在于记忆中了。但我想把这些留给还记得如何感受的人。",
-                "这个城市变化太快，但人心中对真实的渴望从未改变。"
-            ],
-            "encounter_type": "first",
-            "game_effects": {
-                "attributes": {
-                    "successful_interaction": {
-                        "openness": 1.0,
-                        "self_connection": 0.5
-                    }
-                },
-                "driving_preferences": {
-                    "music_off": 0.8,
-                    "smooth_driving": 1.0
-                },
-                "economic": {
-                    "base_fee": 45,
-                    "tip_range": [
-                        5,
-                        15
-                    ]
-                }
-            },
-            "id": "wang_residential_1",
-            "interrupt_responses": {
-                "basic": "是啊，时代不同了",
-                "empathy": "你有一颗善良的心，这在现在很珍贵",
-                "openness": "愿意学习古老智慧的年轻人不多了"
-            },
-            "trigger_conditions": {
-                "time_range": [
-                    "20:00",
-                    "23:00"
-                ],
-                "weather": [
-                    "any"
-                ]
-            },
-            "unlock_day": 1
+  "npc_info": {
+    "npc_id": "old_wang",
+    "npc_name": "老王",
+    "archetype": "记忆守护者",
+    "primary_area": "residential",
+    "background": "经历过'模糊时期'前的退休教师，暗中保存古老的情感表达方式和文化记忆",
+    "story_role": "文化传承者，代表被系统遗忘但依然珍贵的人文价值"
+  },
+  "events": [
+    {
+      "id": "wang_residential_1",
+      "encounter_type": "first",
+      "area": "residential",
+      "unlock_day": 1,
+      "trigger_conditions": {
+        "time_range": ["20:00", "23:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "年轻人，麻烦去文汇路128号，谢谢。刚从老友家里出来，我们几个老头子又聊了一晚上过去的事情。",
+        "我今年72了，经历过'模糊时期'前的日子。那时候人们会用诗歌表达复杂的情感，会为了一句词、一幅画争论到深夜，会因为看到美丽的事物而潸然泪下。",
+        "现在的年轻人都很聪明，工作效率很高，情绪也很稳定。但我总觉得缺了点什么...那种为了美而感动的能力，那种对生活细节的敏感，好像都消失了。",
+        "我是退休的语文老师，以前教过很多学生写诗。那时候孩子们的作文里总是充满奇思妙想，有的写'月亮是夜空的眼睛'，有的写'雨滴是云朵的眼泪'。",
+        "现在的作文都很规范，语法正确，逻辑清晰，但读起来就像是机器写的。有些美好的东西，只存在于记忆中了。我想把这些东西留给还记得如何感受的人。",
+        "你们这些夜班工作的人，见过这个城市最真实的一面。在深夜里，人们卸下白天的面具，也许还能找到一些真实的东西。",
+        "我在家里偷偷保存着一些旧书，里面有古代的诗词，有'模糊时期'前的散文。虽然现在不让公开传播，但我觉得这些东西太珍贵了，不能就这样消失。",
+        "这个城市变化太快，高楼越建越多，但人心中对真实、对美、对诗意的渴望从未改变。也许有一天，这些被遗忘的美好会重新被人们发现。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你有一颗善良的心，这在现在很珍贵。",
+        "self_reflection": "是啊，我们都在寻找生活的真正意义。",
+        "openness": "愿意学习古老智慧的年轻人不多了。",
+        "basic": "是啊，时代不同了，但人心没有变。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_off": 0.8,
+          "music_classical": 0.9,
+          "close_window": 0.6,
+          "fast_driving": 0.2
+        },
+        "economic": {
+          "base_fee": 45,
+          "tip_range": [8, 20]
+        },
+        "attributes": {
+          "successful_interaction": {"openness": 1.2, "self_connection": 0.8, "empathy": 0.5},
+          "completion_bonus": {"pressure": -0.5}
         }
-    ],
-    "npc_info": {
-        "archetype": "记忆守护者",
-        "background": "经历过'模糊时期'的退休教师，暗中保存古老的情感表达方式",
-        "npc_id": "old_wang",
-        "npc_name": "老王",
-        "primary_area": "residential"
+      }
+    },
+    {
+      "id": "wang_residential_2",
+      "encounter_type": "second",
+      "area": "residential",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["19:30", "22:30"],
+        "weather": ["any"],
+        "required_attributes": {"openness": 50},
+        "previous_encounters": ["wang_residential_1"]
+      },
+      "dialogue": [
+        "又是你啊，小司机。今天我去了一趟旧书店，老板是我以前的学生，现在只能偷偷卖一些'安全'的书。我们聊起了你，他说最近也有年轻人开始寻找一些不同的东西。",
+        "我带了一些东西给你看。这是我珍藏的一本手抄诗集，里面有一些'模糊时期'前的作品。'春有百花秋有月，夏有凉风冬有雪。若无闲事挂心头，便是人间好时节。'",
+        "这首诗的作者早已不可考，但这四句话包含了多少生活的智慧。现在的人总是忙忙碌碌，追求效率和成功，却忘记了感受当下的美好。四季更替，本身就是最大的诗意。",
+        "我年轻的时候，和你们现在一样迷茫。那时候我也曾经怀疑，写诗有什么用？教学生感受美有什么意义？直到我看到一个孩子因为理解了一首诗而眼中放光的瞬间。",
+        "那是一首很简单的诗：'天净沙·秋思'。'枯藤老树昏鸦，小桥流水人家，古道西风瘦马。夕阳西下，断肠人在天涯。'孩子说，他突然明白了什么叫做乡愁。",
+        "从那时起我就明白，诗歌不是用来展示技巧的，不是用来考试的，而是用来唤醒心灵的。它帮助我们理解自己的情感，理解这个世界的复杂和美丽。",
+        "现在的教育系统很害怕这种'非理性'的东西，他们觉得情感会干扰判断，诗意会影响效率。但我觉得，没有诗意的人生，就像没有颜色的画，没有旋律的歌。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解这些，说明你的心还没有被完全机械化。",
+        "self_reflection": "每个人心中都有诗意，只是需要有人帮助唤醒它。",
+        "openness": "这些古老的智慧，值得我们用一生去体会。",
+        "basic": "是的，有些东西比效率更重要。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "music_off": 0.9,
+          "music_classical": 1.0,
+          "close_window": 0.7,
+          "open_window": 0.6
+        },
+        "economic": {
+          "base_fee": 50,
+          "tip_range": [15, 30]
+        },
+        "attributes": {
+          "successful_interaction": {"openness": 1.8, "self_connection": 1.2, "empathy": 0.8, "pressure": -0.5},
+          "completion_bonus": {"openness": 1.0, "pressure": -1.0}
+        },
+        "special_rewards": {
+          "cultural_item": "古诗词片段",
+          "memory_unlock": "模糊时期前的文化记忆"
+        }
+      }
+    },
+    {
+      "id": "wang_residential_3",
+      "encounter_type": "third",
+      "area": "residential",
+      "unlock_day": 5,
+      "trigger_conditions": {
+        "time_range": ["20:00", "22:00"],
+        "weather": ["any"],
+        "required_attributes": {"openness": 65, "self_connection": 55},
+        "previous_encounters": ["wang_residential_1", "wang_residential_2"]
+      },
+      "dialogue": [
+        "小司机，又见面了。今天我有个特殊的请求，能不能开慢一点，我想和你分享一些更重要的东西。我觉得你是一个能理解这些价值的人。",
+        "我决定要把我收藏的那些诗集、字画和文章传给合适的人。我已经72岁了，不知道还能保护这些东西多久。与其让它们和我一起消失，不如传给还有感受力的年轻人。",
+        "这些年我一直在思考一个问题：什么是真正的教育？现在的教育教给孩子们知识、技能、效率，但谁来教他们如何感受？如何欣赏？如何在平凡的生活中发现诗意？",
+        "我想起我的老师，一位白发苍苍的老教授。他常说：'教育的目的不是制造标准化的产品，而是唤醒每个人心中独特的光芒。'现在想来，他说的多对啊。",
+        "前几天我路过一个公园，看到一个小女孩在追蝴蝶，她的眼中有那种纯真的快乐。我想，也许希望还在，也许在这个高效运转的世界里，还是有人记得如何为简单的美好而感动。",
+        "我想邀请你到我家里来，看看那些被藏起来的宝贝。有宋词的手抄本，有民国时期的散文集，还有一些我自己写的教学笔记。这些东西，也许对你现在的生活有帮助。",
+        "不是每个人都需要成为诗人，但每个人都应该有感受诗意的能力。不是每个人都要研究古文，但每个人都应该知道我们的文化根脉在哪里。",
+        "你愿意成为这些记忆的守护者吗？不是要你冒险传播，只是希望当有一天这个世界重新需要这些美好时，还有人记得它们曾经存在过。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的善意让我看到了传承的希望。",
+        "self_reflection": "每一代人都有责任把美好的东西传给下一代。",
+        "openness": "你这样的年轻人，就是文化延续的火种。",
+        "basic": "有人愿意倾听，这些记忆就不会消失。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_off": 1.0,
+          "music_classical": 0.9,
+          "close_window": 0.8,
+          "slow_driving": 1.0
+        },
+        "economic": {
+          "base_fee": 40,
+          "tip_range": [25, 50]
+        },
+        "attributes": {
+          "successful_interaction": {"openness": 2.5, "self_connection": 2.0, "empathy": 1.5, "pressure": -1.5},
+          "completion_bonus": {"openness": 1.5, "self_connection": 1.0, "pressure": -2.0}
+        },
+        "special_rewards": {
+          "story_progress": "wang_complete",
+          "cultural_heritage": "古典文化传承者身份",
+          "unlock_hint": "文化保护网络线索",
+          "memory_resonance": "深层文化记忆连接"
+        }
+      }
     }
+  ]
 }
