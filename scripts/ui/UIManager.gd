@@ -241,11 +241,6 @@ func update_home_display(daily_income: int, economic_status: String):
     if stats_label != null:
         stats_label.text = "今日收入: %d元\n当前状态: %s" % [daily_income, economic_status]
 
-func update_shop_display(current_money: int):
-    """更新商店界面显示"""
-    var shop_money_label = shop_ui.get_node("VBoxContainer/MoneyLabel")
-    if shop_money_label != null:
-        shop_money_label.text = "当前余额: %d元" % current_money
 
 # ============ AI助手相关方法 ============
 func show_ai_assistant(message: String, urgent: bool = false):
@@ -454,3 +449,352 @@ func create_ending_ui(ending_type: String, score: float, ending_description: Str
     
     print("✅ 结局界面创建完成")
     return ending_container
+
+func update_shop_display_with_items(current_money: int, available_items: Array):
+    """更新商店界面显示完整商品列表（简化版本，适配现有tscn结构）"""
+    print("🛒 UIManager: 更新商店显示")
+    
+    var shop_money_label = shop_ui.get_node_or_null("VBoxContainer/MoneyLabel")
+    if shop_money_label != null:
+        shop_money_label.text = "当前余额: %d元" % current_money
+        print("✅ 更新金钱显示：%d元" % current_money)
+    else:
+        print("❌ 找不到 MoneyLabel")
+    
+    # 更新商品列表
+    var item_list = shop_ui.get_node_or_null("VBoxContainer/ScrollContainer/ItemList")
+    if item_list != null:
+        # 清除现有的商品按钮
+        for child in item_list.get_children():
+            child.queue_free()
+        
+        print("✅ 清空商品列表，开始添加 %d 个商品" % available_items.size())
+        
+        # 等待一帧确保旧的子节点被清理
+        await get_tree().process_frame
+        
+        # 按分类组织并显示商品
+        var categories = organize_shop_items_by_category(available_items)
+        create_shop_categories_display(item_list, categories, current_money)
+        
+        print("✅ 商店商品显示完成")
+    else:
+        print("❌ 找不到 ItemList 节点")
+
+func organize_shop_items_by_category(items: Array) -> Dictionary:
+    """按分类组织商品"""
+    var categories = {}
+    for item in items:
+        var category = item.get("category", "other")
+        if category not in categories:
+            categories[category] = []
+        categories[category].append(item)
+    
+    print("📦 商品分类结果：")
+    for cat in categories.keys():
+        print("   %s: %d 个商品" % [cat, categories[cat].size()])
+    
+    return categories
+
+func create_shop_categories_display(parent: VBoxContainer, categories: Dictionary, player_money: int):
+    """创建商品分类显示"""
+    var category_order = ["basic", "exploration", "healing", "special"]
+    
+    for category in category_order:
+        if category in categories and categories[category].size() > 0:
+            create_shop_category_section(parent, category, categories[category], player_money)
+
+func create_shop_category_section(parent: VBoxContainer, category: String, items: Array, player_money: int):
+    """创建商品分类区域"""
+    print("📂 创建分类：%s，包含 %d 个商品" % [category, items.size()])
+    
+    # 分类标题
+    var category_label = Label.new()
+    category_label.text = get_shop_category_display_name(category)
+    category_label.add_theme_font_size_override("font_size", 18)
+    category_label.add_theme_color_override("font_color", Color.YELLOW)
+    parent.add_child(category_label)
+    
+    # 分类描述
+    var desc_label = Label.new()
+    desc_label.text = get_shop_category_description(category)
+    desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    desc_label.add_theme_font_size_override("font_size", 11)
+    desc_label.add_theme_color_override("font_color", Color.LIGHT_GRAY)
+    parent.add_child(desc_label)
+    
+    # 商品列表
+    for item in items:
+        create_shop_item_display(parent, item, player_money)
+    
+    # 分隔线
+    var separator = HSeparator.new()
+    separator.custom_minimum_size.y = 10
+    parent.add_child(separator)
+
+func create_shop_item_display(parent: VBoxContainer, item: Dictionary, player_money: int):
+    """创建单个商品显示"""
+    var item_container = HBoxContainer.new()
+    item_container.custom_minimum_size = Vector2(0, 80)
+    
+    # 商品信息容器
+    var info_container = VBoxContainer.new()
+    info_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    
+    # 商品名称和价格行
+    var name_price_container = HBoxContainer.new()
+    
+    var name_label = Label.new()
+    var affordable_icon = "💰" if player_money >= item.price else "❌"
+    name_label.text = "%s %s" % [affordable_icon, item.name]
+    name_label.add_theme_font_size_override("font_size", 16)
+    name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    
+    var price_label = Label.new()
+    price_label.text = "%d元" % item.price
+    price_label.add_theme_font_size_override("font_size", 16)
+    if player_money >= item.price:
+        price_label.add_theme_color_override("font_color", Color.GREEN)
+    else:
+        price_label.add_theme_color_override("font_color", Color.RED)
+    
+    name_price_container.add_child(name_label)
+    name_price_container.add_child(price_label)
+    
+    # 商品描述
+    var desc_label = Label.new()
+    desc_label.text = item.description
+    desc_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    desc_label.add_theme_font_size_override("font_size", 11)
+    desc_label.add_theme_color_override("font_color", Color.LIGHT_GRAY)
+    desc_label.custom_minimum_size.x = 300  # 确保有足够宽度
+    
+    # 效果显示
+    var effects_label = Label.new()
+    effects_label.text = format_shop_item_effects(item.get("effects", {}))
+    effects_label.add_theme_font_size_override("font_size", 10)
+    effects_label.add_theme_color_override("font_color", Color.CYAN)
+    
+    info_container.add_child(name_price_container)
+    info_container.add_child(desc_label)
+    info_container.add_child(effects_label)
+    
+    # 购买按钮
+    var buy_button = Button.new()
+    buy_button.text = "购买"
+    buy_button.custom_minimum_size = Vector2(80, 60)
+    buy_button.disabled = player_money < item.price
+    
+    # 连接购买信号
+    buy_button.pressed.connect(_on_shop_item_purchase_requested.bind(item.id))
+    
+    item_container.add_child(info_container)
+    item_container.add_child(buy_button)
+    parent.add_child(item_container)
+    
+    print("✅ 创建商品显示：%s (%d元)" % [item.name, item.price])
+
+func format_shop_item_effects(effects: Dictionary) -> String:
+    """格式化物品效果显示"""
+    if effects.is_empty():
+        return "无特殊效果"
+    
+    var effect_strings = []
+    for effect in effects.keys():
+        var value = effects[effect]
+        var effect_name = get_shop_effect_display_name(effect)
+        var sign = "+" if value > 0 else ""
+        effect_strings.append("%s%s %s" % [sign, value, effect_name])
+    return "效果: " + ", ".join(effect_strings)
+
+func get_shop_effect_display_name(effect: String) -> String:
+    """获取效果的显示名称"""
+    match effect:
+        "empathy": return "共情"
+        "self_connection": return "自省"
+        "openness": return "开放"
+        "pressure": return "压力"
+        "energy": return "活力"
+        _: return effect
+
+func get_shop_category_display_name(category: String) -> String:
+    """获取分类显示名称"""
+    match category:
+        "basic": return "🏠 生活必需品"
+        "exploration": return "🔍 自我探索"
+        "healing": return "💖 情感治愈"
+        "special": return "⭐ 特殊物品"
+        _: return "📦 其他"
+
+func get_shop_category_description(category: String) -> String:
+    """获取分类描述"""
+    match category:
+        "basic":
+            return "维持基本生活需求的物品"
+        "exploration":
+            return "帮助自我认知和成长的工具"
+        "healing":
+            return "治愈心灵创伤的温暖物品"
+        "special":
+            return "改变人生轨迹的稀有体验"
+        _:
+            return ""
+
+func show_purchase_result(success: bool, item_name: String, story_text: String, remaining_money: int):
+    """显示购买结果（简化版本）"""
+    if success:
+        print("🎉 购买成功：", item_name)
+        print("📖 ", story_text)
+        print("💰 剩余金额：", remaining_money, "元")
+        
+        # 创建简单的成功提示
+        create_purchase_success_popup(item_name, story_text, remaining_money)
+    else:
+        print("❌ 购买失败：", item_name)
+
+func create_purchase_success_popup(item_name: String, story_text: String, remaining_money: int):
+    """创建购买成功弹窗"""
+    var popup_container = CenterContainer.new()
+    popup_container.name = "PurchaseSuccessPopup"
+    popup_container.anchors_preset = Control.PRESET_FULL_RECT
+    
+    # 半透明背景
+    var background = ColorRect.new()
+    background.anchors_preset = Control.PRESET_FULL_RECT
+    background.color = Color(0, 0, 0, 0.7)
+    popup_container.add_child(background)
+    
+    # 弹窗面板
+    var popup_panel = Panel.new()
+    popup_panel.custom_minimum_size = Vector2(500, 300)
+    
+    # 设置面板样式
+    var panel_style = StyleBoxFlat.new()
+    panel_style.bg_color = Color(0.1, 0.1, 0.2, 0.95)
+    panel_style.border_color = Color.GREEN
+    panel_style.border_width_left = 3
+    panel_style.border_width_right = 3
+    panel_style.border_width_top = 3
+    panel_style.border_width_bottom = 3
+    panel_style.corner_radius_top_left = 10
+    panel_style.corner_radius_top_right = 10
+    panel_style.corner_radius_bottom_left = 10
+    panel_style.corner_radius_bottom_right = 10
+    popup_panel.add_theme_stylebox_override("panel", panel_style)
+    
+    var vbox = VBoxContainer.new()
+    vbox.anchors_preset = Control.PRESET_FULL_RECT
+    vbox.offset_left = 20
+    vbox.offset_right = -20
+    vbox.offset_top = 15
+    vbox.offset_bottom = -15
+    
+    # 成功标题
+    var title_label = Label.new()
+    title_label.text = "🎉 购买成功！"
+    title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    title_label.add_theme_font_size_override("font_size", 24)
+    title_label.add_theme_color_override("font_color", Color.GREEN)
+    
+    # 物品名称
+    var item_label = Label.new()
+    item_label.text = "获得：" + item_name
+    item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    item_label.add_theme_font_size_override("font_size", 18)
+    item_label.add_theme_color_override("font_color", Color.WHITE)
+    
+    # 故事文本
+    var story_label = RichTextLabel.new()
+    story_label.text = story_text
+    story_label.fit_content = true
+    story_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    story_label.add_theme_font_size_override("normal_font_size", 14)
+    story_label.add_theme_color_override("default_color", Color.LIGHT_GRAY)
+    
+    # 余额显示
+    var money_label = Label.new()
+    money_label.text = "💰 剩余金额：%d元" % remaining_money
+    money_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    money_label.add_theme_font_size_override("font_size", 16)
+    money_label.add_theme_color_override("font_color", Color.YELLOW)
+    
+    # 关闭按钮
+    var close_button = Button.new()
+    close_button.text = "确定"
+    close_button.custom_minimum_size = Vector2(100, 40)
+    close_button.pressed.connect(_on_purchase_popup_close.bind(popup_container))
+    
+    vbox.add_child(title_label)
+    vbox.add_child(HSeparator.new())
+    vbox.add_child(item_label)
+    vbox.add_child(story_label)
+    vbox.add_child(money_label)
+    vbox.add_child(HSeparator.new())
+    
+    # 按钮居中容器
+    var button_center = CenterContainer.new()
+    button_center.add_child(close_button)
+    vbox.add_child(button_center)
+    
+    popup_panel.add_child(vbox)
+    popup_container.add_child(popup_panel)
+    
+    # 应用字体
+    if has_node("/root/FontManager"):
+        FontManager.apply_theme_to_node(popup_container)
+        FontManager.force_apply_font_to_node(story_label)
+    
+    # 添加到主场景
+    ui_container.get_parent().add_child(popup_container)
+    
+    # 3秒后自动关闭
+    var timer = Timer.new()
+    timer.wait_time = 3.0
+    timer.one_shot = true
+    timer.timeout.connect(_on_purchase_popup_close.bind(popup_container))
+    popup_container.add_child(timer)
+    timer.start()
+    
+    print("✅ 购买成功弹窗已创建")
+
+func _on_purchase_popup_close(popup: Control):
+    """关闭购买成功弹窗"""
+    if popup.is_inside_tree():
+        popup.queue_free()
+        print("✅ 购买弹窗已关闭")
+
+func _on_shop_item_purchase_requested(item_id: String):
+    """处理商店物品购买请求"""
+    print("🛒 UIManager: 请求购买物品：", item_id)
+    button_pressed.emit("purchase_item", {"item_id": item_id})
+
+# 重写现有的 update_shop_display 方法以避免冲突
+func update_shop_display(current_money: int):
+    """更新商店显示（保持向后兼容）"""
+    var shop_money_label = shop_ui.get_node_or_null("VBoxContainer/MoneyLabel")
+    if shop_money_label != null:
+        shop_money_label.text = "当前余额: %d元" % current_money
+
+# 调试方法
+func debug_shop_ui():
+    """调试商店UI状态"""
+    print("=== 商店UI调试信息 ===")
+    print("shop_ui: ", shop_ui)
+    
+    if shop_ui != null:
+        print("shop_ui visible: ", shop_ui.visible)
+        
+        var money_label = shop_ui.get_node_or_null("VBoxContainer/MoneyLabel")
+        print("MoneyLabel: ", money_label)
+        
+        var item_list = shop_ui.get_node_or_null("VBoxContainer/ScrollContainer/ItemList")
+        print("ItemList: ", item_list)
+        if item_list != null:
+            print("ItemList children count: ", item_list.get_child_count())
+    
+    print("====================")
+
+# 在现有的 switch_to_ui 方法中添加商店UI的特殊处理
+# 如果你的 switch_to_ui 方法存在，请在其中添加：
+# if ui_name == "shop":
+#     debug_shop_ui()  # 调试用，正式版本可以移除

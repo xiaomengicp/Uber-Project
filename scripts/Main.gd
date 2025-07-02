@@ -1,9 +1,10 @@
-# Main.gd - 简化版主脚本，只负责协调各个管理器
+# Main.gd - 完整版本，集成商店系统
 extends Control
 
 # 管理器引用
 var ui_manager: UIManager
 var qte_system: DrivingQTESystem
+var shop_system: ShopSystem
 
 # 当前游戏状态
 var current_area: String = ""
@@ -19,37 +20,98 @@ enum DialogueState {
 
 var dialogue_state: DialogueState = DialogueState.WAITING_FOR_PASSENGER
 
-# 简化的测试NPC数据
-var test_npcs = [
+# 增强的测试NPC数据
+var enhanced_test_npcs = [
     {
         "name": "Sarah",
-        "dialogues": ["我今天加班到很晚...", "有时候觉得生活就是个循环", "你觉得这样的生活有意义吗？"],
-        "interrupt_responses": ["是啊，工作压力很大", "生活确实需要思考"],
+        "area": "business_district", 
+        "dialogues": [
+            "又是一个加班到深夜的日子...我得到了想要的一切，为什么还是觉得空虚？",
+            "有时候我觉得自己像个机器人，每天重复着同样的动作和表情",
+            "你说，我还能找回真正的自己吗？那个在影子学院之前的我？"
+        ],
+        "interrupt_responses": {
+            "empathy": "谢谢你理解...很少有人愿意听我说这些",
+            "self_reflection": "你也有过这种感受吗？感觉像是活在别人设计的程序里",
+            "basic": "嗯...也许这就是成年人的生活吧"
+        },
         "driving_preferences": {
             "smooth_driving": 1.0,
             "music_soothing": 0.8,
-            "close_window": 0.9
-        }
+            "close_window": 0.9,
+            "music_off": 0.7
+        },
+        "economic_impact": {
+            "base_fee": 75,
+            "tip_range": [10, 25]
+        },
+        "story_significance": "代表被系统成功规训但内心空虚的群体"
     },
     {
-        "name": "老王", 
-        "dialogues": ["年轻人，现在的世界变化太快了", "我记得以前的日子更简单", "你觉得简单的生活好吗？"],
-        "interrupt_responses": ["确实，科技发展很快", "简单也有简单的美好"],
+        "name": "老王",
+        "area": "residential",
+        "dialogues": [
+            "年轻人，我经历过'模糊时期'前的日子...那时候人们会用诗歌表达复杂的情感",
+            "有些美好的东西，只存在于记忆中了。但我想把这些留给还记得如何感受的人",
+            "这个城市变化太快，但人心中对真实的渴望从未改变"
+        ],
+        "interrupt_responses": {
+            "empathy": "你有一颗善良的心，这在现在很珍贵",
+            "openness": "愿意学习古老智慧的年轻人不多了",
+            "basic": "是啊，时代不同了"
+        },
         "driving_preferences": {
             "smooth_driving": 1.0,
-            "music_off": 0.7,
+            "music_off": 0.8,
             "open_window": 0.6
-        }
+        },
+        "economic_impact": {
+            "base_fee": 45,
+            "tip_range": [5, 15],
+            "special_reward": "ancient_wisdom"
+        },
+        "story_significance": "模糊时期的见证者，文化记忆的守护者"
+    },
+    {
+        "name": "Jamie",
+        "area": "entertainment",
+        "dialogues": [
+            "音乐是他们还没学会完全控制的语言...我在深夜的酒吧里传递着被禁止的情感密码",
+            "有些歌只能在深夜唱给懂的人听，你明白那种感觉吗？",
+            "艺术家的使命就是让真实的东西活下去，即使要冒险"
+        ],
+        "interrupt_responses": {
+            "empathy": "你能理解艺术家的孤独，这很难得",
+            "openness": "是的，真实的表达总是伴随着风险",
+            "basic": "嗯，生活不容易"
+        },
+        "driving_preferences": {
+            "music_energetic": 0.9,
+            "open_window": 0.8,
+            "music_soothing": 0.6
+        },
+        "economic_impact": {
+            "base_fee": 55,
+            "tip_range": [0, 20]  # 收入不稳定
+        },
+        "story_significance": "地下文化网络的传递者"
     }
 ]
+
 var current_npc_index = 0
 var current_dialogue_index = 0
+var successful_interrupts = 0
+var failed_interrupts = 0
 
 func _ready():
     print("=== 主场景初始化 ===")
     
     # 初始化管理器
-    initialize_managers()
+    await initialize_managers()
+    
+    # 验证UI节点
+    await get_tree().process_frame
+    verify_ui_nodes()
     
     # 连接信号
     connect_signals()
@@ -58,11 +120,12 @@ func _ready():
     ui_manager.switch_to_ui("start")
     update_all_displays()
     
-    print("=== 初始化完成 ===\n")
+    print("=== 初始化完成 ===")
+    print_debug_info()
 
 func initialize_managers():
     """初始化所有管理器"""
-    print("初始化管理器...")
+    print("🔧 初始化管理器...")
     
     # 创建UI管理器
     ui_manager = UIManager.new()
@@ -73,14 +136,47 @@ func initialize_managers():
     qte_system = DrivingQTESystem.new()
     add_child(qte_system)
     
+    # 创建商店系统
+    shop_system = ShopSystem.new()
+    add_child(shop_system)
+    
     print("✅ 管理器初始化完成")
+
+func verify_ui_nodes():
+    """验证UI节点结构"""
+    print("🔍 验证UI节点...")
+    
+    var shop_ui = get_node_or_null("UIContainer/ShopUI")
+    if shop_ui == null:
+        print("❌ ShopUI节点不存在")
+        return
+    
+    var required_shop_nodes = [
+        "VBoxContainer/ShopTitle",
+        "VBoxContainer/MoneyLabel", 
+        "VBoxContainer/ScrollContainer",
+        "VBoxContainer/ScrollContainer/ItemList",
+        "VBoxContainer/ReturnButton"
+    ]
+    
+    for node_path in required_shop_nodes:
+        var node = shop_ui.get_node_or_null(node_path)
+        if node == null:
+            print("❌ 缺少商店节点：", node_path)
+        else:
+            print("✅ 商店节点存在：", node_path)
 
 func connect_signals():
     """连接各管理器的信号"""
-    print("连接信号...")
+    print("🔗 连接信号...")
     
     # GameManager信号
+    if GameManager.state_changed.is_connected(_on_game_state_changed):
+        GameManager.state_changed.disconnect(_on_game_state_changed)
     GameManager.state_changed.connect(_on_game_state_changed)
+    
+    if GameManager.day_completed.is_connected(_on_day_completed):
+        GameManager.day_completed.disconnect(_on_day_completed)
     GameManager.day_completed.connect(_on_day_completed)
     
     # UIManager信号
@@ -92,6 +188,11 @@ func connect_signals():
     qte_system.qte_event_completed.connect(_on_qte_event_completed)
     qte_system.ai_assistant_speaks.connect(_on_ai_assistant_speaks)
     
+    # 商店系统信号
+    shop_system.item_purchased.connect(_on_item_purchased)
+    shop_system.purchase_failed.connect(_on_purchase_failed)
+    shop_system.shop_updated.connect(_on_shop_updated)
+    
     # 驾驶控制信号
     connect_driving_controls()
     
@@ -99,30 +200,50 @@ func connect_signals():
 
 func connect_driving_controls():
     """连接驾驶控制按钮信号"""
-    var driving_ui = ui_manager.driving_ui
+    var driving_ui = get_node_or_null("UIContainer/DrivingUI")
     if driving_ui == null:
+        print("❌ DrivingUI节点不存在")
         return
     
     # 音乐控制
-    var music_controls = driving_ui.get_node("ControlArea/DrivingControls/MusicControls")
-    music_controls.get_node("MusicOffButton").pressed.connect(_on_driving_action.bind("music_off"))
-    music_controls.get_node("MusicSoothingButton").pressed.connect(_on_driving_action.bind("music_soothing"))
-    music_controls.get_node("MusicEnergeticButton").pressed.connect(_on_driving_action.bind("music_energetic"))
+    var music_controls = driving_ui.get_node_or_null("ControlArea/DrivingControls/MusicControls")
+    if music_controls != null:
+        var music_off_btn = music_controls.get_node_or_null("MusicOffButton")
+        var music_soothing_btn = music_controls.get_node_or_null("MusicSoothingButton")
+        var music_energetic_btn = music_controls.get_node_or_null("MusicEnergeticButton")
+        
+        if music_off_btn: music_off_btn.pressed.connect(_on_driving_action.bind("music_off"))
+        if music_soothing_btn: music_soothing_btn.pressed.connect(_on_driving_action.bind("music_soothing"))
+        if music_energetic_btn: music_energetic_btn.pressed.connect(_on_driving_action.bind("music_energetic"))
     
     # 窗户控制
-    var window_controls = driving_ui.get_node("ControlArea/DrivingControls/WindowControls")
-    window_controls.get_node("WindowOpenButton").pressed.connect(_on_driving_action.bind("open_window"))
-    window_controls.get_node("WindowCloseButton").pressed.connect(_on_driving_action.bind("close_window"))
+    var window_controls = driving_ui.get_node_or_null("ControlArea/DrivingControls/WindowControls")
+    if window_controls != null:
+        var window_open_btn = window_controls.get_node_or_null("WindowOpenButton")
+        var window_close_btn = window_controls.get_node_or_null("WindowCloseButton")
+        
+        if window_open_btn: window_open_btn.pressed.connect(_on_driving_action.bind("open_window"))
+        if window_close_btn: window_close_btn.pressed.connect(_on_driving_action.bind("close_window"))
     
     # 驾驶风格
-    var style_controls = driving_ui.get_node("ControlArea/DrivingControls/DrivingStyleControls")
-    style_controls.get_node("SmoothDrivingButton").pressed.connect(_on_driving_action.bind("smooth_driving"))
-    style_controls.get_node("FastDrivingButton").pressed.connect(_on_driving_action.bind("fast_driving"))
+    var style_controls = driving_ui.get_node_or_null("ControlArea/DrivingControls/DrivingStyleControls")
+    if style_controls != null:
+        var smooth_btn = style_controls.get_node_or_null("SmoothDrivingButton")
+        var fast_btn = style_controls.get_node_or_null("FastDrivingButton")
+        
+        if smooth_btn: smooth_btn.pressed.connect(_on_driving_action.bind("smooth_driving"))
+        if fast_btn: fast_btn.pressed.connect(_on_driving_action.bind("fast_driving"))
     
     # 对话按钮
-    var dialogue_area = driving_ui.get_node("ControlArea/DialogueArea/DialogueContainer")
-    dialogue_area.get_node("InterruptContainer/InterruptButton1").pressed.connect(_on_interrupt_pressed.bind("basic"))
-    dialogue_area.get_node("ContinueButton").pressed.connect(_on_continue_dialogue_pressed)
+    var dialogue_area = driving_ui.get_node_or_null("ControlArea/DialogueArea/DialogueContainer")
+    if dialogue_area != null:
+        var interrupt_btn1 = dialogue_area.get_node_or_null("InterruptContainer/InterruptButton1")
+        var interrupt_btn2 = dialogue_area.get_node_or_null("InterruptContainer/InterruptButton2")
+        var continue_btn = dialogue_area.get_node_or_null("ContinueButton")
+        
+        if interrupt_btn1: interrupt_btn1.pressed.connect(_on_interrupt_pressed.bind("basic"))
+        if interrupt_btn2: interrupt_btn2.pressed.connect(_on_interrupt_pressed.bind("empathy"))
+        if continue_btn: continue_btn.pressed.connect(_on_continue_dialogue_pressed)
 
 func _process(delta):
     """主循环处理"""
@@ -130,10 +251,32 @@ func _process(delta):
     if qte_system != null and qte_system.is_qte_active:
         ui_manager.update_ai_countdown(qte_system.countdown_timer)
 
+func _input(event):
+    """处理调试输入"""
+    if event is InputEventKey and event.pressed:
+        match event.keycode:
+            KEY_F1:
+                debug_shop_system()
+            KEY_F2:
+                # 快速添加金钱用于测试
+                if GameManager.player_stats != null:
+                    GameManager.player_stats.money += 100
+                    print("💰 添加100元，当前：", GameManager.player_stats.money, "元")
+                    update_all_displays()
+            KEY_F3:
+                # 快速前进一天用于测试解锁
+                GameManager.current_day += 1
+                print("📅 前进到第", GameManager.current_day, "天")
+                if GameManager.current_state == GameManager.GameState.SHOP:
+                    update_shop_display()
+            KEY_F4:
+                # 测试购买功能
+                test_shop_purchase()
+
 # ============ 信号处理方法 ============
 func _on_game_state_changed(new_state: GameManager.GameState):
     """响应游戏状态变化"""
-    print("游戏状态变化：", GameManager.GameState.keys()[new_state])
+    print("🎮 游戏状态变化：", GameManager.GameState.keys()[new_state])
     
     match new_state:
         GameManager.GameState.MENU:
@@ -154,17 +297,19 @@ func _on_game_state_changed(new_state: GameManager.GameState):
 
 func _on_ui_button_pressed(button_id: String, data: Dictionary):
     """处理UI按钮点击"""
-    print("处理按钮：", button_id)
+    print("🔘 处理按钮：", button_id)
     
     match button_id:
         "start_game":
             GameManager.initialize_player_stats()
             GameManager.current_day = 0
+            if shop_system != null:
+                shop_system.reset_shop()
             GameManager.start_new_day()
         "continue_game":
             GameManager.change_state(GameManager.GameState.AREA_SELECTION)
         "settings":
-            print("打开设置")
+            print("🔧 打开设置")
         "quit":
             get_tree().quit()
         "browse_dreamweave":
@@ -181,21 +326,219 @@ func _on_ui_button_pressed(button_id: String, data: Dictionary):
             GameManager.change_state(GameManager.GameState.HOME)
         "restart_game":
             restart_game()
+        "purchase_item":
+            handle_item_purchase(data.get("item_id", ""))
 
 func _on_area_selected(area_name: String):
     """处理区域选择"""
     current_area = area_name
     GameManager.change_state(GameManager.GameState.DRIVING)
 
+# ============ 商店系统处理 ============
+func handle_item_purchase(item_id: String):
+    """处理物品购买"""
+    if item_id == "" or GameManager.player_stats == null or shop_system == null:
+        print("❌ 购买失败：无效的物品ID或系统未初始化")
+        return
+    
+    print("🛒 尝试购买物品：", item_id)
+    
+    # 通过商店系统购买物品
+    var purchase_result = shop_system.purchase_item(item_id, GameManager.player_stats)
+    
+    if purchase_result.success:
+        var item = purchase_result.item
+        var story_text = purchase_result.get("story_text", "")
+        var remaining_money = purchase_result.remaining_money
+        
+        print("✅ 购买成功：", item.name, " 剩余：", remaining_money, "元")
+        
+        # 显示购买结果
+        show_purchase_success(item.name, story_text, remaining_money)
+        
+        # 更新所有显示
+        update_all_displays()
+        update_shop_display()
+    else:
+        print("❌ 购买失败")
+
+func show_purchase_success(item_name: String, story_text: String, remaining_money: int):
+    """显示购买成功信息"""
+    print("🎉 购买成功：", item_name)
+    print("📖 ", story_text)
+    print("💰 剩余金额：", remaining_money, "元")
+    
+    # 可以在这里添加更好的UI反馈
+
+func update_shop_display():
+    """更新商店显示"""
+    if GameManager.player_stats == null or shop_system == null:
+        print("❌ 无法更新商店显示：系统未初始化")
+        return
+    
+    var current_money = GameManager.player_stats.money
+    var current_day = GameManager.current_day
+    var available_items = shop_system.get_available_items(current_day, GameManager.player_stats)
+    
+    print("🛒 更新商店显示：")
+    print("   当前金额：", current_money, "元")
+    print("   当前天数：", current_day)
+    print("   可用物品：", available_items.size(), "个")
+    
+    # 更新金钱显示
+    var money_label = get_node_or_null("UIContainer/ShopUI/VBoxContainer/MoneyLabel")
+    if money_label != null:
+        money_label.text = "当前余额: %d元" % current_money
+    
+    # 更新商品列表
+    update_shop_items_display(available_items, current_money)
+
+func update_shop_items_display(available_items: Array, player_money: int):
+    """更新商品列表显示"""
+    var item_list = get_node_or_null("UIContainer/ShopUI/VBoxContainer/ScrollContainer/ItemList")
+    if item_list == null:
+        print("❌ ItemList节点不存在")
+        return
+    
+    # 清空现有商品
+    for child in item_list.get_children():
+        child.queue_free()
+    
+    # 按分类组织商品
+    var categories = organize_items_by_category(available_items)
+    
+    # 为每个分类创建商品显示
+    for category in categories.keys():
+        create_shop_category_section(item_list, category, categories[category], player_money)
+
+func organize_items_by_category(items: Array) -> Dictionary:
+    """按分类组织商品"""
+    var categories = {}
+    for item in items:
+        var category = item.get("category", "other")
+        if category not in categories:
+            categories[category] = []
+        categories[category].append(item)
+    return categories
+
+func create_shop_category_section(parent: VBoxContainer, category: String, items: Array, player_money: int):
+    """创建商品分类区域"""
+    # 分类标题
+    var category_label = Label.new()
+    category_label.text = get_category_display_name(category)
+    category_label.add_theme_font_size_override("font_size", 18)
+    category_label.add_theme_color_override("font_color", Color.YELLOW)
+    parent.add_child(category_label)
+    
+    # 商品列表
+    for item in items:
+        create_shop_item_button(parent, item, player_money)
+    
+    # 分隔线
+    var separator = HSeparator.new()
+    parent.add_child(separator)
+
+func create_shop_item_button(parent: VBoxContainer, item: Dictionary, player_money: int):
+    """创建单个商品按钮"""
+    var item_container = HBoxContainer.new()
+    item_container.custom_minimum_size = Vector2(0, 60)
+    
+    # 商品信息
+    var info_label = Label.new()
+    var affordable = "💰" if player_money >= item.price else "❌"
+    var effects_text = format_item_effects(item.get("effects", {}))
+    info_label.text = "%s %s - %d元\n%s\n%s" % [affordable, item.name, item.price, item.description, effects_text]
+    info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    info_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    info_label.add_theme_font_size_override("font_size", 12)
+    
+    # 购买按钮
+    var buy_button = Button.new()
+    buy_button.text = "购买"
+    buy_button.custom_minimum_size = Vector2(60, 50)
+    buy_button.disabled = player_money < item.price
+    
+    # 连接购买信号
+    buy_button.pressed.connect(_on_item_purchase_requested.bind(item.id))
+    
+    item_container.add_child(info_label)
+    item_container.add_child(buy_button)
+    parent.add_child(item_container)
+
+func format_item_effects(effects: Dictionary) -> String:
+    """格式化物品效果显示"""
+    var effect_strings = []
+    for effect in effects.keys():
+        var value = effects[effect]
+        var effect_name = get_effect_display_name(effect)
+        var sign = "+" if value > 0 else ""
+        effect_strings.append("%s%s %s" % [sign, value, effect_name])
+    return "效果: " + ", ".join(effect_strings)
+
+func get_effect_display_name(effect: String) -> String:
+    """获取效果的显示名称"""
+    match effect:
+        "empathy": return "共情"
+        "self_connection": return "自省"
+        "openness": return "开放"
+        "pressure": return "压力"
+        "energy": return "活力"
+        _: return effect
+
+func get_category_display_name(category: String) -> String:
+    """获取分类显示名称"""
+    match category:
+        "basic": return "🏠 生活必需品"
+        "exploration": return "🔍 自我探索"
+        "healing": return "💖 情感治愈"
+        "special": return "⭐ 特殊物品"
+        _: return "📦 其他"
+
+func _on_item_purchase_requested(item_id: String):
+    """处理购买请求"""
+    print("🛒 请求购买物品：", item_id)
+    handle_item_purchase(item_id)
+
+# ============ 商店系统信号处理 ============
+func _on_item_purchased(item_id: String, item_data: Dictionary):
+    """物品购买成功回调"""
+    print("🎉 物品购买成功：", item_data.name)
+    handle_special_item_effects(item_id, item_data)
+
+func _on_purchase_failed(reason: String):
+    """购买失败回调"""
+    print("💸 购买失败：", reason)
+
+func _on_shop_updated():
+    """商店更新回调"""
+    print("🔄 商店状态已更新")
+    if GameManager.current_state == GameManager.GameState.SHOP:
+        update_shop_display()
+
+func handle_special_item_effects(item_id: String, item_data: Dictionary):
+    """处理特殊物品效果"""
+    match item_id:
+        "therapy_session":
+            print("🧠 获得心理咨询，解锁深度自我探索")
+            GameManager.player_stats.purchased_items.append("therapy_unlocked")
+        "academy_consultation":
+            print("🎓 与前学院生交流，了解逃离路径")
+            GameManager.player_stats.purchased_items.append("academy_escape_knowledge")
+        "family_contact":
+            print("👥 接触选择性家庭网络")
+            GameManager.player_stats.purchased_items.append("family_network_access")
+        "shadow_integration":
+            print("🌗 真正的影子整合开始")
+            GameManager.player_stats.purchased_items.append("true_shadow_work")
+
+# ============ 驾驶系统处理 ============
 func _on_driving_action(action: String):
     """处理驾驶控制操作"""
     print("🚗 驾驶操作：", action)
     
-    # 检查是否有活跃的QTE事件需要这个操作
-    var qte_handled = qte_system.handle_driving_action(action)
+    var qte_handled = qte_system.handle_driving_action(action) if qte_system != null else false
     
     if not qte_handled:
-        # 正常的驾驶操作，应用属性效果
         apply_driving_action_effects(action)
         check_npc_preference(action)
     
@@ -225,14 +568,12 @@ func apply_driving_action_effects(action: String):
 
 func check_npc_preference(action: String):
     """检查NPC偏好并添加反应"""
-    if current_npc_index >= test_npcs.size() or dialogue_state != DialogueState.IN_DIALOGUE:
+    if current_npc_index >= enhanced_test_npcs.size() or dialogue_state != DialogueState.IN_DIALOGUE:
         return
     
-    var npc = test_npcs[current_npc_index]
-    if not npc.has("driving_preferences"):
-        return
+    var npc = enhanced_test_npcs[current_npc_index]
+    var preferences = npc.get("driving_preferences", {})
     
-    var preferences = npc.driving_preferences
     if action in preferences:
         var preference_value = preferences[action]
         var reaction = ""
@@ -249,32 +590,25 @@ func check_npc_preference(action: String):
 
 func add_npc_reaction_to_dialogue(reaction: String):
     """在对话中添加NPC反应"""
-    var dialogue_label = ui_manager.get_dialogue_label()
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
     if dialogue_label != null:
         dialogue_label.text += "\n\n「" + reaction + "」"
-        print("NPC反应：", reaction)
+        print("💬 NPC反应：", reaction)
 
 # ============ QTE事件处理 ============
 func _on_qte_event_started(event):
     """QTE事件开始"""
     print("🚗 QTE事件开始：", event.ai_prompt)
-    
-    # 显示AI助手（在UIManager中处理）
     var is_urgent = event.countdown_time < 3.0
     ui_manager.show_ai_assistant(event.ai_prompt, is_urgent)
 
 func _on_qte_event_completed(event, success: bool):
     """QTE事件完成"""
     print("🏁 QTE事件完成：", "成功" if success else "失败")
-    
-    # 延迟隐藏AI助手面板
     await get_tree().create_timer(2.0).timeout
     ui_manager.hide_ai_assistant()
-    
-    # 更新显示
     update_all_displays()
     
-    # 添加NPC反应
     var reaction = event.npc_positive_reaction if success else event.npc_negative_reaction
     if reaction != "":
         add_npc_reaction_to_dialogue(reaction)
@@ -286,7 +620,7 @@ func _on_ai_assistant_speaks(message: String, urgent: bool):
 # ============ 对话系统处理 ============
 func _on_interrupt_pressed(interrupt_type: String):
     """处理插话按钮"""
-    print("插话类型：", interrupt_type)
+    print("💬 插话类型：", interrupt_type)
     
     if dialogue_state != DialogueState.IN_DIALOGUE:
         print("❌ 对话状态不正确，忽略插话")
@@ -297,81 +631,89 @@ func _on_interrupt_pressed(interrupt_type: String):
     
     print("插话成功率：%.1f%%, 结果：%s" % [success_rate * 100, "成功" if success else "失败"])
     
-    # 应用插话结果
     apply_interrupt_result(interrupt_type, success)
     
-    # 更新UI状态
-    var buttons = ui_manager.get_interrupt_buttons()
-    buttons.button1.visible = false
+    var buttons = get_interrupt_buttons()
+    if buttons.button1: buttons.button1.visible = false
     
-    var continue_button = ui_manager.get_continue_button()
-    continue_button.visible = true
-    continue_button.text = "继续对话"
-    continue_button.disabled = false
+    var continue_button = get_continue_button()
+    if continue_button:
+        continue_button.visible = true
+        continue_button.text = "继续对话"
+        continue_button.disabled = false
     
     update_all_displays()
 
 func apply_interrupt_result(interrupt_type: String, success: bool):
     """应用插话结果"""
-    var dialogue_label = ui_manager.get_dialogue_label()
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
     
     if success:
-        # 应用成功效果
+        successful_interrupts += 1
+        
+        # 根据插话类型给予不同的属性奖励
         match interrupt_type:
+            "empathy":
+                GameManager.update_player_attribute("empathy", 1.0)
+                GameManager.update_player_attribute("pressure", -0.3)
+            "self_reflection":
+                GameManager.update_player_attribute("self_connection", 1.2)
+                GameManager.update_player_attribute("empathy", 0.4)
+            "openness":
+                GameManager.update_player_attribute("openness", 1.0)
+                GameManager.update_player_attribute("self_connection", 0.3)
             "basic":
-                GameManager.update_player_attribute("empathy", 0.5)
+                GameManager.update_player_attribute("empathy", 0.3)
                 GameManager.update_player_attribute("self_connection", 0.2)
                 GameManager.update_player_attribute("pressure", -0.1)
         
-        # 添加NPC积极回应
-        if dialogue_label != null:
-            var npc = test_npcs[current_npc_index]
-            dialogue_label.text += "\n\n" + npc.interrupt_responses[0]
+        # 显示NPC的深度回应
+        if dialogue_label != null and current_npc_index < enhanced_test_npcs.size():
+            var npc = enhanced_test_npcs[current_npc_index]
+            var responses = npc.get("interrupt_responses", {})
+            if interrupt_type in responses:
+                dialogue_label.text += "\n\n" + responses[interrupt_type]
+            
+        print("✅ 插话成功！获得属性奖励")
     else:
-        # 应用失败效果
-        GameManager.update_player_attribute("empathy", -0.3)
+        failed_interrupts += 1
+        
+        # 失败惩罚
+        GameManager.update_player_attribute("empathy", -0.2)
         GameManager.update_player_attribute("pressure", 0.4)
         
         # 添加失败反应
         if dialogue_label != null:
             dialogue_label.text += "\n\n对方似乎没有回应..."
+            
+        print("❌ 插话失败")
 
-# 可以在_on_continue_dialogue_pressed中添加调试
 func _on_continue_dialogue_pressed():
-    """继续对话 - 添加QTE状态调试"""
-    print("继续对话，当前状态：", DialogueState.keys()[dialogue_state])
-    
-    # 调试QTE状态
-    debug_qte_system()
+    """继续对话"""
+    print("▶️ 继续对话，当前状态：", DialogueState.keys()[dialogue_state])
     
     match dialogue_state:
         DialogueState.IN_DIALOGUE:
-            if current_dialogue_index < test_npcs[current_npc_index].dialogues.size() - 1:
+            if current_dialogue_index < enhanced_test_npcs[current_npc_index].dialogues.size() - 1:
                 current_dialogue_index += 1
                 show_next_dialogue()
             else:
                 dialogue_state = DialogueState.DIALOGUE_FINISHED
                 show_dialogue_finished()
-        
         DialogueState.DIALOGUE_FINISHED:
             complete_current_trip()
-  
 
 # ============ 驾驶会话管理 ============
-# 在Main.gd中修改这些方法来确保QTE正确重置
-
 func start_driving_session():
-    """开始驾驶会话 - 确保QTE系统正确重置"""
+    """开始驾驶会话"""
     print("=== 开始驾驶会话 ===")
     
     dialogue_state = DialogueState.WAITING_FOR_PASSENGER
+    successful_interrupts = 0
+    failed_interrupts = 0
     
-    # 确保QTE系统完全重置
     if qte_system != null:
         qte_system.reset_trip_events()
-        print("✅ QTE系统状态已重置")
-    else:
-        print("❌ qte_system为null")
     
     show_waiting_for_passenger()
     
@@ -379,134 +721,152 @@ func start_driving_session():
     await get_tree().create_timer(2.0).timeout
     start_npc_dialogue()
 
-func maybe_trigger_qte_event():
-    """可能触发QTE事件 - 添加更多调试信息"""
-    print("🎯 尝试触发QTE事件...")
-    
-    if qte_system == null:
-        print("❌ qte_system为null，无法触发QTE")
-        return
-    
-    if qte_system.should_trigger_event():
-        print("✅ 条件满足，触发QTE事件")
-        qte_system.trigger_random_event()
-    else:
-        print("❌ 条件不满足，未触发QTE事件")
-
-func show_next_dialogue():
-    """显示下一段对话 - 确保每段对话都尝试触发QTE"""
-    if dialogue_state != DialogueState.IN_DIALOGUE:
-        return
-    
-    var npc = test_npcs[current_npc_index]
-    var npc_name_label = ui_manager.get_npc_name_label()
-    var dialogue_label = ui_manager.get_dialogue_label()
-    var buttons = ui_manager.get_interrupt_buttons()
-    var continue_button = ui_manager.get_continue_button()
-    
-    if npc_name_label != null:
-        npc_name_label.text = "%s (第%d位乘客)" % [npc.name, GameManager.passengers_today + 1]
-    
-    if current_dialogue_index < npc.dialogues.size():
-        # 显示当前对话
-        if dialogue_label != null:
-            dialogue_label.text = npc.dialogues[current_dialogue_index]
-            print("✅ 显示对话[%d]: %s" % [current_dialogue_index, npc.dialogues[current_dialogue_index]])
-        
-        # 显示插话选项
-        buttons.button1.visible = true
-        buttons.button1.text = "嗯嗯"
-        buttons.button1.disabled = false
-        continue_button.visible = false
-        
-        # 每段对话都尝试触发QTE事件
-        print("🎯 对话[%d]显示完成，尝试触发QTE..." % current_dialogue_index)
-        maybe_trigger_qte_event()
-    else:
-        print("❌ 对话索引超出范围")
-
-# 另外，在complete_current_trip中也确保重置
-func complete_current_trip():
-    """完成当前行程 - 确保状态完全重置"""
-    print("=== 完成当前行程 ===")
-    
-    dialogue_state = DialogueState.TRIP_COMPLETED
-    
-    var income = randi_range(40, 80)
-    var mood_score = randf_range(40.0, 80.0)
-    
-    GameManager.complete_passenger_trip(income, mood_score)
-    
-    # 如果还需要更多乘客，确保QTE系统准备好下一次
-    if GameManager.passengers_today < GameManager.max_passengers_per_day:
-        print("需要接更多乘客，准备QTE系统...")
-        if qte_system != null:
-            # 额外的重置调用确保干净状态
-            qte_system.reset_trip_events()
-        start_driving_session()
-    else:
-        print("今日乘客已满，前往家中")
-
-# 调试QTE系统状态的方法
-func debug_qte_system():
-    """调试QTE系统状态"""
-    if qte_system == null:
-        print("❌ qte_system为null")
-        return
-    
-    print("=== QTE系统状态 ===")
-    var status = qte_system.get_qte_status()
-    for key in status.keys():
-        print("  ", key, ": ", status[key])
-    print("==================")
-
-          
 func show_waiting_for_passenger():
     """显示等待乘客状态"""
-    var npc_name_label = ui_manager.get_npc_name_label()
-    var dialogue_label = ui_manager.get_dialogue_label()
-    var buttons = ui_manager.get_interrupt_buttons()
-    var continue_button = ui_manager.get_continue_button()
+    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
     
-    if npc_name_label != null:
-        npc_name_label.text = "等待乘客中..."
-    if dialogue_label != null:
-        dialogue_label.text = "正在等待乘客上车..."
+    if npc_name_label: npc_name_label.text = "等待乘客中..."
+    if dialogue_label: dialogue_label.text = "正在等待乘客上车..."
     
     # 隐藏所有按钮
-    buttons.button1.visible = false
-    buttons.button2.visible = false
-    continue_button.visible = false
+    if buttons.button1: buttons.button1.visible = false
+    if buttons.button2: buttons.button2.visible = false
+    if continue_button: continue_button.visible = false
 
 func start_npc_dialogue():
     """开始NPC对话"""
     print("=== 开始NPC对话 ===")
     
     dialogue_state = DialogueState.IN_DIALOGUE
-    current_npc_index = randi() % test_npcs.size()
+    
+    # 根据当前区域选择合适的NPC
+    current_npc_index = select_npc_for_area(current_area)
     current_dialogue_index = 0
     
-    print("选择NPC：", test_npcs[current_npc_index].name)
+    print("选择NPC：", enhanced_test_npcs[current_npc_index].name, " (区域：", current_area, ")")
     
     await get_tree().process_frame
     show_next_dialogue()
 
+func select_npc_for_area(area: String) -> int:
+    """根据区域选择合适的NPC"""
+    var suitable_npcs = []
+    for i in range(enhanced_test_npcs.size()):
+        var npc = enhanced_test_npcs[i]
+        if npc.get("area", "") == area or npc.get("area", "") == "":
+            suitable_npcs.append(i)
+    
+    if suitable_npcs.size() > 0:
+        return suitable_npcs[randi() % suitable_npcs.size()]
+    else:
+        return randi() % enhanced_test_npcs.size()
+
+func show_next_dialogue():
+    """显示下一段对话"""
+    if dialogue_state != DialogueState.IN_DIALOGUE:
+        return
+    
+    var npc = enhanced_test_npcs[current_npc_index]
+    var npc_name_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/NPCNameLabel")
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
+    
+    if npc_name_label:
+        npc_name_label.text = "%s (第%d位乘客)" % [npc.name, GameManager.passengers_today + 1]
+    
+    if current_dialogue_index < npc.dialogues.size():
+        # 显示当前对话
+        if dialogue_label:
+            dialogue_label.text = npc.dialogues[current_dialogue_index]
+            print("✅ 显示对话[%d]: %s" % [current_dialogue_index, npc.dialogues[current_dialogue_index]])
+        
+        # 显示插话选项
+        setup_interrupt_options(npc, buttons)
+        if continue_button: continue_button.visible = false
+        
+        # 每段对话都尝试触发QTE事件
+        maybe_trigger_qte_event()
+    else:
+        print("❌ 对话索引超出范围")
+
+func setup_interrupt_options(npc: Dictionary, buttons: Dictionary):
+    """设置插话选项"""
+    if buttons.button1:
+        buttons.button1.visible = true
+        buttons.button1.text = "嗯嗯"
+        buttons.button1.disabled = false
+    
+    # 根据玩家属性和NPC类型动态设置第二个插话选项
+    if buttons.button2:
+        var player_stats = GameManager.player_stats
+        if player_stats != null and player_stats.empathy >= 60:
+            buttons.button2.visible = true
+            buttons.button2.text = "我理解你的感受"
+            buttons.button2.disabled = false
+        else:
+            buttons.button2.visible = false
+
+func maybe_trigger_qte_event():
+    """可能触发QTE事件"""
+    if qte_system != null and qte_system.should_trigger_event():
+        print("✅ 触发QTE事件")
+        qte_system.trigger_random_event()
+    else:
+        print("❌ 未触发QTE事件")
 
 func show_dialogue_finished():
     """显示对话结束"""
-    var dialogue_label = ui_manager.get_dialogue_label()
-    var buttons = ui_manager.get_interrupt_buttons()
-    var continue_button = ui_manager.get_continue_button()
+    var dialogue_label = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/DialogueLabel")
+    var buttons = get_interrupt_buttons()
+    var continue_button = get_continue_button()
     
-    if dialogue_label != null:
+    if dialogue_label:
         dialogue_label.text = "谢谢你的陪伴，这次旅程很愉快。"
     
-    buttons.button1.visible = false
-    buttons.button2.visible = false
-    continue_button.text = "结束行程"
-    continue_button.visible = true
-    continue_button.disabled = false
+    if buttons.button1: buttons.button1.visible = false
+    if buttons.button2: buttons.button2.visible = false
+    if continue_button:
+        continue_button.text = "结束行程"
+        continue_button.visible = true
+        continue_button.disabled = false
 
+func complete_current_trip():
+    """完成当前行程"""
+    print("=== 完成当前行程 ===")
+    
+    dialogue_state = DialogueState.TRIP_COMPLETED
+    
+    var npc = enhanced_test_npcs[current_npc_index]
+    var economic_impact = npc.get("economic_impact", {"base_fee": 50, "tip_range": [0, 10]})
+    var base_income = economic_impact.base_fee
+    var tip_range = economic_impact.get("tip_range", [0, 5])
+    
+    # 根据插话成功次数计算奖励
+    var mood_bonus = 0
+    if successful_interrupts > 0:
+        mood_bonus = randi_range(tip_range[0], tip_range[1])
+    
+    var total_income = base_income + mood_bonus
+    var mood_score = 50.0 + (successful_interrupts * 15) - (failed_interrupts * 8)
+    
+    print("基础费用：%d元" % base_income)
+    if mood_bonus > 0:
+        print("满意度奖励：%d元" % mood_bonus)
+    print("总收入：%d元" % total_income)
+    print("NPC心情：%.1f" % mood_score)
+    
+    GameManager.complete_passenger_trip(total_income, mood_score)
+    
+    # 如果还需要更多乘客
+    if GameManager.passengers_today < GameManager.max_passengers_per_day:
+        print("需要接更多乘客...")
+        start_driving_session()
+    else:
+        print("今日乘客已满，前往家中")
 
 # ============ 显示更新方法 ============
 func update_all_displays():
@@ -520,31 +880,33 @@ func update_attributes_display():
     if GameManager.player_stats == null:
         return
     
-    var labels = ui_manager.get_attribute_labels()
     var stats = GameManager.player_stats
+    var attributes_container = get_node_or_null("UIContainer/DrivingUI/CarWindowView/AttributesPanel/AttributesContainer")
     
-    if labels.empathy != null:
-        labels.empathy.text = "共情: %.0f" % stats.empathy
-    if labels.self != null:
-        labels.self.text = "自省: %.0f" % stats.self_connection
-    if labels.openness != null:
-        labels.openness.text = "开放: %.0f" % stats.openness
-    if labels.pressure != null:
-        labels.pressure.text = "压力: %.0f" % stats.pressure
+    if attributes_container != null:
+        var empathy_label = attributes_container.get_node_or_null("EmpathyLabel")
+        var self_label = attributes_container.get_node_or_null("SelfLabel")
+        var openness_label = attributes_container.get_node_or_null("OpennessLabel")
+        var pressure_label = attributes_container.get_node_or_null("PressureLabel")
+        
+        if empathy_label: empathy_label.text = "共情: %.0f" % stats.empathy
+        if self_label: self_label.text = "自省: %.0f" % stats.self_connection
+        if openness_label: openness_label.text = "开放: %.0f" % stats.openness
+        if pressure_label: pressure_label.text = "压力: %.0f" % stats.pressure
 
 func update_money_display():
     """更新金钱显示"""
     if GameManager.player_stats == null:
         return
     
-    var money_label = ui_manager.get_money_label()
+    var money_label = get_node_or_null("UIContainer/DrivingUI/CarWindowView/MoneyLabel")
     if money_label != null:
         money_label.text = "💰 %d元" % GameManager.player_stats.money
 
 func update_city_background():
     """更新城市背景"""
-    var city_background = ui_manager.get_city_background()
-    var city_label = ui_manager.get_city_label()
+    var city_background = get_node_or_null("UIContainer/DrivingUI/CarWindowView/BackgroundCity")
+    var city_label = get_node_or_null("UIContainer/DrivingUI/CarWindowView/CityLabel")
     
     if city_background == null:
         return
@@ -552,35 +914,44 @@ func update_city_background():
     match current_area:
         "business":
             city_background.color = Color(0.3, 0.4, 0.6)
-            if city_label != null:
-                city_label.text = "商业区夜景"
+            if city_label: city_label.text = "商业区夜景"
         "residential":
             city_background.color = Color(0.4, 0.3, 0.4)
-            if city_label != null:
-                city_label.text = "居住区夜景"
+            if city_label: city_label.text = "居住区夜景"
         "entertainment":
             city_background.color = Color(0.5, 0.2, 0.4)
-            if city_label != null:
-                city_label.text = "娱乐区夜景"
+            if city_label: city_label.text = "娱乐区夜景"
         "suburban":
             city_background.color = Color(0.2, 0.4, 0.3)
-            if city_label != null:
-                city_label.text = "郊外夜景"
+            if city_label: city_label.text = "郊外夜景"
         _:
             city_background.color = Color(0.2, 0.3, 0.5)
-            if city_label != null:
-                city_label.text = "城市夜景"
+            if city_label: city_label.text = "城市夜景"
 
 func update_home_display():
     """更新家中显示"""
     var daily_income = GameManager.daily_income
     var economic_status = GameManager.player_stats.get_economic_status() if GameManager.player_stats != null else "未知"
-    ui_manager.update_home_display(daily_income, economic_status)
+    
+    var stats_label = get_node_or_null("UIContainer/HomeUI/CenterContainer/VBoxContainer/StatsLabel")
+    if stats_label != null:
+        stats_label.text = "今日收入: %d元\n当前状态: %s" % [daily_income, economic_status]
 
-func update_shop_display():
-    """更新商店显示"""
-    if GameManager.player_stats != null:
-        ui_manager.update_shop_display(GameManager.player_stats.money)
+# ============ 辅助方法 ============
+func get_interrupt_buttons() -> Dictionary:
+    """获取插话按钮"""
+    var container = get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/InterruptContainer")
+    if container == null:
+        return {"button1": null, "button2": null}
+    
+    return {
+        "button1": container.get_node_or_null("InterruptButton1"),
+        "button2": container.get_node_or_null("InterruptButton2")
+    }
+
+func get_continue_button() -> Button:
+    """获取继续按钮"""
+    return get_node_or_null("UIContainer/DrivingUI/ControlArea/DialogueArea/DialogueContainer/ContinueButton")
 
 # ============ 结局系统 ============
 func show_ending():
@@ -638,8 +1009,72 @@ func restart_game():
     # 重置游戏状态
     GameManager.initialize_player_stats()
     GameManager.current_day = 0
+    
+    # 重置商店系统
+    if shop_system != null:
+        shop_system.reset_shop()
+    
     GameManager.change_state(GameManager.GameState.MENU)
 
 func _on_day_completed():
     """响应一天结束"""
     last_visited_area = current_area
+
+# ============ 调试方法 ============
+func debug_shop_system():
+    """调试商店系统状态"""
+    print("=== 商店系统调试信息 ===")
+    
+    if shop_system == null:
+        print("❌ shop_system为null")
+        return
+    
+    if GameManager.player_stats == null:
+        print("❌ player_stats为null")
+        return
+    
+    var current_day = GameManager.current_day
+    var player_money = GameManager.player_stats.money
+    var available_items = shop_system.get_available_items(current_day, GameManager.player_stats)
+    
+    print("当前天数：", current_day)
+    print("玩家金额：", player_money, "元")
+    print("可用物品数量：", available_items.size())
+    
+    print("\n可用物品列表：")
+    for i in range(available_items.size()):
+        var item = available_items[i]
+        var affordable = "💰" if player_money >= item.price else "❌"
+        print("  [%d] %s %s - %d元 (%s)" % [i, affordable, item.name, item.price, item.category])
+    
+    print("\n已购买物品：", GameManager.player_stats.purchased_items)
+    print("==========================")
+
+func test_shop_purchase():
+    """测试商店购买功能"""
+    if shop_system == null or GameManager.player_stats == null:
+        print("❌ 系统未初始化")
+        return
+    
+    # 确保有足够金钱
+    GameManager.player_stats.money = 500
+    
+    # 尝试购买咖啡
+    var result = shop_system.purchase_item("coffee", GameManager.player_stats)
+    if result.success:
+        print("✅ 测试购买成功：", result.item.name)
+        show_purchase_success(result.item.name, result.story_text, result.remaining_money)
+    else:
+        print("❌ 测试购买失败")
+    
+    update_all_displays()
+
+func print_debug_info():
+    """打印调试信息"""
+    print("\n=== 调试信息 ===")
+    print("调试快捷键：")
+    print("  F1 - 显示商店调试信息")
+    print("  F2 - 添加100元金钱")
+    print("  F3 - 前进一天")
+    print("  F4 - 测试购买功能")
+    print("===================")
