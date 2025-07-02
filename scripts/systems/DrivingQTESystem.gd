@@ -44,8 +44,8 @@ var event_resolved: bool = false
 # 事件触发控制
 var events_this_trip: int = 0
 var max_events_per_trip: int = 2
-var event_probability: float = 0.4
-var min_event_interval: float = 15.0
+var event_probability: float = 0.7
+var min_event_interval: float = 10.0
 var last_event_time: float = 0.0
 
 # 可用的QTE事件
