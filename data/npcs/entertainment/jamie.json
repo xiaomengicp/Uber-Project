@@ -1,0 +1,149 @@
+{
+  "npc_info": {
+    "npc_id": "sarah",
+    "npc_name": "Sarah",
+    "archetype": "伪装白领",
+    "primary_area": "business_district",
+    "background": "影子学院3年前的优秀毕业生，被作为宣传样本，实际内心极度空虚",
+    "story_role": "代表被系统成功规训但内心空虚的群体"
+  },
+  "events": [
+    {
+      "id": "sarah_business_1",
+      "encounter_type": "first",
+      "area": "business_district",
+      "unlock_day": 1,
+      "trigger_conditions": {
+        "time_range": ["22:00", "02:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "又是一个加班到深夜的日子...师傅，去滨江国际，谢谢。刚才开完一个价值八百万的并购案例会议，所有人都在恭喜我。",
+        "老板说我是公司最有潜力的分析师，同事们羡慕地看着我，客户对我的方案赞不绝口。按理说我应该很开心，但你知道吗？我完全感受不到任何满足感。",
+        "三年前我从影子学院毕业，他们说我是'优秀整合案例'，说我成功地将影子部分融入了功能性人格。当时我以为这是件好事，以为我终于变成了一个'完整'的人。",
+        "我得到了想要的一切——年薪百万的工作、别人羡慕的眼光、社会认可的成功标签。每天穿着昂贵的套装，住在高档公寓，开着豪车，过着所有人眼中的'人生赢家'生活。",
+        "但为什么我总觉得自己像个机器人？每天早上6点起床，7点到公司，晚上11点离开，回家洗澡睡觉，第二天重复。我说着同样的话，做着同样的表情，连笑容都是程序化的。",
+        "有时候我会想，那个在学院之前的我，那个会为了一首诗哭泣、会为了朋友的痛苦彻夜难眠、会因为看到日落而感动得发呆的我，她还在吗？",
+        "我记得小时候，妈妈带我去看樱花，我会兴奋得在花树下转圈，会捡落花装进口袋里。现在即使站在最美的樱花树下，我也只是拍张照发朋友圈，内心毫无波澜。",
+        "昨晚我试着哭，就是想看看自己还能不能流眼泪。我想起了各种悲伤的事情，但眼泪就是流不出来。我开始害怕，害怕自己真的变成了一台完美运行的机器。"
+      ],
+      "interrupt_responses": {
+        "empathy": "谢谢你理解...很少有人愿意听我说这些。",
+        "self_reflection": "你也有过这种感受吗？",
+        "openness": "也许我真的需要改变什么。",
+        "basic": "嗯...也许这就是成年人的生活吧。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "music_soothing": 0.8,
+          "close_window": 0.7,
+          "music_off": 0.6
+        },
+        "economic": {
+          "base_fee": 75,
+          "tip_range": [10, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "self_connection": 0.5},
+          "completion_bonus": {"openness": 0.3}
+        }
+      }
+    },
+    {
+      "id": "sarah_business_2", 
+      "encounter_type": "second",
+      "area": "business_district",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["23:00", "01:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 55},
+        "previous_encounters": ["sarah_business_1"]
+      },
+      "dialogue": [
+        "是你啊，上次的司机。我一直在想你说的话...关于找回自己的事情。这几天我做了一些奇怪的实验，想看看自己还有没有真实的情感。",
+        "我试着在没人的时候哭泣，强迫自己回想悲伤的事情，想看看眼泪是什么感觉。结果很奇怪——我能让眼泪流出来，但内心依然空洞。就像在演戏，连对自己都在演戏。",
+        "不过我发现了一件有趣的事情。昨天下班路过一家旧书店，看到橱窗里放着一本诗集，封面是梵高的《星夜》。那一瞬间，我居然产生了想进去买下它的强烈冲动。",
+        "这种冲动很奇怪，因为我已经三年没有读过诗了。在学院的时候，他们说诗歌是'非理性情感表达'，会干扰我们的整合进程。但那一刻，我感觉胸口有什么东西在颤动。",
+        "虽然我最终还是没有进去，但那一瞬间的冲动...感觉很真实，比我这三年感受到的所有情绪都要真实。我开始偷偷观察其他人，想知道什么是真实的情感。",
+        "今天在电梯里，我看到一个清洁阿姨在看手机里孙女的照片，她脸上的笑容...那种发自内心的温暖，我已经多久没有见过了。那一瞬间我突然意识到，也许问题不是我没有情感。",
+        "也许我只是被训练得不知道如何表达它们。影子学院教我们压抑、控制、规范，但从来没有教过我们如何真实地生活。我想知道，这是不是就是他们说的'影子'在苏醒？"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的理解给了我很大的勇气。",
+        "self_reflection": "是的，我们都在寻找自己的路。",
+        "openness": "你说得对，改变总是伴随着风险。",
+        "basic": "嗯，至少我开始行动了。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.8,
+          "music_soothing": 0.9,
+          "open_window": 0.6,
+          "music_energetic": 0.4
+        },
+        "economic": {
+          "base_fee": 80,
+          "tip_range": [15, 30]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.0, "openness": 0.5},
+          "completion_bonus": {"openness": 0.8, "pressure": -1.0}
+        }
+      }
+    },
+    {
+      "id": "sarah_business_3",
+      "encounter_type": "third", 
+      "area": "business_district",
+      "unlock_day": 5,
+      "trigger_conditions": {
+        "time_range": ["21:00", "00:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 65, "self_connection": 60},
+        "previous_encounters": ["sarah_business_1", "sarah_business_2"]
+      },
+      "dialogue": [
+        "司机！真的很高兴又遇到你。我有好消息要告诉你——我找到了那个治愈师。她叫林医生，在城市边缘开了一个小诊所，专门帮助像我们这样从学院出来的人。",
+        "你知道吗，第一次见面她就告诉我，学院的整合方法是完全错误的。她说影子不是需要被消除的缺陷，而是需要被理解和拥抱的自己的一部分。这颠覆了我三年来的所有认知。",
+        "我们开始做一种叫做'影子对话'的练习。刚开始我试着和那个被压抑的自己对话，很困难，我甚至不知道她长什么样子，声音是什么样的。但慢慢地...慢慢地我开始听到她的声音。",
+        "她很愤怒，愤怒于被忽视了这么久，愤怒于被当作需要清除的垃圾。她也很害怕，害怕重新出现会毁掉我现在看似完美的生活，害怕被再次压抑和否定。",
+        "但你知道最神奇的是什么吗？当我真正开始倾听她的时候，当我不再试图压制或改造她的时候，我第一次感受到了内心的平静。不是那种空洞的平静，而是真正的安宁。",
+        "我辞职了。是的，我辞掉了那份让所有人羡慕的工作。老板觉得我疯了，父母也不理解，朋友们都说我在自毁前程。但我知道这是对的，我不能再假装成一个完美的机器了。",
+        "现在我在一家小的咨询公司工作，收入只有原来的一半，但你知道吗？昨天我在公园里看到一只小狗在追自己的尾巴，我居然笑出了声——不是社交场合的礼貌笑容，而是发自内心的快乐。",
+        "那一刻我想起了小时候的自己，那个容易被简单的事情感动的女孩。我觉得...我觉得我正在找回她。谢谢你，司机，是你最初的理解给了我勇气开始这段旅程。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你一直都能看到我内心真正的需要。",
+        "self_reflection": "是的，我们都在这条路上。",
+        "openness": "改变真的是可能的，虽然很难，但绝对值得。",
+        "basic": "是啊，生活开始有了不同的颜色。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.7,
+          "music_soothing": 0.9,
+          "music_energetic": 0.7,
+          "open_window": 0.8,
+          "music_off": 0.4
+        },
+        "economic": {
+          "base_fee": 60,
+          "tip_range": [20, 40]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.0, "self_connection": 2.0, "openness": 1.5, "pressure": -1.0},
+          "completion_bonus": {"empathy": 1.0, "self_connection": 1.5, "pressure": -2.0}
+        },
+        "special_rewards": {
+          "story_progress": "sarah_complete",
+          "unlock_hint": "林医生咨询线索",
+          "inspiration": "真正的影子整合可能性"
+        }
+      }
+    }
+  ]
+}
