@@ -1,1 +1,158 @@
-null
+{
+  "npc_info": {
+    "npc_id": "chen",
+    "npc_name": "老陈",
+    "archetype": "底层的坚韧者",
+    "primary_area": "suburban",
+    "background": "38岁制造业夜班工人，虽被系统边缘化但保持人性尊严，代表被忽视但坚韧的底层力量，从未接触学院系统，保持原始的情感真实性",
+    "story_role": "未被系统完全渗透的原始人性代表，展现劳动阶层的朴实智慧和相互支撑"
+  },
+  "events": [
+    {
+      "id": "chen_suburban_1",
+      "encounter_type": "first",
+      "area": "suburban",
+      "unlock_day": 2,
+      "trigger_conditions": {
+        "time_range": ["21:00", "02:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "师傅辛苦了，去城东工业园，谢谢。刚下夜班，在电子厂做了12小时，手还有点酸。不过习惯了，干了十五年了。",
+        "我叫老陈，今年38，听起来老，其实也不算太老哈哈。在富康电子厂上夜班，主要做手机零件的组装。单调是单调，但总得有人做这些活儿。",
+        "你知道吗，我们这些工人和城里那些白领过的是完全不同的生活。他们有什么情绪评分、心理咨询，我们就是简单地活着，累了就睡，饿了就吃。",
+        "倒不是说我们没有烦恼，房租、孩子上学、老人看病...这些事情够我们忙的了。但我们处理问题的方式很直接：有困难就想办法解决，解决不了就互相帮忙。",
+        "厂里有个小伙子，家里出了事急需用钱，我们几十个工友每人凑了点，很快就解决了。没人要他写什么感谢信，也没人指望他还钱，就是觉得应该帮一把。",
+        "有时候我觉得，我们这些被社会'遗忘'的人，反而保持着最朴素的人情味。我们知道什么叫难，所以看到别人有难处，就想伸把手。",
+        "城里人总说我们'素质不高'，但我觉得素质不是看你会不会说漂亮话，而是看你会不会在别人需要的时候站出来。这方面，我们工人从来不输给任何人。",
+        "工作虽然累，但有个好处：每天都能看到实实在在的成果。手机从零件变成成品，这个过程让人踏实。不像有些工作，忙活半天也不知道在干什么。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解我们工人的想法，说明你是个有心人。",
+        "self_reflection": "是啊，每个人都有自己的活法，关键是要踏实。",
+        "openness": "愿意听我们这些普通人说话的人不多了。",
+        "basic": "嗯，生活就是这样，平平淡淡才是真。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.8,
+          "music_energetic": 0.7,
+          "music_soothing": 0.8,
+          "open_window": 0.9,
+          "fast_driving": 0.6
+        },
+        "economic": {
+          "base_fee": 30,
+          "tip_range": [3, 10]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "self_connection": 0.8, "pressure": -0.8},
+          "completion_bonus": {"pressure": -1.0}
+        }
+      }
+    },
+    {
+      "id": "chen_suburban_2",
+      "encounter_type": "second",
+      "area": "suburban",
+      "unlock_day": 4,
+      "trigger_conditions": {
+        "time_range": ["20:30", "01:30"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 55},
+        "previous_encounters": ["chen_suburban_1"]
+      },
+      "dialogue": [
+        "哎呀，又是你啊师傅！真巧。今天心情特别好，因为我女儿考上了职业技术学院，学护理专业。她说长大了要帮助别人，我听了特别自豪。",
+        "我这辈子没什么文化，初中毕业就出来打工了。但我一直告诉女儿，要好好读书，将来做个对社会有用的人。不求大富大贵，但要能堂堂正正地活着。",
+        "说起来，我们工人家庭教育孩子的方式可能和城里人不太一样。我们不会给孩子报什么情绪管理班，不会让她学什么'高效沟通'，就是教她做人的基本道理。",
+        "比如说，看到别人有困难要帮忙，犯了错误要承认，答应的事情要做到。这些道理很简单，但我觉得比那些复杂的理论更管用。",
+        "前几天女儿问我，为什么她们学校的同学都要参加什么心理测评，但我从来没让她去过。我告诉她，心理健康不是靠测试出来的，是靠真正的关爱和理解。",
+        "我们工友之间有什么心事，就是聚在一起喝点酒，说说话。有人失恋了，大家陪着喝酒；有人家里有事，大家帮着想办法。不需要什么专业咨询师，朋友就是最好的心理医生。",
+        "工厂里有个大哥，干了二十年了，他常说：'做人要实在，做事要认真，对朋友要义气。'我觉得这就是我们工人的人生哲学，简单但有力量。",
+        "有时候我想，也许我们这些'没文化'的人，反而保持着最原始的智慧。我们知道什么是真正重要的：家人、朋友、诚实的劳动，还有在困难时互相支撑的温暖。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你这样的人，让我觉得这个世界还是有温度的。",
+        "self_reflection": "每个做父亲的都希望给孩子最好的教育，不管是什么方式。",
+        "openness": "能听进去我们普通人想法的人，说明你心胸开阔。",
+        "basic": "是的，简单的道理往往最有用。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "music_energetic": 0.8,
+          "music_soothing": 0.9,
+          "open_window": 1.0,
+          "music_off": 0.6
+        },
+        "economic": {
+          "base_fee": 35,
+          "tip_range": [8, 18]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.2, "openness": 0.8, "pressure": -1.2},
+          "completion_bonus": {"empathy": 1.0, "pressure": -1.5}
+        },
+        "special_rewards": {
+          "story_progress": "chen_family_values",
+          "life_wisdom": "劳动者朴实人生哲学",
+          "solidarity_example": "工人阶级互助精神"
+        }
+      }
+    },
+    {
+      "id": "chen_suburban_3",
+      "encounter_type": "third",
+      "area": "suburban",
+      "unlock_day": 6,
+      "trigger_conditions": {
+        "time_range": ["22:00", "03:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 65, "self_connection": 60},
+        "previous_encounters": ["chen_suburban_1", "chen_suburban_2"]
+      },
+      "dialogue": [
+        "师傅，又见面了！今天有点特殊情况，我们厂里要来一批大学生实习，听说都是什么心理学、管理学专业的，要研究我们工人的'工作状态'和'情绪管理'。",
+        "说实话，刚听到这个消息的时候，我们都有点紧张。不知道这些高学历的年轻人会怎么看我们，会不会觉得我们'落后'、'需要改造'什么的。",
+        "但后来我想通了，我们没什么好怕的。我们靠自己的双手吃饭，靠诚实的劳动生活，这有什么不好意思的？反而是那些整天想着怎么'管理'别人情绪的人，我觉得他们才需要反思一下。",
+        "我女儿现在在护理学校，她告诉我学校里也在教'情绪管理'课程。她说很多同学都觉得压抑，不敢表达真实想法，生怕被认为'不够专业'。这让我很担心。",
+        "我跟女儿说，做护士最重要的是有爱心，有责任感。技术可以学，但如果连基本的人情味都没有了，那还怎么照顾病人？病人需要的不只是专业技能，更需要真诚的关怀。",
+        "这些年我看着这个社会的变化，感觉人与人之间越来越冷漠，越来越'专业化'。但我们工人之间还保持着最原始的温暖：有困难一起扛，有快乐一起分享。",
+        "也许在那些专家眼里，我们是'需要被教育'的群体。但我想问，如果连最基本的同情心和互助精神都要被'管理'，那我们还算是人吗？",
+        "我希望那些来实习的大学生，能够真正了解我们的生活，而不是带着预设的理论来'分析'我们。也许他们会发现，真正的智慧不在教科书里，而在普通人的日常生活中。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你这样理解我们，让我觉得还有希望，还有人真正关心普通人。",
+        "self_reflection": "每个人都有自己的智慧，关键是要相互尊重。",
+        "openness": "你愿意听我们这些'没文化'的人的想法，说明你是真正有文化的人。",
+        "basic": "是啊，人最重要的是要有人味儿。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_energetic": 0.8,
+          "music_soothing": 1.0,
+          "open_window": 1.0,
+          "music_classical": 0.6
+        },
+        "economic": {
+          "base_fee": 32,
+          "tip_range": [15, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.0, "self_connection": 1.8, "openness": 1.5, "pressure": -2.0},
+          "completion_bonus": {"empathy": 1.5, "self_connection": 1.2, "pressure": -2.5}
+        },
+        "special_rewards": {
+          "story_progress": "chen_complete",
+          "working_class_wisdom": "劳动者生活哲学完整领悟",
+          "human_dignity": "底层尊严与智慧认知",
+          "solidarity_spirit": "工人阶级互助精神传承"
+        }
+      }
+    }
+  ]
+}

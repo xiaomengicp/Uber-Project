@@ -1,1 +1,159 @@
-null
+{
+  "npc_info": {
+    "npc_id": "robin",
+    "npc_name": "Robin",
+    "archetype": "系统夹缝中的治愈者",
+    "primary_area": "cross_area",
+    "background": "33岁医院夜班护士，在医疗系统中工作，见惯情绪管控制度对人体造成的真实伤害，在不同区域间工作，见证系统暴力的多重面向",
+    "story_role": "医疗内部观察者，从专业角度揭示系统对人体和心理的具体伤害"
+  },
+  "events": [
+    {
+      "id": "robin_cross_1",
+      "encounter_type": "first",
+      "area": "business_district",
+      "unlock_day": 2,
+      "trigger_conditions": {
+        "time_range": ["02:00", "07:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "师傅，去中心医院，谢谢。刚结束12小时的夜班，有点累但还好。在ICU工作久了，你会对生命有不同的理解。",
+        "我是Robin，中心医院的夜班护士。这几年我在不同科室轮转，内科、精神科、急诊...每个科室都让我看到这个社会不同的侧面。",
+        "你知道吗，现在医院里有很多奇怪的病例。表面上看起来身体健康，各项指标正常，但就是有各种莫名的症状——失眠、头痛、消化不良、莫名的疲惫。",
+        "医生们称之为'现代压力综合症'，开一些调节类的药物。但我工作这么多年，我觉得这些症状背后有更深层的原因。",
+        "很多病人都有一个共同点：情绪评分很高，社会功能良好，看起来适应得很好。但他们的身体在抗议，在用疾病的方式表达什么东西。",
+        "昨晚来了一个年轻的公司高管，心律不齐，但心脏本身没有任何问题。他告诉我，他已经三年没有为任何事情真正激动过了，包括升职、加薪，甚至爱情。",
+        "还有一个女孩，才25岁，但是记忆力严重衰退。不是老年痴呆那种，而是情感记忆的缺失。她记得所有的工作细节，但忘记了自己喜欢什么，讨厌什么。",
+        "我开始怀疑，这些'适应良好'的人，身体正在承受他们意识层面感受不到的巨大压力。情绪管控也许控制了心理症状，但生理的抗议是无法完全压制的。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解这种职业困扰，说明你有医者仁心。",
+        "self_reflection": "是的，身体往往比大脑更诚实。",
+        "openness": "愿意思考这些问题的医护人员不多了。",
+        "basic": "嗯，现代人的身体确实承受了很多压力。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 0.9,
+          "music_soothing": 0.8,
+          "music_off": 0.7,
+          "close_window": 0.6,
+          "fast_driving": 0.3
+        },
+        "economic": {
+          "base_fee": 55,
+          "tip_range": [8, 18]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "self_connection": 0.8, "openness": 0.5},
+          "completion_bonus": {"pressure": -0.8}
+        }
+      }
+    },
+    {
+      "id": "robin_cross_2",
+      "encounter_type": "second",
+      "area": "residential",
+      "unlock_day": 4,
+      "trigger_conditions": {
+        "time_range": ["01:30", "06:30"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 60},
+        "previous_encounters": ["robin_cross_1"]
+      },
+      "dialogue": [
+        "又是你啊，夜班司机。今晚在社区医院值班，和中心医院很不一样。这里的病人更真实，也更让人心疼。我想继续和你分享一些观察。",
+        "在中心医院，我主要接触商业区的精英患者。但在这里，我看到了更广泛的受害者群体。有工厂工人因为情绪抑制剂过量导致的肝功能异常，有家庭主妇因为长期压抑愤怒而出现的免疫系统紊乱。",
+        "最让我心痛的是孩子们。现在连儿科都有'情绪调节门诊'，专门给那些'情感表达过度'的孩子开药。一个8岁的女孩因为在学校哭泣被送来，医生要给她开抑制剂。",
+        "我偷偷问那个女孩为什么哭，她说老师不让她画彩虹，说颜色太鲜艳会刺激其他孩子的情绪。一个8岁的孩子，因为想画彩虹而被当作病人治疗，这正常吗？",
+        "还有一件事让我很震惊。我们医院的药物消耗量统计显示，情绪调节类药物的使用量每年增长15%，但传统的抗生素、止痛药用量在下降。这说明了什么？",
+        "说明人们的身体在适应，但心理健康在严重恶化。我们在制造一代生理健康但精神麻木的人群。从医学角度看，这是一场缓慢的人道主义灾难。",
+        "我开始做一些私下的记录，统计那些'原因不明'症状与患者情绪评分的关系。初步数据显示，评分越高的人，不明原因的身体症状越多。",
+        "作为医护人员，我有责任关注病人的整体健康，不只是他们的生理指标。但现在的医疗系统只关心数据，不关心人。我感觉自己在与一台巨大的机器作斗争。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的关怀让我觉得还有人在乎病人的真正需求。",
+        "self_reflection": "每个医护人员都应该问问自己，我们真的在帮助病人吗？",
+        "openness": "愿意质疑系统的医生护士越来越少了。",
+        "basic": "是的，医疗应该治疗人，不是管理数据。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_soothing": 0.9,
+          "music_off": 0.8,
+          "close_window": 0.8,
+          "open_window": 0.4
+        },
+        "economic": {
+          "base_fee": 45,
+          "tip_range": [12, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.2, "openness": 1.0, "pressure": -1.0},
+          "completion_bonus": {"empathy": 1.0, "pressure": -1.5}
+        },
+        "special_rewards": {
+          "story_progress": "robin_investigation",
+          "unlock_hint": "医疗内部数据线索",
+          "professional_insight": "系统医疗伤害证据"
+        }
+      }
+    },
+    {
+      "id": "robin_cross_3",
+      "encounter_type": "third",
+      "area": "entertainment",
+      "unlock_day": 6,
+      "trigger_conditions": {
+        "time_range": ["03:00", "07:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 70, "openness": 65},
+        "previous_encounters": ["robin_cross_1", "robin_cross_2"]
+      },
+      "dialogue": [
+        "朋友，今晚在急诊科值班，这里是城市最真实的地方。酒精、意外、情绪失控...所有被白天压抑的东西都在深夜爆发出来。我想告诉你我最近的发现。",
+        "我一直在收集那些数据，现在有了一些惊人的结论。情绪评分90分以上的人群，有80%都存在不同程度的身体症状。而且这些症状有一个共同特点：无法用常规医学解释。",
+        "更可怕的是，我发现了一些被刻意隐藏的病例。有人因为情绪抑制剂长期使用导致永久性的情感障碍，有人因为强制性情绪调节出现了人格分裂症状。",
+        "这些病例都被归类为'个体差异'或'罕见副作用'，不会出现在官方统计中。但我知道，这样的情况远比公开数据显示的要多得多。",
+        "今晚来了一个特殊的病人，是影子学院的在读学生。他在'整合过程'中出现了严重的精神分裂症状，一个人格痛恨另一个人格，内心处于持续的战争状态。",
+        "学院的人说这是'整合过程的正常反应'，但我见过太多类似的病例。这不是整合，这是人为制造的精神分裂。他们在系统性地摧毁人格的完整性。",
+        "我决定要做点什么。我联系了一些同行，我们准备建立一个非正式的医疗网络，专门收治那些被系统伤害的人。不是为了对抗，而是为了治愈。",
+        "我们会提供真正的心理支持，帮助人们重新连接被分离的情感，学会表达被压抑的感受。这很危险，但作为医护人员，我们不能眼睁睁看着人们被'治疗'成机器。",
+        "如果你遇到那些需要帮助的人，可以告诉他们，还有一些医生护士记得医学的初心：治病救人，而不是改造人性。我们会在暗中继续这项工作。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的理解给了我继续下去的勇气。",
+        "self_reflection": "每个医护人员都要问自己，什么是真正的治愈。",
+        "openness": "你的开放心态让我看到希望，还有人愿意接受真相。",
+        "basic": "是的，医疗的本质应该是关爱，不是控制。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_soothing": 1.0,
+          "music_off": 0.9,
+          "close_window": 0.9,
+          "music_classical": 0.7
+        },
+        "economic": {
+          "base_fee": 50,
+          "tip_range": [20, 35]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.5, "self_connection": 2.0, "openness": 1.8, "pressure": -1.8},
+          "completion_bonus": {"empathy": 2.0, "self_connection": 1.5, "pressure": -2.5}
+        },
+        "special_rewards": {
+          "story_progress": "robin_complete",
+          "medical_network": "地下医疗网络接触",
+          "healing_knowledge": "真正治愈方法指导",
+          "resistance_medicine": "医疗抵抗网络成员身份"
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,4 @@
-# NPCEventManager.gd - AutoLoad NPC事件管理器
-# 负责加载、管理和筛选所有NPC事件
-
+# NPCEventManager.gd - 修复版本，正确处理PlayerStats属性获取
 extends Node
 
 # 信号定义
@@ -31,6 +29,25 @@ var npc_dirs: Array[String] = [
 func _ready():
     print("🎭 NPCEventManager初始化...")
     load_all_npc_events()
+
+func get_player_attribute_value(player_stats, attr_name: String) -> float:
+    """安全地获取玩家属性值"""
+    if player_stats == null:
+        return 0.0
+    
+    # 直接访问PlayerStats的属性
+    match attr_name:
+        "empathy":
+            return player_stats.empathy
+        "self_connection":
+            return player_stats.self_connection
+        "openness":
+            return player_stats.openness
+        "pressure":
+            return player_stats.pressure
+        _:
+            print("⚠️ 未知属性名称：", attr_name)
+            return 0.0
 
 func load_all_npc_events():
     """加载所有NPC事件文件"""
@@ -194,53 +211,52 @@ func get_available_events_for_area(area: String, current_day: int, player_stats,
     return available_events
 
 func can_event_trigger(event: NPCEvent, current_day: int, current_area: String, player_stats, weather: String) -> bool:
-    """检查事件是否可以触发"""
+    """检查事件是否可以触发 - 修正版逻辑"""
     
-    # 使用NPCEvent自己的检查方法
+    # 使用NPCEvent自己的基础检查方法（天数、区域、属性等）
     if not event.can_trigger(current_day, current_area, player_stats, weather):
         return false
     
-    # 检查是否已经遇见过（根据遇见类型限制）
-    var encounter_limit = get_encounter_limit(event.encounter_type)
-    var current_encounters = npc_encounter_counts.get(event.npc_id, 0)
+    # 检查这个具体事件是否已经完成
+    if event.id in encountered_events:
+        return false  # 这个具体事件已经遇见过，不能再触发
     
-    if current_encounters >= encounter_limit:
-        return false
-    
-    # 检查前置事件
+    # 检查前置事件（这是关键！）
     for prerequisite_id in event.previous_encounters:
         if prerequisite_id not in encountered_events:
-            return false
+            return false  # 前置事件未完成，不能触发
     
     return true
-
+    
 func get_trigger_failure_reason(event: NPCEvent, current_day: int, current_area: String, player_stats, weather: String) -> String:
-    """获取事件无法触发的原因（调试用）"""
+    """获取事件无法触发的原因（调试用） - 修正版"""
     if current_day < event.unlock_day:
         return "天数不足(%d < %d)" % [current_day, event.unlock_day]
     
     if event.area != "" and current_area != event.area:
         return "区域不匹配(%s != %s)" % [current_area, event.area]
     
-    var encounter_limit = get_encounter_limit(event.encounter_type)
-    var current_encounters = npc_encounter_counts.get(event.npc_id, 0)
-    if current_encounters >= encounter_limit:
-        return "遇见次数已达上限(%d >= %d)" % [current_encounters, encounter_limit]
+    # 检查具体事件是否已完成
+    if event.id in encountered_events:
+        return "该事件已完成: " + event.id
     
+    # 检查前置事件
     for prerequisite_id in event.previous_encounters:
         if prerequisite_id not in encountered_events:
             return "前置事件未完成: " + prerequisite_id
     
+    # 检查属性要求
     if player_stats != null:
         for attr in event.required_attributes.keys():
             var required = event.required_attributes[attr]
-            var current = player_stats.get(attr, 0)
+            var current = get_player_attribute_value(player_stats, attr)
             if current < required:
-                return "属性不足: %s(%d < %d)" % [attr, current, required]
+                return "属性不足: %s(%.1f < %d)" % [attr, current, required]
     
     return "未知原因"
-
-func get_encounter_limit(encounter_type: String) -> int:
+    
+    
+'''func get_encounter_limit(encounter_type: String) -> int:
     """获取遇见类型的次数限制"""
     match encounter_type:
         "first":
@@ -254,22 +270,33 @@ func get_encounter_limit(encounter_type: String) -> int:
         "special":
             return 1
         _:
-            return 1
+            return 1'''
 
 func select_random_event_for_area(area: String, current_day: int, player_stats, weather: String = "clear") -> NPCEvent:
-    """为指定区域随机选择一个可用事件"""
+    """为指定区域随机选择一个可用事件 - 修正版权重逻辑"""
     var available_events = get_available_events_for_area(area, current_day, player_stats, weather)
     
     if available_events.is_empty():
         print("❌ 区域 ", area, " 没有可用的NPC事件")
         return null
     
-    # 根据遇见次数加权选择（优先选择没遇见过的）
+    # 修正的权重逻辑：优先first事件，然后是可解锁的后续事件
     var weighted_events = []
     for event in available_events:
-        var encounters = npc_encounter_counts.get(event.npc_id, 0)
-        var weight = max(1, 4 - encounters)  # 遇见次数越少，权重越高
+        var weight = 1
         
+        # 根据事件类型给不同权重
+        match event.encounter_type:
+            "first":
+                weight = 4  # first事件高权重，优先遇见
+            "second":
+                weight = 3  # second事件中等权重
+            "third":
+                weight = 2  # third事件较低权重，因为更珍贵
+            "hidden", "special":
+                weight = 5  # 特殊事件最高权重，因为稀有
+        
+        # 将事件按权重加入池子
         for i in range(weight):
             weighted_events.append(event)
     
@@ -277,23 +304,23 @@ func select_random_event_for_area(area: String, current_day: int, player_stats, 
         return available_events[0]
     
     var selected_event = weighted_events[randi() % weighted_events.size()]
-    print("🎭 选中NPC事件: ", selected_event.id, " (", selected_event.npc_name, ")")
+    print("🎭 选中NPC事件: ", selected_event.id, " (", selected_event.npc_name, ", ", selected_event.encounter_type, ")")
     
     return selected_event
-
+    
 func mark_event_encountered(event: NPCEvent, current_day: int):
-    """标记事件已遇见"""
+    """标记事件已遇见 - 简化版逻辑"""
     if event == null:
         return
     
     # 更新事件状态
     event.mark_encountered(current_day)
     
-    # 更新全局记录
+    # 将具体事件ID加入已完成列表
     if event.id not in encountered_events:
         encountered_events.append(event.id)
     
-    # 更新NPC遇见次数
+    # 简单记录NPC遇见次数（用于统计，不影响解锁逻辑）
     var current_count = npc_encounter_counts.get(event.npc_id, 0)
     npc_encounter_counts[event.npc_id] = current_count + 1
     
@@ -301,7 +328,7 @@ func mark_event_encountered(event: NPCEvent, current_day: int):
     
     # 检查是否解锁了新事件
     check_for_newly_unlocked_events()
-
+    
 func check_for_newly_unlocked_events():
     """检查是否有新解锁的事件"""
     for event in all_npc_events:
@@ -323,34 +350,43 @@ func check_for_newly_unlocked_events():
             new_npc_event_unlocked.emit(event)
 
 func get_npc_progress(npc_id: String) -> Dictionary:
-    """获取特定NPC的进度信息"""
+    """获取特定NPC的进度信息 - 基于具体事件完成情况"""
     var npc_events = events_by_npc.get(npc_id, [])
-    var encountered_count = npc_encounter_counts.get(npc_id, 0)
     
-    var encountered_event_ids = []
+    var completed_events = []
+    var available_events = []
+    var locked_events = []
+    
     for event in npc_events:
         if event.id in encountered_events:
-            encountered_event_ids.append(event.id)
+            completed_events.append(event.id)
+        else:
+            # 检查是否可以触发（不考虑天数和区域，只看前置条件）
+            var can_unlock = true
+            for prerequisite_id in event.previous_encounters:
+                if prerequisite_id not in encountered_events:
+                    can_unlock = false
+                    break
+            
+            if can_unlock:
+                available_events.append(event.id)
+            else:
+                locked_events.append(event.id)
     
     return {
         "npc_id": npc_id,
         "total_events": npc_events.size(),
-        "encountered_count": encountered_count,
-        "encountered_events": encountered_event_ids,
-        "can_encounter_more": encountered_count < get_max_encounters_for_npc(npc_id)
+        "completed_events": completed_events,
+        "available_events": available_events,
+        "locked_events": locked_events,
+        "completion_rate": float(completed_events.size()) / float(npc_events.size()) if npc_events.size() > 0 else 0.0
     }
-
+    
 func get_max_encounters_for_npc(npc_id: String) -> int:
-    """获取NPC的最大遇见次数"""
+    """获取NPC的最大遇见次数 - 改为基于具体事件数量"""
     var npc_events = events_by_npc.get(npc_id, [])
-    var max_encounters = 0
+    return npc_events.size()  # 直接返回该NPC的事件总数
     
-    for event in npc_events:
-        var limit = get_encounter_limit(event.encounter_type)
-        max_encounters = max(max_encounters, limit)
-    
-    return max_encounters
-
 func reset_progress():
     """重置所有进度（新游戏时调用）"""
     encountered_events.clear()

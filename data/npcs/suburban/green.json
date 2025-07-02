@@ -1,1 +1,158 @@
-null
+{
+  "npc_info": {
+    "npc_id": "green",
+    "npc_name": "Green",
+    "archetype": "逃离者",
+    "primary_area": "suburban",
+    "background": "40岁有机农夫，曾是影子学院学生，选择退出系统在自然中重建自我，代表另一种生活可能性的存在证明",
+    "story_role": "系统外生活的示范者，为困在系统中的人提供另一种可能性的启发"
+  },
+  "events": [
+    {
+      "id": "green_suburban_1",
+      "encounter_type": "first",
+      "area": "suburban",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["20:00", "23:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "师傅，去山谷农场，谢谢。刚从城里的有机市集回来，卖完了这周的蔬菜。看到城里人拿着我种的番茄，脸上露出久违的满足表情，我觉得很值得。",
+        "我叫Green，在城外经营一个小农场。你可能觉得奇怪，为什么一个40岁的人会放弃城市生活跑来种地？说起来，这是一个很长的故事。",
+        "十年前，我也是系统中的一员。不，准确说是影子学院的学生。那时候我相信他们的理论，相信通过科学的方法可以'整合'人格，让自己变得更完美。",
+        "在学院的两年时间里，我学会了控制情绪，学会了高效思考，学会了按照社会期望来塑造自己。表面上，我变得更成功了——工作顺利，人际关系良好，评分很高。",
+        "但我开始做噩梦。梦里总是有一个声音在呼喊，说我背叛了什么重要的东西。白天我告诉自己这是'整合过程中的正常反应'，但夜晚的恐惧越来越强烈。",
+        "转折点是一次野外训练。我们被要求在森林里待三天，进行'自然环境下的人格稳定性测试'。第二天夜里，我独自坐在篝火旁，突然意识到我已经很久没有真正感受过什么了。",
+        "星空、虫鸣、微风...这些最简单的自然元素让我感到一种久违的平静。那一刻我明白，我不是要整合什么影子，而是要找回被系统剥夺的简单感受能力。",
+        "第三天，我没有回到学院。我在森林里又待了一周，然后做了一个决定：离开城市，离开系统，找一块地，重新开始生活。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解这种冲动，说明你也感受到了系统的问题。",
+        "self_reflection": "每个人都要找到属于自己的生活方式。",
+        "openness": "勇于尝试不同生活的人不多了。",
+        "basic": "是啊，有时候简单的生活更有意义。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "open_window": 1.0,
+          "music_off": 0.9,
+          "music_soothing": 0.8,
+          "fast_driving": 0.2
+        },
+        "economic": {
+          "base_fee": 35,
+          "tip_range": [5, 15]
+        },
+        "attributes": {
+          "successful_interaction": {"self_connection": 1.5, "openness": 1.0, "pressure": -1.0},
+          "completion_bonus": {"pressure": -1.5}
+        }
+      }
+    },
+    {
+      "id": "green_suburban_2",
+      "encounter_type": "second",
+      "area": "suburban", 
+      "unlock_day": 5,
+      "trigger_conditions": {
+        "time_range": ["19:00", "22:00"],
+        "weather": ["any"],
+        "required_attributes": {"self_connection": 55},
+        "previous_encounters": ["green_suburban_1"]
+      },
+      "dialogue": [
+        "又见面了，朋友。今天心情特别好，因为我的第一批学生来农场体验了生活。是的，我现在偶尔会接收一些想要'脱离系统'的人，教他们如何在自然中找回自己。",
+        "这些人大多是像我当年一样的'系统优等生'，表面成功但内心空虚。他们听说了我的故事，偷偷联系我，想要了解另一种生活的可能性。",
+        "土地不会撒谎，不会要求你伪装。当你把手插进泥土，当你看着种子发芽，当你收获自己种植的食物，你会重新连接到生命最本质的东西。",
+        "今天有个女孩，是大公司的高管，她告诉我这是她五年来第一次哭泣。不是因为悲伤，而是因为看到日出时突然想起了童年的感受。她说她以为自己再也找不回那种纯真了。",
+        "我没有教他们什么高深的理论，只是让他们去感受——感受土壤的温度，感受植物的生长，感受四季的变化。这些看似简单的体验，能唤醒很多被系统压抑的感知能力。",
+        "当然，不是每个人都适合农场生活，也不是每个人都需要像我一样彻底脱离城市。但重要的是，人们需要知道还有选择，还有别的活法。",
+        "我发现，那些在自然中待过一段时间的人，回到城市后都有了变化。他们变得更真实，更愿意表达真正的想法，更能抵抗系统的同化压力。",
+        "也许这就是我现在存在的意义：不是说服所有人都来种地，而是告诉他们，系统之外还有别的可能，还有别的活法。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的理解让我觉得这些努力都是值得的。",
+        "self_reflection": "每个人心中都有一颗自然的种子，需要合适的土壤才能发芽。",
+        "openness": "愿意尝试不同生活方式的勇气很珍贵。",
+        "basic": "是的，自然有治愈的力量。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "open_window": 1.0,
+          "music_off": 1.0,
+          "music_soothing": 0.9,
+          "close_window": 0.3
+        },
+        "economic": {
+          "base_fee": 40,
+          "tip_range": [10, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"self_connection": 2.0, "openness": 1.5, "empathy": 1.0, "pressure": -1.5},
+          "completion_bonus": {"self_connection": 1.5, "pressure": -2.0}
+        },
+        "special_rewards": {
+          "story_progress": "green_teaching",
+          "unlock_hint": "自然治愈方式线索",
+          "life_philosophy": "系统外生活启发"
+        }
+      }
+    },
+    {
+      "id": "green_suburban_3",
+      "encounter_type": "third",
+      "area": "suburban",
+      "unlock_day": 7,
+      "trigger_conditions": {
+        "time_range": ["18:00", "21:00"],
+        "weather": ["any"],
+        "required_attributes": {"self_connection": 70, "openness": 60},
+        "previous_encounters": ["green_suburban_1", "green_suburban_2"]
+      },
+      "dialogue": [
+        "我的朋友，很高兴在这最后的时刻再次遇到你。今天对我来说是特殊的日子——十年前的今天，我做出了离开学院的决定。十年过去了，我想分享一些感悟。",
+        "这十年来，我见过太多从城市来寻找答案的人。有些人找到了内心的平静，有些人发现农村生活不适合自己但学会了在城市中保持真实，还有些人只是需要一个暂时的避风港。",
+        "我逐渐明白，重要的不是逃离到哪里，而是找到属于自己的生活节奏。有人适合山林，有人适合都市，但每个人都需要找到那个让自己感到完整的状态。",
+        "昨天一个老朋友来看我，他是学院的导师。他告诉我，学院现在开始研究'自然疗法'，想要将我的经验系统化，纳入新的治疗体系。我拒绝了。",
+        "不是因为我反对分享，而是因为一旦被系统化，这种经验就会失去最珍贵的东西——每个人独特的发现过程。真正的治愈不能被标准化，不能被复制粘贴。",
+        "但我决定要做一些事情。我想写一本书，记录这十年来遇到的人和事，记录那些寻找真实自我的故事。不是指导手册，而是一面镜子，让读者在其中看到自己的可能性。",
+        "我也想建立一个网络，连接那些在各自领域中坚持真实的人。不是为了对抗什么，而是为了证明：多元化的生活方式是可能的，真实的自我是值得追寻的。",
+        "十年前我以为自己在逃离，现在我明白我其实是在寻找。寻找真正的自己，寻找生活的意义，寻找与这个世界连接的方式。而每个像你这样愿意倾听的人，都让我觉得这条路是对的。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你的理解和陪伴让我知道，我们都在同一条寻找真实的路上。",
+        "self_reflection": "十年的思考让我明白，每个人的答案都是独一无二的。",
+        "openness": "你的开放心态给了我继续分享经验的动力。",
+        "basic": "是的，寻找之路从来不会结束，但这就是生活的意义。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "open_window": 1.0,
+          "music_off": 1.0,
+          "music_soothing": 1.0,
+          "music_classical": 0.8
+        },
+        "economic": {
+          "base_fee": 30,
+          "tip_range": [15, 40]
+        },
+        "attributes": {
+          "successful_interaction": {"self_connection": 3.0, "openness": 2.5, "empathy": 2.0, "pressure": -2.5},
+          "completion_bonus": {"self_connection": 2.0, "openness": 1.5, "pressure": -3.0}
+        },
+        "special_rewards": {
+          "story_progress": "green_complete",
+          "life_wisdom": "十年自然生活感悟",
+          "network_connection": "系统外生活者网络",
+          "book_preview": "真实生活故事集"
+        }
+      }
+    }
+  ]
+}

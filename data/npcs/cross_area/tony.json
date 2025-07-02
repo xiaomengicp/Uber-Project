@@ -1,1 +1,161 @@
-null
+{
+  "npc_info": {
+    "npc_id": "tony",
+    "npc_name": "Tony",
+    "archetype": "城市血管中的观察者",
+    "primary_area": "cross_area",
+    "background": "25岁全职外卖员，穿梭于城市各个角落，见证不同阶层的真实生活状态，与司机有职业共性，容易产生阶级共鸣",
+    "story_role": "底层服务业观察者，代表零工经济下的年轻劳动者，展现城市真实的社会分层"
+  },
+  "events": [
+    {
+      "id": "tony_cross_1",
+      "encounter_type": "first",
+      "area": "business_district",
+      "unlock_day": 1,
+      "trigger_conditions": {
+        "time_range": ["20:00", "03:00"],
+        "weather": ["any"],
+        "required_attributes": {},
+        "forbidden_attributes": {}
+      },
+      "dialogue": [
+        "兄弟你好！去天府广场那边，谢谢。刚送完一单，今天跑了快80公里了，腿都有点软。看到你们开车的，感觉咱们都是城市里的'运送者'，都不容易。",
+        "我叫Tony，干外卖快三年了。别看我才25，但这个城市的每条街每栋楼我都熟，比导航还准。每天在路上跑12小时，什么人什么事都见过。",
+        "我们这行和你们司机一样，属于'城市毛细血管'，哪里需要去哪里。但也因为这样，我见过这个城市最真实的一面——有钱人怎么生活，穷人怎么挣扎。",
+        "送过最贵的一单是个商务套餐，3000块钱，送到顶楼的CEO办公室。那个老板正在开视频会议，头都没抬就让秘书签收。3000块，对他来说就是一顿普通的工作餐。",
+        "也送过最便宜的一单，8块钱的盖浇饭，送到城中村的地下室。一个收废品的大爷，数了好久才凑够钱。他说这是这个月第一次叫外卖，因为生病了实在爬不动楼梯。",
+        "有时候同一栋楼，我要送到顶楼的豪华办公室，也要送到地下室的员工宿舍。电梯上上下下，就像这个社会的缩影——同一个空间里，人们过着完全不同的生活。",
+        "我们外卖员被系统严格管控着，迟到要扣钱，差评要扣钱，就连休息时间都被算法精确计算。但说实话，我觉得我们比那些看起来光鲜的白领要自由一些。",
+        "至少我们知道自己在为谁服务，知道自己的劳动有实际价值。不像有些人，整天开会、写报告，但连自己都不知道在干什么。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解我们这些跑腿的辛苦，说明你是个有良心的人。",
+        "self_reflection": "是啊，我们都在为生活奔波，但至少要知道自己为什么而跑。",
+        "openness": "愿意听我们这些送餐的说话，你比很多人都开明。",
+        "basic": "嗯，大家都不容易，互相理解吧。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "fast_driving": 0.8,
+          "music_energetic": 0.9,
+          "open_window": 0.8,
+          "smooth_driving": 0.7,
+          "music_soothing": 0.6
+        },
+        "economic": {
+          "base_fee": 25,
+          "tip_range": [2, 8]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.0, "openness": 0.8, "self_connection": 0.5},
+          "completion_bonus": {"pressure": -0.5}
+        }
+      }
+    },
+    {
+      "id": "tony_cross_2",
+      "encounter_type": "second",
+      "area": "residential",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["19:00", "02:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 50},
+        "previous_encounters": ["tony_cross_1"]
+      },
+      "dialogue": [
+        "哎，又是你啊兄弟！今天在居民区跑单，感触特别深。送了很多家庭订单，看到了很多不一样的生活状态，想和你分享一下。",
+        "居民区的单子和商业区很不同。商业区多是办公室订餐，快速、高效、没什么人情味。但居民区的客户，你能感受到家的温暖，也能看到家的压力。",
+        "今天送了一单到老小区，是个单亲妈妈点的儿童套餐。她开门的时候很疲惫，但看到我带的小玩具时，眼睛亮了。她说孩子病了不能出门，这个小礼物会让孩子很开心。",
+        "还有一单是给一对老夫妻送的，他们点了两份最简单的粥。老爷爷告诉我，老伴生病了，只能吃流食。他们没有子女在身边，叫外卖已经成了日常。我看着他们相互照顾的样子，心里很温暖。",
+        "最让我印象深刻的是一个高中生，他趁父母上班偷偷点了一份汉堡。收到餐的时候特别紧张，一直说'谢谢哥哥，请不要告诉我爸妈'。我想起自己小时候也这样偷偷买过零食。",
+        "我们外卖员其实就像城市的'毛细血管'，不只是送食物，还在传递着各种情感。有时候一句'慢用'、一个微笑，就能让疲惫的人感到一点温暖。",
+        "但平台的管理越来越严格了，要求我们'标准化服务'、'提高效率'，不允许和客户有太多交流。他们说这样更'专业'，但我觉得这样我们就变成了送餐机器人。",
+        "有些客户点单的时候会备注'谢谢辛苦了'、'注意安全'，这些话比小费更让我开心。说明还有人把我们当人看，而不只是一个配送工具。",
+        "我们这些底层服务业的人，互相之间特别能理解。保安大哥、清洁阿姨、快递小哥、司机师傅，我们都知道什么叫'为生活奔波'，所以见面都会相互关照。",
+        "虽然工作累，收入也不高，但我觉得我们的工作是有意义的。我们连接着这个城市的每一个角落，让人们的生活更方便。这种价值感，是金钱买不到的。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你能理解我们这些送餐员的想法，真的让人感动。",
+        "self_reflection": "是的，每个工作都有它的意义，关键是要找到自己的价值。",
+        "openness": "你这样愿意听我们讲故事的人不多了。",
+        "basic": "嗯，生活就是这样，互相帮助才能过下去。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "fast_driving": 0.7,
+          "music_energetic": 0.8,
+          "music_soothing": 0.8,
+          "open_window": 0.9,
+          "smooth_driving": 0.8
+        },
+        "economic": {
+          "base_fee": 30,
+          "tip_range": [5, 12]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 1.5, "self_connection": 1.0, "openness": 0.8, "pressure": -0.8},
+          "completion_bonus": {"empathy": 1.0, "pressure": -1.0}
+        },
+        "special_rewards": {
+          "story_progress": "tony_community_connection",
+          "service_wisdom": "底层服务业人文关怀",
+          "social_observation": "城市社会层级观察"
+        }
+      }
+    },
+    {
+      "id": "tony_cross_3",
+      "encounter_type": "third",
+      "area": "entertainment",
+      "unlock_day": 5,
+      "trigger_conditions": {
+        "time_range": ["21:00", "04:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 65, "openness": 55},
+        "previous_encounters": ["tony_cross_1", "tony_cross_2"]
+      },
+      "dialogue": [
+        "兄弟！今晚在娱乐区跑单，这里的夜生活真的不一样。酒吧、KTV、深夜餐厅...我看到了这个城市另一面的真实。想和你聊聊我的一些思考。",
+        "娱乐区的客户很特殊，白天可能是严肃的商务人士，晚上就变成了另一个样子。我送餐的时候能感受到，他们在释放白天被压抑的那部分自己。",
+        "有个常客，是个看起来很成功的中年男人，但每次深夜点单的时候，眼神都很空洞。他总是点很多酒，然后一个人在包厢里坐到天亮。我觉得他很孤独。",
+        "还有一些年轻人，他们聚在一起唱歌、喝酒，表面上很开心，但我送餐进去的时候，能感受到一种刻意的快乐，就像在用狂欢来掩盖什么东西。",
+        "最特别的是一些艺术家客户，他们点单的时候会和我聊天，问我对这个城市的看法。有个音乐人说，像我们这样在街头奔跑的人，最了解城市的真实脉搏。",
+        "这三年跑外卖，我见过太多人的生活状态。我发现，不管是有钱人还是穷人，成功人士还是普通工人，大家都在寻找一些东西——真实的连接，真诚的关怀。",
+        "我们这些服务业的人，虽然社会地位不高，但我们承担着很重要的社会功能：我们是城市情感的传递者，是人与人之间连接的桥梁。",
+        "最近我在考虑要不要换工作，朋友说可以去工厂或者学个技术。但我舍不得这份工作，不是因为收入，而是因为它让我觉得自己是这个城市不可缺少的一部分。",
+        "我想对所有像我们这样的底层工作者说：我们的工作是有尊严的，我们的存在是有价值的。不要让任何人告诉你，你的劳动不重要。我们都在用自己的方式，让这个世界变得更好一点。"
+      ],
+      "interrupt_responses": {
+        "empathy": "你这样理解我们，让我觉得所有的辛苦都值得。",
+        "self_reflection": "每个人都要找到自己存在的意义，不管做什么工作。",
+        "openness": "你能看到我们工作的价值，说明你真的懂生活。",
+        "basic": "是的，每个人都有自己的价值，都值得被尊重。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "fast_driving": 0.8,
+          "music_energetic": 1.0,
+          "music_soothing": 0.9,
+          "open_window": 1.0,
+          "smooth_driving": 0.9
+        },
+        "economic": {
+          "base_fee": 28,
+          "tip_range": [8, 20]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.0, "self_connection": 1.8, "openness": 1.5, "pressure": -1.5},
+          "completion_bonus": {"empathy": 1.5, "self_connection": 1.2, "pressure": -2.0}
+        },
+        "special_rewards": {
+          "story_progress": "tony_complete",
+          "worker_dignity": "劳动者尊严觉醒",
+          "urban_observer": "城市观察者完整视角",
+          "service_philosophy": "服务业人生哲学"
+        }
+      }
+    }
+  ]
+}

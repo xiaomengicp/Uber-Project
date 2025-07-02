@@ -1,154 +1,156 @@
 {
   "npc_info": {
-    "npc_id": "old_wang",
-    "npc_name": "老王",
-    "archetype": "记忆守护者",
+    "npc_id": "maria",
+    "npc_name": "Maria",
+    "archetype": "边缘母亲",
     "primary_area": "residential",
-    "background": "经历过'模糊时期'前的退休教师，暗中保存古老的情感表达方式和文化记忆",
-    "story_role": "文化传承者，代表被系统遗忘但依然珍贵的人文价值"
+    "background": "28岁超市夜班收银员，被系统标记为'情绪不稳定个体'，但拒绝进入学院系统。独自抚养6岁女儿，努力保护孩子的真实情感不被系统规训",
+    "story_role": "母性抵抗代表，展现为保护下一代纯真而对抗系统规训的母爱力量"
   },
   "events": [
     {
-      "id": "wang_residential_1",
+      "id": "maria_residential_1",
       "encounter_type": "first",
       "area": "residential",
-      "unlock_day": 1,
+      "unlock_day": 2,
       "trigger_conditions": {
-        "time_range": ["20:00", "23:00"],
+        "time_range": ["22:30", "06:00"],
         "weather": ["any"],
         "required_attributes": {},
         "forbidden_attributes": {}
       },
       "dialogue": [
-        "年轻人，麻烦去文汇路128号，谢谢。刚从老友家里出来，我们几个老头子又聊了一晚上过去的事情。",
-        "我今年72了，经历过'模糊时期'前的日子。那时候人们会用诗歌表达复杂的情感，会为了一句词、一幅画争论到深夜，会因为看到美丽的事物而潸然泪下。",
-        "现在的年轻人都很聪明，工作效率很高，情绪也很稳定。但我总觉得缺了点什么...那种为了美而感动的能力，那种对生活细节的敏感，好像都消失了。",
-        "我是退休的语文老师，以前教过很多学生写诗。那时候孩子们的作文里总是充满奇思妙想，有的写'月亮是夜空的眼睛'，有的写'雨滴是云朵的眼泪'。",
-        "现在的作文都很规范，语法正确，逻辑清晰，但读起来就像是机器写的。有些美好的东西，只存在于记忆中了。我想把这些东西留给还记得如何感受的人。",
-        "你们这些夜班工作的人，见过这个城市最真实的一面。在深夜里，人们卸下白天的面具，也许还能找到一些真实的东西。",
-        "我在家里偷偷保存着一些旧书，里面有古代的诗词，有'模糊时期'前的散文。虽然现在不让公开传播，但我觉得这些东西太珍贵了，不能就这样消失。",
-        "这个城市变化太快，高楼越建越多，但人心中对真实、对美、对诗意的渴望从未改变。也许有一天，这些被遗忘的美好会重新被人们发现。"
+        "师傅您好，去春阳小区，谢谢。刚下夜班，有点累。在24小时超市做收银员，凌晨的班次特别安静，但工资稍微高一点，可以更好地照顾女儿。",
+        "我叫Maria，今年28岁，有个6岁的女儿叫小雨。她爸爸在她两岁的时候就走了，说受不了我的'情绪化'。从那以后就是我们母女俩相依为命。",
+        "系统把我标记为'情绪不稳定个体'，因为我曾经在工作中为了保护一个被欺负的同事而大声争吵，还因为女儿生病时在医院走廊里哭过。",
+        "他们建议我去影子学院进行'情绪调节训练'，说这样对我的职业发展和孩子教育都有好处。但我拒绝了，我不想变成一个感受不到愤怒和悲伤的机器人。",
+        "特别是为了我女儿，我必须保持真实的情感。孩子需要一个能真正感受她快乐和痛苦的妈妈，而不是一个'情绪稳定'但内心空洞的看护者。",
+        "小雨现在上幼儿园，老师已经开始教他们'情绪管理'。6岁的孩子，就要学会控制自己的哭声，学会'合理表达需求'。我看着她努力憋住眼泪的样子，心都碎了。",
+        "每天晚上，我都会和小雨聊天，告诉她哭没有关系，生气也没有关系，高兴的时候可以大声笑。我教她感受自己的情绪，而不是压抑它们。",
+        "虽然生活很辛苦，但我不后悔我的选择。我宁愿做一个'问题母亲'，也要保护女儿内心的那份纯真和真实。"
       ],
       "interrupt_responses": {
-        "empathy": "你有一颗善良的心，这在现在很珍贵。",
-        "self_reflection": "是啊，我们都在寻找生活的真正意义。",
-        "openness": "愿意学习古老智慧的年轻人不多了。",
-        "basic": "是啊，时代不同了，但人心没有变。"
+        "empathy": "谢谢您的理解，很少有人能明白一个母亲的担忧。",
+        "self_reflection": "是的，有时候坚持做自己是需要勇气的。",
+        "openness": "您愿意听我这样的想法，说明您是个有同情心的人。",
+        "basic": "嗯，为了孩子，再辛苦也值得。"
       },
       "game_effects": {
         "driving_preferences": {
           "smooth_driving": 1.0,
-          "music_off": 0.8,
-          "music_classical": 0.9,
-          "close_window": 0.6,
+          "music_soothing": 0.9,
+          "music_off": 0.7,
+          "close_window": 0.8,
           "fast_driving": 0.2
         },
         "economic": {
-          "base_fee": 45,
-          "tip_range": [8, 20]
+          "base_fee": 35,
+          "tip_range": [3, 10]
         },
         "attributes": {
-          "successful_interaction": {"openness": 1.2, "self_connection": 0.8, "empathy": 0.5},
-          "completion_bonus": {"pressure": -0.5}
+          "successful_interaction": {"empathy": 1.2, "self_connection": 0.8, "openness": 0.5},
+          "completion_bonus": {"pressure": -0.8}
         }
       }
     },
     {
-      "id": "wang_residential_2",
+      "id": "maria_residential_2",
       "encounter_type": "second",
       "area": "residential",
-      "unlock_day": 3,
+      "unlock_day": 4,
       "trigger_conditions": {
-        "time_range": ["19:30", "22:30"],
+        "time_range": ["23:00", "05:30"],
         "weather": ["any"],
-        "required_attributes": {"openness": 50},
-        "previous_encounters": ["wang_residential_1"]
+        "required_attributes": {"empathy": 60},
+        "previous_encounters": ["maria_residential_1"]
       },
       "dialogue": [
-        "又是你啊，小司机。今天我去了一趟旧书店，老板是我以前的学生，现在只能偷偷卖一些'安全'的书。我们聊起了你，他说最近也有年轻人开始寻找一些不同的东西。",
-        "我带了一些东西给你看。这是我珍藏的一本手抄诗集，里面有一些'模糊时期'前的作品。'春有百花秋有月，夏有凉风冬有雪。若无闲事挂心头，便是人间好时节。'",
-        "这首诗的作者早已不可考，但这四句话包含了多少生活的智慧。现在的人总是忙忙碌碌，追求效率和成功，却忘记了感受当下的美好。四季更替，本身就是最大的诗意。",
-        "我年轻的时候，和你们现在一样迷茫。那时候我也曾经怀疑，写诗有什么用？教学生感受美有什么意义？直到我看到一个孩子因为理解了一首诗而眼中放光的瞬间。",
-        "那是一首很简单的诗：'天净沙·秋思'。'枯藤老树昏鸦，小桥流水人家，古道西风瘦马。夕阳西下，断肠人在天涯。'孩子说，他突然明白了什么叫做乡愁。",
-        "从那时起我就明白，诗歌不是用来展示技巧的，不是用来考试的，而是用来唤醒心灵的。它帮助我们理解自己的情感，理解这个世界的复杂和美丽。",
-        "现在的教育系统很害怕这种'非理性'的东西，他们觉得情感会干扰判断，诗意会影响效率。但我觉得，没有诗意的人生，就像没有颜色的画，没有旋律的歌。"
+        "又见面了，师傅。今天心情很复杂，小雨的学校开家长会，老师说她'情绪表达过于强烈'，建议我带她去做心理评估。我当场就拒绝了。",
+        "老师说小雨在同学被欺负时会大哭，在看到受伤的小动物时会非常难过，这些都是'过度情绪反应'的表现。但我觉得，这正说明我女儿还保持着最珍贵的同情心。",
+        "会后有几个家长私下和我聊，他们说自己的孩子经过'情绪调节'后确实变得更'乖'了，不哭不闹，但也不笑了，就像小大人一样。这真的是我们想要的吗？",
+        "我告诉小雨，她为朋友哭泣是因为她有爱心，这是妈妈最骄傲的事情。她问我：'妈妈，为什么老师说哭泣不好？'我说：'因为有些大人忘记了哭泣的意义。'",
+        "晚上我们一起看了《小王子》的绘本，小雨指着那句'用心去看才能看得清楚'说：'妈妈，我想要用心去看世界。'那一刻我知道，我的坚持是对的。",
+        "虽然我被标记为'问题家长'，虽然我的收入微薄，虽然我们的生活不够稳定，但我不会让他们把我女儿变成一个没有感情的机器。",
+        "我开始联系一些和我想法相似的家长，我们准备组织一个非正式的支持小组。不是要对抗什么，只是想为我们的孩子创造一个可以真实表达情感的空间。",
+        "我相信，真正的教育应该是培养孩子的同情心、创造力和感受美好的能力，而不是把他们培养成情绪稳定的生产工具。"
       ],
       "interrupt_responses": {
-        "empathy": "你能理解这些，说明你的心还没有被完全机械化。",
-        "self_reflection": "每个人心中都有诗意，只是需要有人帮助唤醒它。",
-        "openness": "这些古老的智慧，值得我们用一生去体会。",
-        "basic": "是的，有些东西比效率更重要。"
-      },
-      "game_effects": {
-        "driving_preferences": {
-          "smooth_driving": 0.9,
-          "music_off": 0.9,
-          "music_classical": 1.0,
-          "close_window": 0.7,
-          "open_window": 0.6
-        },
-        "economic": {
-          "base_fee": 50,
-          "tip_range": [15, 30]
-        },
-        "attributes": {
-          "successful_interaction": {"openness": 1.8, "self_connection": 1.2, "empathy": 0.8, "pressure": -0.5},
-          "completion_bonus": {"openness": 1.0, "pressure": -1.0}
-        },
-        "special_rewards": {
-          "cultural_item": "古诗词片段",
-          "memory_unlock": "模糊时期前的文化记忆"
-        }
-      }
-    },
-    {
-      "id": "wang_residential_3",
-      "encounter_type": "third",
-      "area": "residential",
-      "unlock_day": 5,
-      "trigger_conditions": {
-        "time_range": ["20:00", "22:00"],
-        "weather": ["any"],
-        "required_attributes": {"openness": 65, "self_connection": 55},
-        "previous_encounters": ["wang_residential_1", "wang_residential_2"]
-      },
-      "dialogue": [
-        "小司机，又见面了。今天我有个特殊的请求，能不能开慢一点，我想和你分享一些更重要的东西。我觉得你是一个能理解这些价值的人。",
-        "我决定要把我收藏的那些诗集、字画和文章传给合适的人。我已经72岁了，不知道还能保护这些东西多久。与其让它们和我一起消失，不如传给还有感受力的年轻人。",
-        "这些年我一直在思考一个问题：什么是真正的教育？现在的教育教给孩子们知识、技能、效率，但谁来教他们如何感受？如何欣赏？如何在平凡的生活中发现诗意？",
-        "我想起我的老师，一位白发苍苍的老教授。他常说：'教育的目的不是制造标准化的产品，而是唤醒每个人心中独特的光芒。'现在想来，他说的多对啊。",
-        "前几天我路过一个公园，看到一个小女孩在追蝴蝶，她的眼中有那种纯真的快乐。我想，也许希望还在，也许在这个高效运转的世界里，还是有人记得如何为简单的美好而感动。",
-        "我想邀请你到我家里来，看看那些被藏起来的宝贝。有宋词的手抄本，有民国时期的散文集，还有一些我自己写的教学笔记。这些东西，也许对你现在的生活有帮助。",
-        "不是每个人都需要成为诗人，但每个人都应该有感受诗意的能力。不是每个人都要研究古文，但每个人都应该知道我们的文化根脉在哪里。",
-        "你愿意成为这些记忆的守护者吗？不是要你冒险传播，只是希望当有一天这个世界重新需要这些美好时，还有人记得它们曾经存在过。"
-      ],
-      "interrupt_responses": {
-        "empathy": "你的善意让我看到了传承的希望。",
-        "self_reflection": "每一代人都有责任把美好的东西传给下一代。",
-        "openness": "你这样的年轻人，就是文化延续的火种。",
-        "basic": "有人愿意倾听，这些记忆就不会消失。"
+        "empathy": "您的理解给了我很大的力量，让我知道我不是一个人在战斗。",
+        "self_reflection": "每个母亲都要为孩子做出选择，我选择保护她的真实。",
+        "openness": "您这样支持我们的想法，让我觉得还有希望。",
+        "basic": "是的，孩子的纯真是最宝贵的。"
       },
       "game_effects": {
         "driving_preferences": {
           "smooth_driving": 1.0,
-          "music_off": 1.0,
-          "music_classical": 0.9,
-          "close_window": 0.8,
-          "slow_driving": 1.0
+          "music_soothing": 1.0,
+          "music_classical": 0.7,
+          "close_window": 0.9,
+          "open_window": 0.4
         },
         "economic": {
           "base_fee": 40,
-          "tip_range": [25, 50]
+          "tip_range": [5, 15]
         },
         "attributes": {
-          "successful_interaction": {"openness": 2.5, "self_connection": 2.0, "empathy": 1.5, "pressure": -1.5},
-          "completion_bonus": {"openness": 1.5, "self_connection": 1.0, "pressure": -2.0}
+          "successful_interaction": {"empathy": 1.8, "self_connection": 1.5, "openness": 1.0, "pressure": -1.2},
+          "completion_bonus": {"empathy": 1.2, "pressure": -1.5}
         },
         "special_rewards": {
-          "story_progress": "wang_complete",
-          "cultural_heritage": "古典文化传承者身份",
-          "unlock_hint": "文化保护网络线索",
-          "memory_resonance": "深层文化记忆连接"
+          "story_progress": "maria_resistance",
+          "maternal_wisdom": "母性保护本能觉醒",
+          "parent_network": "抵抗性家长群体线索"
+        }
+      }
+    },
+    {
+      "id": "maria_residential_3",
+      "encounter_type": "third",
+      "area": "residential",
+      "unlock_day": 6,
+      "trigger_conditions": {
+        "time_range": ["00:00", "06:00"],
+        "weather": ["any"],
+        "required_attributes": {"empathy": 75, "self_connection": 65},
+        "previous_encounters": ["maria_residential_1", "maria_residential_2"]
+      },
+      "dialogue": [
+        "师傅，今天是特殊的日子。我们的家长支持小组第一次聚会，来了十几个和我有相似想法的父母。我们决定要为孩子们做一些真正有意义的事情。",
+        "我们不是什么反对组织，我们只是一群想要保护孩子纯真的普通家长。我们决定在周末组织一些活动，让孩子们可以自由地表达情感，可以哭，可以笑，可以愤怒。",
+        "今天小雨第一次参加我们的活动，她和其他孩子一起画画、唱歌、讲故事。看到她们毫无保留地表达自己的想法和感受，我眼泪都流出来了。",
+        "有个8岁的男孩，平时在学校里总是沉默不语，但今天他大声说出了对父母离婚的愤怒和悲伤。他妈妈抱着他哭，说这是她第一次听到儿子表达真实感受。",
+        "还有个小女孩，她画了一幅画，里面有各种颜色的云朵。她说：'我的心情就像天空，有时候是蓝色的，有时候是灰色的，但都很美。'多么纯真的智慧！",
+        "我意识到，我们不只是在保护自己的孩子，我们是在为下一代保留人性中最珍贵的东西。如果连孩子都不被允许真实地感受，这个世界还有什么希望？",
+        "小雨问我：'妈妈，为什么有些大人不喜欢我们哭？'我告诉她：'因为他们忘记了哭泣可以洗净心灵，忘记了情感是生命的颜色。但妈妈永远不会忘记。'",
+        "这条路很难走，我们可能会面临更多的压力和困难。但我相信，只要还有人记得什么是真正的爱，什么是真正的教育，希望就不会消失。"
+      ],
+      "interrupt_responses": {
+        "empathy": "您的支持让我知道，世界上还有人真正关心孩子的心灵。",
+        "self_reflection": "每个大人都曾经是孩子，我们不能忘记那份纯真的价值。",
+        "openness": "您这样理解我们，给了我们继续前进的勇气。",
+        "basic": "是的，孩子们需要真正的爱和理解。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "smooth_driving": 1.0,
+          "music_soothing": 1.0,
+          "music_classical": 0.8,
+          "close_window": 0.9,
+          "music_off": 0.7
+        },
+        "economic": {
+          "base_fee": 38,
+          "tip_range": [10, 25]
+        },
+        "attributes": {
+          "successful_interaction": {"empathy": 2.5, "self_connection": 2.0, "openness": 1.8, "pressure": -2.0},
+          "completion_bonus": {"empathy": 2.0, "self_connection": 1.5, "pressure": -2.5}
+        },
+        "special_rewards": {
+          "story_progress": "maria_complete",
+          "maternal_network": "抵抗性教育网络建立",
+          "child_protection": "儿童情感保护者身份",
+          "hope_preservation": "为下一代保留人性光辉"
         }
       }
     }

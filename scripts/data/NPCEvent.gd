@@ -1,7 +1,4 @@
-# NPCEvent.gd - NPC事件数据类  
-# 这是一个Resource类，用于存储单个NPC事件的所有数据
-# 放在 scripts/data/NPCEvent.gd
-
+# NPCEvent.gd - 修复版本，正确处理PlayerStats属性获取
 class_name NPCEvent
 extends Resource
 
@@ -69,6 +66,28 @@ func _init():
     """初始化NPC事件"""
     pass
 
+func get_player_attribute_value(player_stats, attr_name: String) -> float:
+    """安全地获取玩家属性值，提供默认值"""
+    if player_stats == null:
+        return 0.0
+    
+    # 直接访问属性，如果不存在则返回0
+    match attr_name:
+        "empathy":
+            return player_stats.empathy if player_stats.has_method("get") or "empathy" in player_stats else 0.0
+        "self_connection":
+            return player_stats.self_connection if player_stats.has_method("get") or "self_connection" in player_stats else 0.0
+        "openness":
+            return player_stats.openness if player_stats.has_method("get") or "openness" in player_stats else 0.0
+        "pressure":
+            return player_stats.pressure if player_stats.has_method("get") or "pressure" in player_stats else 0.0
+        _:
+            # 对于其他属性，尝试直接访问
+            if player_stats.has_method("get"):
+                return player_stats.get(attr_name) if player_stats.get(attr_name) != null else 0.0
+            else:
+                return 0.0
+
 func can_trigger(current_day: int, current_area: String, player_stats, weather: String = "clear") -> bool:
     """检查事件是否可以触发"""
     
@@ -82,17 +101,17 @@ func can_trigger(current_day: int, current_area: String, player_stats, weather: 
     if weather != "any" and weather not in weather_conditions and "any" not in weather_conditions:
         return false
     
-    # 属性要求检查
+    # 属性要求检查 - 使用安全的属性获取方法
     if player_stats != null:
         for attr in required_attributes.keys():
             var required_value = required_attributes[attr]
-            var current_value = player_stats.get(attr, 0)
+            var current_value = get_player_attribute_value(player_stats, attr)
             if current_value < required_value:
                 return false
         
         for attr in forbidden_attributes.keys():
             var forbidden_value = forbidden_attributes[attr]
-            var current_value = player_stats.get(attr, 0)
+            var current_value = get_player_attribute_value(player_stats, attr)
             if current_value >= forbidden_value:
                 return false
     
