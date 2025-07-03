@@ -103,11 +103,11 @@ func can_trigger(current_day: int, current_area: String, player_stats, weather: 
     
     # 属性要求检查 - 使用安全的属性获取方法
     if player_stats != null:
-        for attr in required_attributes.keys():
-            var required_value = required_attributes[attr]
-            var current_value = get_player_attribute_value(player_stats, attr)
-            if current_value < required_value:
-                return false
+        # for attr in required_attributes.keys():
+        #    var required_value = required_attributes[attr]
+        #    var current_value = get_player_attribute_value(player_stats, attr)
+        #    if current_value < required_value:
+        #        return false
         
         for attr in forbidden_attributes.keys():
             var forbidden_value = forbidden_attributes[attr]
