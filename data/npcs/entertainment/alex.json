@@ -1,156 +1,159 @@
 {
   "npc_info": {
-    "npc_id": "jamie",
-    "npc_name": "Jamie",
-    "archetype": "地下音乐人",
+    "npc_id": "alex",
+    "npc_name": "Alex",
+    "archetype": "情感走私者",
     "primary_area": "entertainment",
-    "background": "26岁酒吧驻唱歌手，用音乐传递被禁止的情感密码，可能是Queer Family边缘成员，地下梦语音乐网络的参与者",
-    "story_role": "艺术抵抗者，代表在系统监控下依然坚持真实表达的创作者群体"
+    "background": "28岁地下音乐人，在官方认可的娱乐场所表面演出，实际上通过音乐进行情感走私，传递被禁止的真实情感表达",
+    "story_role": "艺术抵抗的代表，展现在压抑环境中艺术作为情感出口的可能性"
   },
   "events": [
     {
-      "id": "jamie_entertainment_1",
+      "id": "alex_entertainment_1",
       "encounter_type": "first",
       "area": "entertainment",
       "unlock_day": 2,
       "trigger_conditions": {
-        "time_range": ["23:00", "04:00"],
+        "time_range": ["22:00", "04:00"],
         "weather": ["any"],
         "required_attributes": {},
         "forbidden_attributes": {}
       },
       "dialogue": [
-        "师傅，去月影酒吧，谢谢。刚结束今晚最后一场演出，嗓子有点哑，但心情很好。今晚台下有几个人真的在听，而不是只是把音乐当背景噪音。",
-        "我叫Jamie，在这一带的几个酒吧唱歌。表面上我唱的都是安全的流行歌曲，但懂的人能听出来，我会在旋律里藏一些...不一样的东西。",
-        "你知道吗，现在的音乐都太干净了，每一首歌都要经过情绪评估，确保不会引起'不当情感反应'。但真正的音乐不应该是这样的，它应该能触动人心最深处的东西。",
-        "我会在深夜的时候偷偷弹唱一些老歌，那些'模糊时期'前的经典。《月亮代表我的心》、《夜来香》...那些旋律里有种现在音乐里找不到的真挚。",
-        "有时候演出结束后，会有人悄悄走到台前，什么都不说，只是看着我点点头。我知道他们听懂了，听懂了那些不能明说的情感。",
-        "音乐是他们还没学会完全控制的语言。因为音乐是抽象的，是感性的，系统很难界定什么旋律会带来什么确切的情感反应。这就是我们的机会。",
-        "我认识一些人，和我一样的音乐人，我们有自己的小圈子。我们会交换一些特别的歌曲，一些能让人想起真实感受的旋律。这些歌只能在深夜唱给懂的人听。",
-        "当你每晚都面对那些麻木的观众，看着他们机械地摇摆，你就明白为什么真实的艺术变得如此珍贵。我们不是在表演，我们是在偷偷进行一场拯救灵魂的战争。"
+        "师傅，去艺术区那边的小酒吧，谢谢。刚结束今晚的演出，感觉有些复杂。在台上演奏那些'安全'的曲目，但心里想的是完全不同的音乐。",
+        "我是Alex，是个音乐人，主要在娱乐区的各种场所演出。表面上我演奏的都是官方认可的'情绪稳定'音乐，但实际上...我在做一些更有意义的事情。",
+        "你知道，现在的音乐都被严格分类了。有'提升工作效率'的音乐，有'促进休息'的音乐，有'社交场合'的音乐。每种音乐都有特定的用途，不允许'偏离功能'。",
+        "但音乐的真正力量不是这样的。真正的音乐应该能触动人心，让人想起被遗忘的感受，甚至唤醒一些被压抑的东西。",
+        "我在合法演出中偷偷加入一些'禁忌'的元素。比如在舒缓的曲调中加入一些不和谐音，在快乐的节奏中暗藏一些忧伤。听懂的人会有反应，不懂的人觉得只是音乐技巧。",
+        "今晚有个观众，听到我演奏的时候突然哭了。那是一首表面上很欢快的曲子，但我在其中藏了一段关于失去的旋律。她哭得很安静，但我能感受到那种情感的释放。",
+        "演出结束后她来找我，说已经很久没有这样哭过了，她以为自己已经失去了哭泣的能力。她说我的音乐让她想起了小时候听摇篮曲时的感觉。",
+        "这就是我想要做的 - 用音乐走私那些被禁止的情感，提醒人们他们内心深处还有什么。即使只是一瞬间，也是值得的。"
       ],
       "interrupt_responses": {
-        "empathy": "你能理解音乐的力量，这说明你的心还是敞开的。",
-        "self_reflection": "是的，每个艺术家都在寻找自己的声音。",
-        "openness": "愿意聆听不同声音的人越来越少了。",
-        "basic": "嗯，音乐确实能表达很多东西。"
+        "empathy": "你能理解音乐的真正力量，说明你的心还没有被完全封闭。",
+        "self_reflection": "是的，艺术应该是自我表达的方式，而不是控制工具。",
+        "openness": "你愿意欣赏这种'非主流'的音乐理念，这很难得。",
+        "basic": "嗯，音乐确实有很神奇的力量。"
       },
       "game_effects": {
         "driving_preferences": {
-          "music_energetic": 0.9,
-          "music_soothing": 0.8,
-          "music_off": 0.3,
-          "open_window": 0.8,
-          "smooth_driving": 0.7
+          "music_soothing": 0.9,
+          "music_energetic": 0.8,
+          "smooth_driving": 0.7,
+          "open_window": 0.6,
+          "music_off": 0.2
         },
         "economic": {
-          "base_fee": 45,
-          "tip_range": [5, 20]
+          "base_fee": 60,
+          "tip_range": [8, 20]
         },
         "attributes": {
-          "successful_interaction": {"openness": 1.2, "empathy": 0.8, "self_connection": 0.5},
-          "completion_bonus": {"pressure": -0.5}
+          "successful_interaction": {"openness": 1.5, "empathy": 1.0, "self_connection": 1.2},
+          "completion_bonus": {"pressure": -0.8}
         }
       }
     },
     {
-      "id": "jamie_entertainment_2",
-      "encounter_type": "second", 
+      "id": "alex_entertainment_2",
+      "encounter_type": "second",
       "area": "entertainment",
       "unlock_day": 4,
       "trigger_conditions": {
-        "time_range": ["01:00", "05:00"],
+        "time_range": ["23:00", "05:00"],
         "weather": ["any"],
-        "required_attributes": {"openness": 55},
-        "previous_encounters": ["jamie_entertainment_1"]
+        "required_attributes": {"openness": 60},
+        "previous_encounters": ["alex_entertainment_1"]
       },
       "dialogue": [
-        "嘿，是你啊！刚才在台上看到一个熟悉的面孔，原来是你。今晚特别，我冒险唱了一首特别的歌，《风继续吹》，用的是原版的编曲。",
-        "你知道那首歌的故事吗？张国荣唱的，关于爱情，关于离别，关于那种撕心裂肺的真实情感。现在这样的歌是不被允许的，他们说会引起'情绪不稳定'。",
-        "但你看到台下人们的反应了吗？有个女孩哭了，有个中年男人眼中有光。那一刻我确定，人们内心对真实情感的渴望从未消失，只是被深深埋藏了。",
-        "我想告诉你一个秘密。我们有一个地下网络，叫做'梦语音乐'。我们会在不同的场所，用暗号交流，分享那些被禁止的旋律。不是为了反抗，只是为了保存。",
-        "就像古代的人把经书藏在山洞里一样，我们把真正的音乐藏在人们的记忆里。每一次传唱，都是一次文化的传递，一次情感的传承。",
-        "昨天有个老先生找到我，说他年轻时是乐队的贝斯手。他教了我一些和弦进行，那些在'模糊时期'前就存在的音乐理论。原来音乐可以这么复杂，这么有层次。",
-        "我开始明白，我们不只是在保存音乐，我们是在保存人类表达情感的能力。每一个音符，每一段旋律，都是对系统单调化的抵抗。",
-        "有人说我们这样做很危险，但我觉得真正危险的是让音乐变成背景噪音，让艺术变成装饰品。如果音乐不能触动人心，它还能叫音乐吗？"
+        "师傅！今晚特别想和你分享一些事情。我发现了一个秘密网络，一群像我这样的艺术家，我们在做一些...非常规的事情。",
+        "几个月前，我通过某种特殊的方式联系到了一些其他的音乐人。我们都有同样的感受 - 不满足于只演奏那些'功能性'音乐，想要创造真正有灵魂的作品。",
+        "我们开始在深夜进行秘密聚会，在一些隐蔽的地下空间。没有官方监管，没有功能性要求，我们可以自由地创作和演奏任何想要的音乐。",
+        "在那里，我听到了这个城市里最真实的声音。有人用音乐表达对系统的愤怒，有人用旋律诉说被压抑的爱情，有人用节奏敲击着内心的呐喊。",
+        "最神奇的是，当这些'禁忌'的音乐响起时，在场的每个人都变得不一样了。他们的眼神重新有了光芒，身体开始自然地摇摆，脸上出现了真实的表情。",
+        "我们还在探索一种新的演出方式 - 把真实的音乐偷偷带到公共场所。比如在地铁站的街头演出中加入一些'私货'，在商场的背景音乐中混入一些觉醒的元素。",
+        "但这很危险。上个月有个朋友在演出时被发现了，他演奏了一首关于自由的曲子，被'行为分析部'的人带走问话。他们说他的音乐'包含不稳定因素'。",
+        "现在他必须定期接受'音乐治疗'，只能演奏官方认可的曲目。但我看得出来，他的灵魂已经被压碎了一部分。",
+        "尽管如此，我们不会停止。因为我们发现，音乐可能是这个城市里最后的自由空间之一。在旋律和节奏中，人们还能找回一点点真实的自己。",
+        "今晚我想邀请你来听我们的聚会，如果你愿意的话。不是作为乘客，而是作为一个可能理解我们的人。你愿意吗？"
       ],
       "interrupt_responses": {
-        "empathy": "你理解音乐的真正意义，这让我觉得所做的一切都值得。",
-        "self_reflection": "每个人心中都有属于自己的歌，我们只是帮助唤醒它。",
-        "openness": "你愿意聆听这些被隐藏的声音，说明你有勇气面对真实。",
-        "basic": "是的，音乐应该有更深的意义。"
+        "empathy": "你的理解给了我勇气，音乐需要有共鸣的听众。",
+        "self_reflection": "是的，艺术是最后的避难所，我们必须保护它。",
+        "openness": "你愿意参与这种'危险'的艺术，说明你真的理解自由的意义。",
+        "basic": "嗯，听起来很有趣，但确实也很冒险。"
       },
       "game_effects": {
         "driving_preferences": {
-          "music_energetic": 1.0,
-          "music_soothing": 0.9,
-          "music_classical": 0.7,
-          "open_window": 0.9,
+          "music_soothing": 0.8,
+          "music_energetic": 0.9,
+          "smooth_driving": 0.8,
+          "open_window": 0.7,
           "fast_driving": 0.6
         },
         "economic": {
-          "base_fee": 50,
-          "tip_range": [10, 30]
+          "base_fee": 70,
+          "tip_range": [10, 25]
         },
         "attributes": {
-          "successful_interaction": {"openness": 1.8, "empathy": 1.2, "self_connection": 1.0, "pressure": -0.8},
-          "completion_bonus": {"openness": 1.2, "pressure": -1.0}
+          "successful_interaction": {"openness": 2.0, "empathy": 1.5, "self_connection": 1.3, "pressure": 0.8},
+          "completion_bonus": {"openness": 1.5, "pressure": -0.5}
         },
         "special_rewards": {
-          "story_progress": "jamie_music_network",
-          "unlock_hint": "地下音乐网络线索",
-          "cultural_item": "禁忌音乐片段"
+          "story_progress": "underground_art_network",
+          "resistance_invitation": "地下艺术网络的邀请",
+          "creative_awakening": "创造性表达的觉醒"
         }
       }
     },
     {
-      "id": "jamie_entertainment_3",
+      "id": "alex_entertainment_3",
       "encounter_type": "third",
-      "area": "entertainment", 
+      "area": "entertainment",
       "unlock_day": 6,
       "trigger_conditions": {
-        "time_range": ["02:00", "06:00"],
+        "time_range": ["00:00", "04:00"],
         "weather": ["any"],
-        "required_attributes": {"openness": 70, "self_connection": 60},
-        "previous_encounters": ["jamie_entertainment_1", "jamie_entertainment_2"]
+        "required_attributes": {"openness": 70, "empathy": 60},
+        "previous_encounters": ["alex_entertainment_1", "alex_entertainment_2"]
       },
       "dialogue": [
-        "司机朋友！今晚真的是特殊的夜晚。我们成功举办了一场秘密音乐会，就在废弃的地下通道里，没有监控，没有评分系统，只有纯粹的音乐和真实的情感。",
-        "来了大概三十个人，都是我们网络里的朋友。有音乐人、有诗人、有画家，还有一些只是想听真正音乐的普通人。我们唱了两个小时，没有人玩手机，没有人走神。",
-        "我唱了《后来》、《新不了情》，还有一首我自己写的歌，叫《夜行者》，写的就是像我们这样在黑暗中寻找光明的人。当最后一个音符落下时，全场寂静，然后爆发出最真诚的掌声。",
-        "你知道最神奇的是什么吗？一个从来没哭过的中年男人流泪了，一个平时很内向的女孩主动要求上台分享她的故事。音乐真的有一种魔力，能让人找回最真实的自己。",
-        "今晚我们还做了一个决定：要开始录制这些音乐，用最简单的设备，最原始的方法。不是为了传播，而是为了保存。总有一天，这个世界会重新需要真实的声音。",
-        "有个朋友提到了'选择性家庭'的概念。他说我们这群人，虽然没有血缘关系，但通过音乐连接在一起，互相支撑，互相理解。我觉得这就是我一直在寻找的归属感。",
-        "我想邀请你下次也来参加，如果你愿意的话。不一定要会音乐，只要有一颗还能被感动的心就够了。我们需要更多像你这样能理解的人。",
-        "也许有一天，我们不用再躲在地下。也许有一天，真实的音乐可以重新在阳光下响起。但在那一天到来之前，我们会继续在黑暗中点亮星火。"
+        "师傅！我有重大消息要告诉你！还记得我说过的那个地下音乐网络吗？我们取得了一个突破性的进展，而且我想你可能是其中的一部分。",
+        "昨晚，我们的聚会来了一个神秘的客人。她自称来自某个更大的组织，说我们的音乐'被注意到了' - 不是被当局，而是被那些'仍在寻找'的人。",
+        "她告诉我们，在这个城市里，有一个庞大但隐秘的网络，由各种各样的人组成 - 医生、司机、清洁工、学生、艺术家。他们都在用自己的方式保护着什么。",
+        "最让我震惊的是，她知道你。她说有个网约车司机，在深夜的接送中倾听着人们的真实声音，用共情和理解治愈着破碎的心灵。她说的就是你，对吧？",
+        "她给了我一首特殊的曲子，说这是'连接的密码'。当我演奏这首曲子时，真正的同路人会有反应。今晚在你的车里，我想为你演奏这首曲子。",
+        "如果我猜得没错，这首音乐会让你想起什么 - 也许是年轻时的梦想，也许是某个特殊的人，也许是你一直在寻找但说不清楚的东西。",
+        "我现在明白了，我们这些人不是孤立的个体。我们是一个看不见的大家庭，用不同的方式在做同样的事情 - 保护人性，传递真实，创造连接。",
+        "音乐只是其中一种语言。你的倾听是另一种，那个护士的治疗是第三种，那个学生的坚持是第四种。我们都在用自己的方式，让这个世界保持一点温度。",
+        "师傅，谢谢你。虽然你可能没有意识到，但你是这个网络中非常重要的一环。在这个冰冷的城市里，你的车厢就是一个移动的避难所。"
       ],
       "interrupt_responses": {
-        "empathy": "你就是我们在寻找的同伴，有同理心的人。",
-        "self_reflection": "每个人都需要找到自己的部落，自己的家。",
-        "openness": "你的开放心态给我们的网络带来了新的可能性。",
-        "basic": "是的，音乐能连接彼此孤独的心。"
+        "empathy": "你让我明白了，我们真的不是一个人在战斗。",
+        "self_reflection": "这首音乐...确实让我想起了一些重要的东西。",
+        "openness": "能成为这个网络的一部分，我感到既荣幸又责任重大。",
+        "basic": "这一切听起来像是电影情节，但又感觉很真实。"
       },
       "game_effects": {
         "driving_preferences": {
-          "music_energetic": 1.0,
           "music_soothing": 1.0,
-          "music_classical": 0.8,
-          "open_window": 1.0,
-          "smooth_driving": 0.8
+          "smooth_driving": 0.9,
+          "open_window": 0.8,
+          "music_energetic": 0.7
         },
         "economic": {
-          "base_fee": 40,
-          "tip_range": [20, 50]
+          "base_fee": 80,
+          "tip_range": [15, 30]
         },
         "attributes": {
-          "successful_interaction": {"openness": 2.5, "empathy": 2.0, "self_connection": 1.8, "pressure": -1.5},
-          "completion_bonus": {"openness": 2.0, "empathy": 1.5, "pressure": -2.5}
+          "successful_interaction": {"empathy": 2.5, "self_connection": 2.0, "openness": 2.0, "pressure": -1.0},
+          "completion_bonus": {"empathy": 2.0, "self_connection": 1.5, "pressure": -1.5}
         },
         "special_rewards": {
-          "story_progress": "jamie_complete",
-          "unlock_hint": "选择性家庭网络接触机会",
-          "network_access": "地下音乐圈完全接纳",
-          "identity_connection": "艺术抵抗者身份认同"
+          "story_progress": "queer_family_connection",
+          "network_recognition": "被更大组织认可",
+          "identity_revelation": "司机身份在网络中的重要性",
+          "musical_awakening": "音乐作为连接密码的觉醒",
+          "family_membership": "选择性家庭成员身份确认"
         }
       }
     }

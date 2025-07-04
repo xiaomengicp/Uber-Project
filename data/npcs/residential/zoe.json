@@ -1,156 +1,158 @@
 {
   "npc_info": {
-    "npc_id": "maria",
-    "npc_name": "Maria",
-    "archetype": "边缘母亲",
+    "npc_id": "zoe",
+    "npc_name": "Zoe",
+    "archetype": "纯真的提醒者",
     "primary_area": "residential",
-    "background": "28岁超市夜班收银员，被系统标记为'情绪不稳定个体'，但拒绝进入学院系统。独自抚养6岁女儿，努力保护孩子的真实情感不被系统规训",
-    "story_role": "母性抵抗代表，展现为保护下一代纯真而对抗系统规训的母爱力量"
+    "background": "19岁大学生，尚未被系统完全规训，保持着原始的情感表达能力和对世界的好奇心。代表着未被污染的人性和可能性",
+    "story_role": "纯真对比的载体，提醒玩家什么是未被系统扭曲的真实情感"
   },
   "events": [
     {
-      "id": "maria_residential_1",
+      "id": "zoe_residential_1",
       "encounter_type": "first",
       "area": "residential",
-      "unlock_day": 2,
+      "unlock_day": 1,
       "trigger_conditions": {
-        "time_range": ["22:30", "06:00"],
+        "time_range": ["21:00", "01:00"],
         "weather": ["any"],
         "required_attributes": {},
         "forbidden_attributes": {}
       },
       "dialogue": [
-        "师傅您好，去春阳小区，谢谢。刚下夜班，有点累。在24小时超市做收银员，凌晨的班次特别安静，但工资稍微高一点，可以更好地照顾女儿。",
-        "我叫Maria，今年28岁，有个6岁的女儿叫小雨。她爸爸在她两岁的时候就走了，说受不了我的'情绪化'。从那以后就是我们母女俩相依为命。",
-        "系统把我标记为'情绪不稳定个体'，因为我曾经在工作中为了保护一个被欺负的同事而大声争吵，还因为女儿生病时在医院走廊里哭过。",
-        "他们建议我去影子学院进行'情绪调节训练'，说这样对我的职业发展和孩子教育都有好处。但我拒绝了，我不想变成一个感受不到愤怒和悲伤的机器人。",
-        "特别是为了我女儿，我必须保持真实的情感。孩子需要一个能真正感受她快乐和痛苦的妈妈，而不是一个'情绪稳定'但内心空洞的看护者。",
-        "小雨现在上幼儿园，老师已经开始教他们'情绪管理'。6岁的孩子，就要学会控制自己的哭声，学会'合理表达需求'。我看着她努力憋住眼泪的样子，心都碎了。",
-        "每天晚上，我都会和小雨聊天，告诉她哭没有关系，生气也没有关系，高兴的时候可以大声笑。我教她感受自己的情绪，而不是压抑它们。",
-        "虽然生活很辛苦，但我不后悔我的选择。我宁愿做一个'问题母亲'，也要保护女儿内心的那份纯真和真实。"
+        "师傅你好！去大学城那边，谢谢！今晚和朋友们聚会聊得特别开心，感觉心情都飞起来了。你知道吗，我觉得能自由地笑和哭真的是很珍贵的事情。",
+        "我叫Zoe，是本地大学的二年级学生，学的是文学。我超级喜欢读各种书，尤其是诗歌，虽然老师说现在诗歌'不实用'，但我觉得诗歌里有很多大人们忘记的东西。",
+        "今天我们在讨论一首很老的诗，是关于自由和梦想的。同学们都说这种诗'太理想化了'，'现实不是这样的'。但我觉得正是因为现实不是这样，我们才更需要这种理想啊。",
+        "我发现周围的大人们好像都很累，很少看到他们真正开心地笑。就连我的室友，大三了，已经开始担心就业，每天都在研究什么叫'职场适应能力'。",
+        "她们告诉我要学会'情绪管理'，不要太'情绪化'，要变得'成熟稳重'。但我不明白，为什么开心的时候不能大笑，难过的时候不能大哭呢？这不是很自然的事情吗？",
+        "我妈妈最近也在劝我'现实一点'，说我这样下去会'适应不了社会'。但我觉得如果适应社会意味着失去自己，那我宁愿不要适应。",
+        "今晚和朋友们聊天的时候，我们说到小时候的梦想。大家都笑着说'那时候好幼稚啊'，但我看到他们眼里有种说不出的遗憾。",
+        "我想，如果长大意味着必须放弃那些让我们发光的东西，那长大到底有什么意义呢？"
       ],
       "interrupt_responses": {
-        "empathy": "谢谢您的理解，很少有人能明白一个母亲的担忧。",
-        "self_reflection": "是的，有时候坚持做自己是需要勇气的。",
-        "openness": "您愿意听我这样的想法，说明您是个有同情心的人。",
-        "basic": "嗯，为了孩子，再辛苦也值得。"
+        "empathy": "你能理解我的想法，说明你心里还保留着那份纯真。",
+        "self_reflection": "是的，保持真实的自己真的很重要。",
+        "openness": "你愿意听一个学生的思考，说明你还没有变得僵化。",
+        "basic": "嗯，年轻人就应该有年轻人的活力。"
       },
       "game_effects": {
         "driving_preferences": {
-          "smooth_driving": 1.0,
-          "music_soothing": 0.9,
-          "music_off": 0.7,
-          "close_window": 0.8,
-          "fast_driving": 0.2
+          "music_energetic": 0.9,
+          "fast_driving": 0.7,
+          "open_window": 0.8,
+          "smooth_driving": 0.6,
+          "music_soothing": 0.7
+        },
+        "economic": {
+          "base_fee": 30,
+          "tip_range": [2, 8]
+        },
+        "attributes": {
+          "successful_interaction": {"openness": 1.5, "self_connection": 1.0, "empathy": 0.8, "pressure": -1.0},
+          "completion_bonus": {"pressure": -0.8}
+        }
+      }
+    },
+    {
+      "id": "zoe_residential_2",
+      "encounter_type": "second",
+      "area": "residential",
+      "unlock_day": 3,
+      "trigger_conditions": {
+        "time_range": ["20:00", "02:00"],
+        "weather": ["any"],
+        "required_attributes": {"self_connection": 50},
+        "previous_encounters": ["zoe_residential_1"]
+      },
+      "dialogue": [
+        "师傅！又遇到你了，真巧。今天有点难过，想和你聊聊。我发现了一些让我困惑的事情，关于我们学校，关于这个社会。",
+        "最近学校开始推行一个新的'情绪健康计划'，说是要帮助学生更好地'适应社会'。表面上听起来很好，但实际体验让我感到不安。",
+        "他们给每个学生做'情绪评估'，用一些很奇怪的问题测试我们的反应。比如'当你看到不公平的事情时，你会怎么做？'，'你认为个人情感重要还是集体利益重要？'",
+        "我很诚实地回答了，说我会为不公平感到愤怒，会想要改变它。结果评估报告说我'情绪波动较大，需要进行调节训练'。",
+        "训练很奇怪，他们让我们看一些视频，听一些音频，说是'情绪调节技术'。看完之后，我感觉脑子里有种空空的感觉，就像情感被抽空了一样。",
+        "更可怕的是，我发现经过几次训练的同学们真的变了。他们变得很'稳定'，不再为任何事情激动或愤怒，连笑容都变得很标准，像是复制粘贴的一样。",
+        "我的室友就是其中一个。以前她会为了看到小动物受伤而哭，会为了不公平的事情而愤怒。现在她对什么都很'平静'，用她的话说就是'成熟了'。",
+        "但我觉得那不是成熟，那是某种东西死掉了。她的眼睛里失去了光芒，就像那些疲惫的大人们一样。",
+        "我开始害怕自己也会变成那样。我不想失去愤怒的能力，不想失去为美好事物而感动的心。但如果我不配合这些训练，我可能无法正常毕业。",
+        "师傅，你说我应该怎么办？是妥协，让自己变得'适应'，还是坚持自己，即使这意味着我可能被边缘化？"
+      ],
+      "interrupt_responses": {
+        "empathy": "谢谢你理解我的困扰，有时候坚持真实真的很孤独。",
+        "self_reflection": "是的，保持自己的感受能力比什么都重要。",
+        "openness": "你愿意支持我的选择，这给了我很大的勇气。",
+        "basic": "嗯，这确实是个很难的选择。"
+      },
+      "game_effects": {
+        "driving_preferences": {
+          "music_soothing": 0.8,
+          "smooth_driving": 0.9,
+          "close_window": 0.6,
+          "music_off": 0.7
         },
         "economic": {
           "base_fee": 35,
           "tip_range": [3, 10]
         },
         "attributes": {
-          "successful_interaction": {"empathy": 1.2, "self_connection": 0.8, "openness": 0.5},
-          "completion_bonus": {"pressure": -0.8}
+          "successful_interaction": {"empathy": 1.8, "self_connection": 1.5, "openness": 1.0, "pressure": 0.5},
+          "completion_bonus": {"self_connection": 1.0, "pressure": -0.5}
+        },
+        "special_rewards": {
+          "story_progress": "education_system_control",
+          "innocence_protection": "保护纯真的意识觉醒",
+          "resistance_inspiration": "年轻一代的抵抗可能性"
         }
       }
     },
     {
-      "id": "maria_residential_2",
-      "encounter_type": "second",
+      "id": "zoe_residential_3",
+      "encounter_type": "third",
       "area": "residential",
-      "unlock_day": 4,
+      "unlock_day": 5,
       "trigger_conditions": {
-        "time_range": ["23:00", "05:30"],
+        "time_range": ["19:00", "23:00"],
         "weather": ["any"],
-        "required_attributes": {"empathy": 60},
-        "previous_encounters": ["maria_residential_1"]
+        "required_attributes": {"empathy": 65, "self_connection": 60},
+        "previous_encounters": ["zoe_residential_1", "zoe_residential_2"]
       },
       "dialogue": [
-        "又见面了，师傅。今天心情很复杂，小雨的学校开家长会，老师说她'情绪表达过于强烈'，建议我带她去做心理评估。我当场就拒绝了。",
-        "老师说小雨在同学被欺负时会大哭，在看到受伤的小动物时会非常难过，这些都是'过度情绪反应'的表现。但我觉得，这正说明我女儿还保持着最珍贵的同情心。",
-        "会后有几个家长私下和我聊，他们说自己的孩子经过'情绪调节'后确实变得更'乖'了，不哭不闹，但也不笑了，就像小大人一样。这真的是我们想要的吗？",
-        "我告诉小雨，她为朋友哭泣是因为她有爱心，这是妈妈最骄傲的事情。她问我：'妈妈，为什么老师说哭泣不好？'我说：'因为有些大人忘记了哭泣的意义。'",
-        "晚上我们一起看了《小王子》的绘本，小雨指着那句'用心去看才能看得清楚'说：'妈妈，我想要用心去看世界。'那一刻我知道，我的坚持是对的。",
-        "虽然我被标记为'问题家长'，虽然我的收入微薄，虽然我们的生活不够稳定，但我不会让他们把我女儿变成一个没有感情的机器。",
-        "我开始联系一些和我想法相似的家长，我们准备组织一个非正式的支持小组。不是要对抗什么，只是想为我们的孩子创造一个可以真实表达情感的空间。",
-        "我相信，真正的教育应该是培养孩子的同情心、创造力和感受美好的能力，而不是把他们培养成情绪稳定的生产工具。"
+        "师傅！我有好消息要告诉你！记得我上次说的那些困扰吗？我想我找到了自己的答案，而且发现了一些很重要的事情。",
+        "我决定不参加那些'情绪调节训练'了。虽然这可能意味着我会被标记为'问题学生'，但我不能让自己变成那个样子。",
+        "更重要的是，我发现我不是一个人。有一些老师和同学，虽然表面上配合学校的政策，但私下里他们也在保护着什么。",
+        "我的文学教授悄悄给了我一些'不在课程里'的书，都是很老的诗集和小说。她说这些书里有'被遗忘的情感'，让我在家里偷偷读。",
+        "还有几个同学，我们组成了一个秘密的读书会。我们在宿舍里小声地讨论那些'不合时宜'的文学作品，分享自己真实的感受和想法。",
+        "在那些聚会里，我看到了他们真正的样子 - 有愤怒、有喜悦、有困惑、有希望。原来还有这么多人在内心深处保持着真实的自己。",
+        "我开始明白，保持真实不是一个人的战斗。虽然表面上这个社会要求我们变得'标准化'，但总有一些人在悄悄地保护着人性的火种。",
+        "我想起你上次听我说话时的眼神，那种理解和支持。我觉得你也是这样的人，在这个城市的角落里，用自己的方式保持着人性的温度。",
+        "现在我不再害怕了。即使我可能无法按照'标准路径'生活，即使我可能会面临困难，但我知道世界上还有像我们这样的人存在。",
+        "谢谢你，师傅。虽然我们只是在车里聊了几次天，但你让我明白，真实的连接是可能的，而且非常珍贵。"
       ],
       "interrupt_responses": {
-        "empathy": "您的理解给了我很大的力量，让我知道我不是一个人在战斗。",
-        "self_reflection": "每个母亲都要为孩子做出选择，我选择保护她的真实。",
-        "openness": "您这样支持我们的想法，让我觉得还有希望。",
-        "basic": "是的，孩子的纯真是最宝贵的。"
+        "empathy": "能和你这样的人相遇，是我的幸运。",
+        "self_reflection": "你让我也想起了自己年轻时的坚持。",
+        "openness": "你的勇气激励了我，让我也想要更真实地生活。",
+        "basic": "你是个很有勇气的孩子，保持这份真实。"
       },
       "game_effects": {
         "driving_preferences": {
-          "smooth_driving": 1.0,
-          "music_soothing": 1.0,
-          "music_classical": 0.7,
-          "close_window": 0.9,
-          "open_window": 0.4
+          "music_energetic": 0.8,
+          "open_window": 0.9,
+          "fast_driving": 0.6,
+          "smooth_driving": 0.8
         },
         "economic": {
           "base_fee": 40,
-          "tip_range": [5, 15]
+          "tip_range": [5, 12]
         },
         "attributes": {
-          "successful_interaction": {"empathy": 1.8, "self_connection": 1.5, "openness": 1.0, "pressure": -1.2},
-          "completion_bonus": {"empathy": 1.2, "pressure": -1.5}
+          "successful_interaction": {"empathy": 2.0, "self_connection": 2.0, "openness": 1.5, "pressure": -1.5},
+          "completion_bonus": {"empathy": 1.5, "self_connection": 1.5, "pressure": -1.0}
         },
         "special_rewards": {
-          "story_progress": "maria_resistance",
-          "maternal_wisdom": "母性保护本能觉醒",
-          "parent_network": "抵抗性家长群体线索"
-        }
-      }
-    },
-    {
-      "id": "maria_residential_3",
-      "encounter_type": "third",
-      "area": "residential",
-      "unlock_day": 6,
-      "trigger_conditions": {
-        "time_range": ["00:00", "06:00"],
-        "weather": ["any"],
-        "required_attributes": {"empathy": 75, "self_connection": 65},
-        "previous_encounters": ["maria_residential_1", "maria_residential_2"]
-      },
-      "dialogue": [
-        "师傅，今天是特殊的日子。我们的家长支持小组第一次聚会，来了十几个和我有相似想法的父母。我们决定要为孩子们做一些真正有意义的事情。",
-        "我们不是什么反对组织，我们只是一群想要保护孩子纯真的普通家长。我们决定在周末组织一些活动，让孩子们可以自由地表达情感，可以哭，可以笑，可以愤怒。",
-        "今天小雨第一次参加我们的活动，她和其他孩子一起画画、唱歌、讲故事。看到她们毫无保留地表达自己的想法和感受，我眼泪都流出来了。",
-        "有个8岁的男孩，平时在学校里总是沉默不语，但今天他大声说出了对父母离婚的愤怒和悲伤。他妈妈抱着他哭，说这是她第一次听到儿子表达真实感受。",
-        "还有个小女孩，她画了一幅画，里面有各种颜色的云朵。她说：'我的心情就像天空，有时候是蓝色的，有时候是灰色的，但都很美。'多么纯真的智慧！",
-        "我意识到，我们不只是在保护自己的孩子，我们是在为下一代保留人性中最珍贵的东西。如果连孩子都不被允许真实地感受，这个世界还有什么希望？",
-        "小雨问我：'妈妈，为什么有些大人不喜欢我们哭？'我告诉她：'因为他们忘记了哭泣可以洗净心灵，忘记了情感是生命的颜色。但妈妈永远不会忘记。'",
-        "这条路很难走，我们可能会面临更多的压力和困难。但我相信，只要还有人记得什么是真正的爱，什么是真正的教育，希望就不会消失。"
-      ],
-      "interrupt_responses": {
-        "empathy": "您的支持让我知道，世界上还有人真正关心孩子的心灵。",
-        "self_reflection": "每个大人都曾经是孩子，我们不能忘记那份纯真的价值。",
-        "openness": "您这样理解我们，给了我们继续前进的勇气。",
-        "basic": "是的，孩子们需要真正的爱和理解。"
-      },
-      "game_effects": {
-        "driving_preferences": {
-          "smooth_driving": 1.0,
-          "music_soothing": 1.0,
-          "music_classical": 0.8,
-          "close_window": 0.9,
-          "music_off": 0.7
-        },
-        "economic": {
-          "base_fee": 38,
-          "tip_range": [10, 25]
-        },
-        "attributes": {
-          "successful_interaction": {"empathy": 2.5, "self_connection": 2.0, "openness": 1.8, "pressure": -2.0},
-          "completion_bonus": {"empathy": 2.0, "self_connection": 1.5, "pressure": -2.5}
-        },
-        "special_rewards": {
-          "story_progress": "maria_complete",
-          "maternal_network": "抵抗性教育网络建立",
-          "child_protection": "儿童情感保护者身份",
-          "hope_preservation": "为下一代保留人性光辉"
+          "story_progress": "underground_resistance_network",
+          "hope_restoration": "年轻一代抵抗的希望",
+          "connection_achievement": "跨代际情感连接的建立",
+          "humanity_preservation": "人性火种的传递"
         }
       }
     }

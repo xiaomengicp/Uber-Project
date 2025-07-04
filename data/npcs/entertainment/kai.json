@@ -1,156 +1,105 @@
 {
   "npc_info": {
-    "npc_id": "jamie",
-    "npc_name": "Jamie",
-    "archetype": "地下音乐人",
+    "npc_id": "kai",
+    "npc_name": "Kai",
+    "archetype": "视觉诗歌走私者",
     "primary_area": "entertainment",
-    "background": "26岁酒吧驻唱歌手，用音乐传递被禁止的情感密码，可能是Queer Family边缘成员，地下梦语音乐网络的参与者",
-    "story_role": "艺术抵抗者，代表在系统监控下依然坚持真实表达的创作者群体"
+    "background": "26岁秘密视觉艺术家，白天在广告公司做设计师，晚上在地下画廊创作禁忌艺术。用视觉语言传递被压抑的情感和记忆",
+    "story_role": "视觉艺术抵抗的代表，展现创意在压抑环境中的顽强生存"
   },
   "events": [
     {
-      "id": "jamie_entertainment_1",
+      "id": "kai_entertainment_1",
       "encounter_type": "first",
       "area": "entertainment",
       "unlock_day": 2,
       "trigger_conditions": {
-        "time_range": ["23:00", "04:00"],
+        "time_range": ["01:00", "05:00"],
         "weather": ["any"],
         "required_attributes": {},
         "forbidden_attributes": {}
       },
       "dialogue": [
-        "师傅，去月影酒吧，谢谢。刚结束今晚最后一场演出，嗓子有点哑，但心情很好。今晚台下有几个人真的在听，而不是只是把音乐当背景噪音。",
-        "我叫Jamie，在这一带的几个酒吧唱歌。表面上我唱的都是安全的流行歌曲，但懂的人能听出来，我会在旋律里藏一些...不一样的东西。",
-        "你知道吗，现在的音乐都太干净了，每一首歌都要经过情绪评估，确保不会引起'不当情感反应'。但真正的音乐不应该是这样的，它应该能触动人心最深处的东西。",
-        "我会在深夜的时候偷偷弹唱一些老歌，那些'模糊时期'前的经典。《月亮代表我的心》、《夜来香》...那些旋律里有种现在音乐里找不到的真挚。",
-        "有时候演出结束后，会有人悄悄走到台前，什么都不说，只是看着我点点头。我知道他们听懂了，听懂了那些不能明说的情感。",
-        "音乐是他们还没学会完全控制的语言。因为音乐是抽象的，是感性的，系统很难界定什么旋律会带来什么确切的情感反应。这就是我们的机会。",
-        "我认识一些人，和我一样的音乐人，我们有自己的小圈子。我们会交换一些特别的歌曲，一些能让人想起真实感受的旋律。这些歌只能在深夜唱给懂的人听。",
-        "当你每晚都面对那些麻木的观众，看着他们机械地摇摆，你就明白为什么真实的艺术变得如此珍贵。我们不是在表演，我们是在偷偷进行一场拯救灵魂的战争。"
+        "师傅，去艺术区的那个24小时打印店，谢谢。需要赶在天亮前完成一些...特殊的项目。你有没有注意过这个城市里的广告和宣传画？它们都有种奇怪的相似性。",
+        "我是Kai，白天在一家大广告公司做视觉设计师。表面上我设计那些'情绪稳定'的商业图像，但晚上...我在做完全不同的事情。",
+        "你知道吗，现在所有的视觉艺术都被严格规范了。颜色、构图、符号使用，都有详细的指导原则。红色不能太鲜艳，黑色不能太深沉，任何可能引起'情绪波动'的视觉元素都被禁止。",
+        "我们被要求创造'和谐、积极、促进生产力'的图像。但真正的艺术不应该是这样的。艺术应该能够触动内心深处的东西，甚至唤醒一些被遗忘的感受。",
+        "所以我开始了秘密创作。白天我按规范做那些安全的设计，晚上我画那些真实的、混乱的、充满矛盾的作品。",
+        "我的秘密作品都藏着密码。表面上看可能是抽象的色彩和线条，但如果你知道怎么解读，就能看到其中隐藏的诗歌、记忆片段、甚至是禁忌的情感表达。",
+        "今晚我要去打印一系列新作品，准备偷偷贴在城市的各个角落。不是为了出名，而是为了让那些迷失的人知道，还有人在创造真实的东西。",
+        "有时候一个陌生人会在街角停下来，长久地凝视我的作品。我知道他们在那一刻找回了什么 - 也许是童年的记忆，也许是被压抑的梦想，也许只是片刻的真实感受。"
       ],
       "interrupt_responses": {
-        "empathy": "你能理解音乐的力量，这说明你的心还是敞开的。",
-        "self_reflection": "是的，每个艺术家都在寻找自己的声音。",
-        "openness": "愿意聆听不同声音的人越来越少了。",
-        "basic": "嗯，音乐确实能表达很多东西。"
+        "empathy": "你能理解艺术的这种力量，说明你的心还没有被完全规范化。",
+        "self_reflection": "是的，创作就是一种自我寻找的过程。",
+        "openness": "你愿意欣赏这种'危险'的艺术，这很珍贵。",
+        "basic": "街头艺术确实有种特别的魅力。"
       },
       "game_effects": {
         "driving_preferences": {
-          "music_energetic": 0.9,
-          "music_soothing": 0.8,
-          "music_off": 0.3,
+          "smooth_driving": 0.7,
+          "music_energetic": 0.8,
           "open_window": 0.8,
-          "smooth_driving": 0.7
-        },
-        "economic": {
-          "base_fee": 45,
-          "tip_range": [5, 20]
-        },
-        "attributes": {
-          "successful_interaction": {"openness": 1.2, "empathy": 0.8, "self_connection": 0.5},
-          "completion_bonus": {"pressure": -0.5}
-        }
-      }
-    },
-    {
-      "id": "jamie_entertainment_2",
-      "encounter_type": "second", 
-      "area": "entertainment",
-      "unlock_day": 4,
-      "trigger_conditions": {
-        "time_range": ["01:00", "05:00"],
-        "weather": ["any"],
-        "required_attributes": {"openness": 55},
-        "previous_encounters": ["jamie_entertainment_1"]
-      },
-      "dialogue": [
-        "嘿，是你啊！刚才在台上看到一个熟悉的面孔，原来是你。今晚特别，我冒险唱了一首特别的歌，《风继续吹》，用的是原版的编曲。",
-        "你知道那首歌的故事吗？张国荣唱的，关于爱情，关于离别，关于那种撕心裂肺的真实情感。现在这样的歌是不被允许的，他们说会引起'情绪不稳定'。",
-        "但你看到台下人们的反应了吗？有个女孩哭了，有个中年男人眼中有光。那一刻我确定，人们内心对真实情感的渴望从未消失，只是被深深埋藏了。",
-        "我想告诉你一个秘密。我们有一个地下网络，叫做'梦语音乐'。我们会在不同的场所，用暗号交流，分享那些被禁止的旋律。不是为了反抗，只是为了保存。",
-        "就像古代的人把经书藏在山洞里一样，我们把真正的音乐藏在人们的记忆里。每一次传唱，都是一次文化的传递，一次情感的传承。",
-        "昨天有个老先生找到我，说他年轻时是乐队的贝斯手。他教了我一些和弦进行，那些在'模糊时期'前就存在的音乐理论。原来音乐可以这么复杂，这么有层次。",
-        "我开始明白，我们不只是在保存音乐，我们是在保存人类表达情感的能力。每一个音符，每一段旋律，都是对系统单调化的抵抗。",
-        "有人说我们这样做很危险，但我觉得真正危险的是让音乐变成背景噪音，让艺术变成装饰品。如果音乐不能触动人心，它还能叫音乐吗？"
-      ],
-      "interrupt_responses": {
-        "empathy": "你理解音乐的真正意义，这让我觉得所做的一切都值得。",
-        "self_reflection": "每个人心中都有属于自己的歌，我们只是帮助唤醒它。",
-        "openness": "你愿意聆听这些被隐藏的声音，说明你有勇气面对真实。",
-        "basic": "是的，音乐应该有更深的意义。"
-      },
-      "game_effects": {
-        "driving_preferences": {
-          "music_energetic": 1.0,
-          "music_soothing": 0.9,
-          "music_classical": 0.7,
-          "open_window": 0.9,
-          "fast_driving": 0.6
+          "fast_driving": 0.6,
+          "music_soothing": 0.7
         },
         "economic": {
           "base_fee": 50,
-          "tip_range": [10, 30]
+          "tip_range": [5, 15]
         },
         "attributes": {
-          "successful_interaction": {"openness": 1.8, "empathy": 1.2, "self_connection": 1.0, "pressure": -0.8},
-          "completion_bonus": {"openness": 1.2, "pressure": -1.0}
-        },
-        "special_rewards": {
-          "story_progress": "jamie_music_network",
-          "unlock_hint": "地下音乐网络线索",
-          "cultural_item": "禁忌音乐片段"
+          "successful_interaction": {"openness": 1.3, "self_connection": 1.0, "empathy": 0.8},
+          "completion_bonus": {"pressure": -0.7}
         }
       }
     },
     {
-      "id": "jamie_entertainment_3",
-      "encounter_type": "third",
-      "area": "entertainment", 
-      "unlock_day": 6,
+      "id": "kai_entertainment_2",
+      "encounter_type": "second",
+      "area": "entertainment",
+      "unlock_day": 4,
       "trigger_conditions": {
         "time_range": ["02:00", "06:00"],
         "weather": ["any"],
-        "required_attributes": {"openness": 70, "self_connection": 60},
-        "previous_encounters": ["jamie_entertainment_1", "jamie_entertainment_2"]
+        "required_attributes": {"openness": 60},
+        "previous_encounters": ["kai_entertainment_1"]
       },
       "dialogue": [
-        "司机朋友！今晚真的是特殊的夜晚。我们成功举办了一场秘密音乐会，就在废弃的地下通道里，没有监控，没有评分系统，只有纯粹的音乐和真实的情感。",
-        "来了大概三十个人，都是我们网络里的朋友。有音乐人、有诗人、有画家，还有一些只是想听真正音乐的普通人。我们唱了两个小时，没有人玩手机，没有人走神。",
-        "我唱了《后来》、《新不了情》，还有一首我自己写的歌，叫《夜行者》，写的就是像我们这样在黑暗中寻找光明的人。当最后一个音符落下时，全场寂静，然后爆发出最真诚的掌声。",
-        "你知道最神奇的是什么吗？一个从来没哭过的中年男人流泪了，一个平时很内向的女孩主动要求上台分享她的故事。音乐真的有一种魔力，能让人找回最真实的自己。",
-        "今晚我们还做了一个决定：要开始录制这些音乐，用最简单的设备，最原始的方法。不是为了传播，而是为了保存。总有一天，这个世界会重新需要真实的声音。",
-        "有个朋友提到了'选择性家庭'的概念。他说我们这群人，虽然没有血缘关系，但通过音乐连接在一起，互相支撑，互相理解。我觉得这就是我一直在寻找的归属感。",
-        "我想邀请你下次也来参加，如果你愿意的话。不一定要会音乐，只要有一颗还能被感动的心就够了。我们需要更多像你这样能理解的人。",
-        "也许有一天，我们不用再躲在地下。也许有一天，真实的音乐可以重新在阳光下响起。但在那一天到来之前，我们会继续在黑暗中点亮星火。"
+        "师傅！今晚有个重大发现要和你分享。我发现了一个隐秘的视觉语言网络，一种在监管之外传递信息的方式。",
+        "最近几个月，我开始在我的街头作品中留下特殊的符号 - 不是明显的标记，而是一些颜色组合、线条走向、形状关系。只有真正理解的人才能看懂。",
+        "令我惊讶的是，有人开始回应了。我在不同的地方发现了使用相似视觉语言的作品，它们在和我的画进行对话，完善我提出的视觉诗句。",
+        "我意识到，有一个由地下艺术家组成的网络在悄悄运作。我们可能从未见过面，但我们在用视觉语言进行着深层的情感交流。",
+        "这种视觉对话包含着被禁止的内容：对自由的渴望、对复杂情感的表达、对美好事物的记忆、甚至是对系统的质疑。但这些都被巧妙地编码在抽象的艺术语言中。",
+        "更有趣的是，普通人也开始参与了。我看到有人在我的作品旁边画小花，有人添加一些简单的线条。他们可能不懂我们的'专业语言'，但他们在用最直观的方式表达共鸣。",
+        "昨天我发现了一个特别感人的回应：一个孩子在我的画旁边画了一个太阳，用最纯真的黄色。那一刻我明白，真正的艺术不需要复杂的技巧，只需要真实的表达。",
+        "我开始思考，也许我们这些秘密艺术家的真正使命不是创造'高深'的作品，而是为普通人提供一个表达真实情感的出口。",
+        "现在我在设计一种更简单、更直观的视觉语言，让任何人都能参与这种情感的表达和交流。艺术应该属于每个人，而不只是艺术家。"
       ],
       "interrupt_responses": {
-        "empathy": "你就是我们在寻找的同伴，有同理心的人。",
-        "self_reflection": "每个人都需要找到自己的部落，自己的家。",
-        "openness": "你的开放心态给我们的网络带来了新的可能性。",
-        "basic": "是的，音乐能连接彼此孤独的心。"
+        "empathy": "你理解了艺术的民主化意义，这比技巧更重要。",
+        "self_reflection": "这让我想起小时候自由涂鸦的快乐。",
+        "openness": "你在创造一种新的交流方式，这很了不起。",
+        "basic": "能看到人们用艺术表达自己确实很美好。"
       },
       "game_effects": {
         "driving_preferences": {
-          "music_energetic": 1.0,
-          "music_soothing": 1.0,
-          "music_classical": 0.8,
-          "open_window": 1.0,
-          "smooth_driving": 0.8
+          "smooth_driving": 0.8,
+          "music_energetic": 0.9,
+          "open_window": 0.9,
+          "music_soothing": 0.8
         },
         "economic": {
-          "base_fee": 40,
-          "tip_range": [20, 50]
+          "base_fee": 60,
+          "tip_range": [8, 20]
         },
         "attributes": {
-          "successful_interaction": {"openness": 2.5, "empathy": 2.0, "self_connection": 1.8, "pressure": -1.5},
-          "completion_bonus": {"openness": 2.0, "empathy": 1.5, "pressure": -2.5}
+          "successful_interaction": {"openness": 1.8, "empathy": 1.3, "self_connection": 1.2, "pressure": -0.8},
+          "completion_bonus": {"openness": 1.0, "pressure": -0.5}
         },
         "special_rewards": {
-          "story_progress": "jamie_complete",
-          "unlock_hint": "选择性家庭网络接触机会",
-          "network_access": "地下音乐圈完全接纳",
-          "identity_connection": "艺术抵抗者身份认同"
+          "story_progress": "visual_resistance_network",
+          "democratic_art": "艺术民主化的觉醒",
+          "visual_language": "视觉密码语言的发现"
         }
       }
     }

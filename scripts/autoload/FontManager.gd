@@ -77,9 +77,9 @@ func create_ui_theme():
     ui_theme = Theme.new()
     
     # 设置字体大小
-    ui_theme.set_font_size("font_size", "Button", 18)
-    ui_theme.set_font_size("font_size", "Label", 16)
-    ui_theme.set_font_size("font_size", "RichTextLabel", 16)
+    ui_theme.set_font_size("font_size", "Button", 22)
+    ui_theme.set_font_size("font_size", "Label", 20)
+    ui_theme.set_font_size("font_size", "RichTextLabel", 20)
     
     # 如果成功加载了字体，就应用它
     if default_font and (default_font.data.size() > 0 or default_font != null):
