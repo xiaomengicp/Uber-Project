@@ -798,3 +798,393 @@ func debug_shop_ui():
 # 如果你的 switch_to_ui 方法存在，请在其中添加：
 # if ui_name == "shop":
 #     debug_shop_ui()  # 调试用，正式版本可以移除
+# UIManager.gd 梦网界面扩展部分
+# 将这些方法添加到现有的UIManager.gd中
+
+# ============ 梦网界面相关方法 ============
+
+
+
+func create_dreamweave_content_item(parent: VBoxContainer, content: Dictionary, index: int):
+    """创建单个梦网内容项"""
+    # 内容项容器
+    var item_container = Panel.new()
+    item_container.custom_minimum_size = Vector2(0, 120)
+    
+    # 设置不同类型内容的颜色
+    var item_style = StyleBoxFlat.new()
+    item_style.corner_radius_top_left = 8
+    item_style.corner_radius_top_right = 8
+    item_style.corner_radius_bottom_left = 8
+    item_style.corner_radius_bottom_right = 8
+    
+    # 根据内容情感设置颜色
+    match content.get("sentiment", "neutral"):
+        "positive":
+            item_style.bg_color = Color(0.1, 0.2, 0.1, 0.8)
+            item_style.border_color = Color(0.2, 0.8, 0.2, 0.5)
+        "negative":
+            item_style.bg_color = Color(0.2, 0.1, 0.1, 0.8)
+            item_style.border_color = Color(0.8, 0.2, 0.2, 0.5)
+        _:
+            item_style.bg_color = Color(0.1, 0.1, 0.2, 0.8)
+            item_style.border_color = Color(0.4, 0.4, 0.8, 0.5)
+    
+    item_style.border_width_left = 1
+    item_style.border_width_right = 1
+    item_style.border_width_top = 1
+    item_style.border_width_bottom = 1
+    item_container.add_theme_stylebox_override("panel", item_style)
+    
+    # 主布局
+    var main_hbox = HBoxContainer.new()
+    main_hbox.anchors_preset = Control.PRESET_FULL_RECT
+    main_hbox.offset_left = 15
+    main_hbox.offset_right = -15
+    main_hbox.offset_top = 10
+    main_hbox.offset_bottom = -10
+    item_container.add_child(main_hbox)
+    
+    # 内容区域
+    var content_vbox = VBoxContainer.new()
+    content_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    
+    # 作者和标签行
+    var header_hbox = HBoxContainer.new()
+    
+    # 作者标签
+    var author_label = Label.new()
+    author_label.text = "@" + content.get("author", "匿名")
+    author_label.add_theme_font_size_override("font_size", 12)
+    author_label.add_theme_color_override("font_color", Color(0.6, 0.8, 1.0))
+    
+    # 标签显示
+    var tags_label = Label.new()
+    var tags_text = ""
+    var tags = content.get("tags", [])
+    for tag in tags:
+        tags_text += "#" + tag + " "
+    tags_label.text = tags_text
+    tags_label.add_theme_font_size_override("font_size", 10)
+    tags_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.6))
+    tags_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    tags_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    
+    header_hbox.add_child(author_label)
+    header_hbox.add_child(tags_label)
+    content_vbox.add_child(header_hbox)
+    
+    # 内容文本
+    var content_label = Label.new()
+    content_label.text = content.get("content", "")
+    content_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    content_label.add_theme_font_size_override("font_size", 14)
+    content_label.add_theme_color_override("font_color", Color.WHITE)
+    content_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    content_vbox.add_child(content_label)
+    
+    main_hbox.add_child(content_vbox)
+    
+    # 点赞区域
+    var like_container = VBoxContainer.new()
+    like_container.custom_minimum_size = Vector2(80, 0)
+    like_container.alignment = BoxContainer.ALIGNMENT_CENTER
+    
+    # 点赞按钮
+    var like_button = Button.new()
+    var is_liked = content.get("is_liked", false)
+    like_button.text = "❤️" if is_liked else "🤍"
+    like_button.custom_minimum_size = Vector2(60, 40)
+    like_button.disabled = is_liked
+    
+    # 连接点赞信号
+    if not is_liked:
+        like_button.pressed.connect(_on_dreamweave_like_pressed.bind(content.get("id", "")))
+    
+    # 点赞状态文字
+    var like_status_label = Label.new()
+    like_status_label.text = "已赞" if is_liked else "点赞"
+    like_status_label.add_theme_font_size_override("font_size", 10)
+    like_status_label.add_theme_color_override("font_color", Color.PINK if is_liked else Color.LIGHT_GRAY)
+    like_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    
+    like_container.add_child(like_button)
+    like_container.add_child(like_status_label)
+    main_hbox.add_child(like_container)
+    
+    parent.add_child(item_container)
+    
+    # 添加项目间距
+    if index < parent.get_child_count() - 1:
+        var spacer = Control.new()
+        spacer.custom_minimum_size.y = 10
+        parent.add_child(spacer)
+
+
+func show_dreamweave_like_feedback(content_id: String, effects: Dictionary):
+    """显示点赞反馈"""
+    print("💖 点赞反馈：", content_id, " 效果：", effects)
+    
+    # 创建简单的反馈提示
+    var dreamweave_ui = get_node_or_null("../DreamWeaveUI")
+    if dreamweave_ui == null:
+        return
+    
+    # 创建反馈标签
+    var feedback_label = Label.new()
+    var feedback_text = "✨ "
+    for attr in effects.keys():
+        var change = effects[attr]
+        var attr_name = get_attribute_display_name(attr)
+        var sign = "+" if change > 0 else ""
+        feedback_text += "%s%s %s " % [sign, change, attr_name]
+    
+    feedback_label.text = feedback_text
+    feedback_label.add_theme_font_size_override("font_size", 12)
+    feedback_label.add_theme_color_override("font_color", Color.YELLOW)
+    feedback_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    feedback_label.position = Vector2(dreamweave_ui.size.x / 2 - 100, 100)
+    feedback_label.size = Vector2(200, 30)
+    
+    dreamweave_ui.add_child(feedback_label)
+    
+    # 2秒后自动消失
+    var timer = Timer.new()
+    timer.wait_time = 2.0
+    timer.one_shot = true
+    timer.timeout.connect(feedback_label.queue_free)
+    dreamweave_ui.add_child(timer)
+    timer.start()
+
+func get_attribute_display_name(attr: String) -> String:
+    """获取属性显示名称"""
+    match attr:
+        "empathy": return "共情"
+        "self_connection": return "自省"
+        "openness": return "开放"
+        "pressure": return "压力"
+        _: return attr
+
+# ============ 梦网界面信号处理 ============
+
+func _on_dreamweave_like_pressed(content_id: String):
+    """处理梦网点赞"""
+    print("👍 梦网点赞：", content_id)
+    button_pressed.emit("dreamweave_like", {"content_id": content_id})
+
+func _on_dreamweave_refresh_pressed():
+    """处理梦网刷新"""
+    print("🔄 梦网刷新请求")
+    button_pressed.emit("dreamweave_refresh", {})
+
+func _on_dreamweave_return_pressed():
+    """处理梦网返回"""
+    print("🏠 梦网返回")
+    button_pressed.emit("dreamweave_return", {})
+    
+    # UIManager.gd 修复的梦网UI方法
+# 替换现有的相关方法
+
+func update_dreamweave_content(content_list: Array):
+    """更新梦网内容显示 - 修复版本"""
+    # 修复节点路径查找
+    var dreamweave_ui = get_node_or_null("../DreamWeaveUI")
+    if dreamweave_ui == null:
+        print("❌ 梦网界面不存在，尝试直接查找...")
+        # 尝试从当前UI容器的父节点查找
+        var parent = ui_container.get_parent()
+        if parent != null:
+            dreamweave_ui = parent.get_node_or_null("DreamWeaveUI")
+        
+        if dreamweave_ui == null:
+            print("❌ 无法找到梦网界面")
+            return
+    
+    # 修复内容容器路径
+    var content_container = dreamweave_ui.get_node_or_null("Panel/VBoxContainer/ScrollContainer/ContentList")
+    if content_container == null:
+        print("❌ 梦网内容容器不存在，尝试查找所有可能路径...")
+        # 调试：打印界面结构
+        print("🔍 梦网界面结构：")
+        debug_node_structure(dreamweave_ui, 0)
+        
+        # 尝试其他可能的路径
+        var possible_paths = [
+            "VBoxContainer/ScrollContainer/ContentList",
+            "MainPanel/VBoxContainer/ScrollContainer/ContentList", 
+            "Panel/VBox/ScrollContainer/ContentList"
+        ]
+        
+        for path in possible_paths:
+            content_container = dreamweave_ui.get_node_or_null(path)
+            if content_container != null:
+                print("✅ 找到内容容器，路径：", path)
+                break
+        
+        if content_container == null:
+            print("❌ 无法找到内容容器，请检查create_dreamweave_ui()的节点结构")
+            return
+    
+    # 清空现有内容
+    for child in content_container.get_children():
+        child.queue_free()
+    
+    await get_tree().process_frame
+    
+    print("🌐 更新梦网内容，共", content_list.size(), "条")
+    
+    # 创建内容项
+    for i in range(content_list.size()):
+        var content = content_list[i]
+        create_dreamweave_content_item(content_container, content, i)
+
+func debug_node_structure(node: Node, indent: int = 0):
+    """调试节点结构"""
+    var indent_str = "  ".repeat(indent)
+    print(indent_str + "- " + node.name + " (" + node.get_class() + ")")
+    
+    for child in node.get_children():
+        if indent < 3:  # 限制深度避免输出过多
+            debug_node_structure(child, indent + 1)
+
+func create_dreamweave_ui() -> Control:
+    """创建梦网界面 - 修复版本"""
+    print("🌐 创建梦网界面...")
+    
+    # 隐藏所有现有UI
+    hide_all_ui()
+    
+    # 创建梦网界面容器
+    var dreamweave_container = Control.new()
+    dreamweave_container.name = "DreamWeaveUI"
+    dreamweave_container.anchors_preset = Control.PRESET_FULL_RECT
+    
+    # 主面板 - 确保名称一致
+    var main_panel = Panel.new()
+    main_panel.name = "Panel"  # 确保名称是"Panel"
+    main_panel.anchors_preset = Control.PRESET_FULL_RECT
+    main_panel.offset_left = 50
+    main_panel.offset_right = -50
+    main_panel.offset_top = 50
+    main_panel.offset_bottom = -50
+    
+    # 设置面板样式
+    var panel_style = StyleBoxFlat.new()
+    panel_style.bg_color = Color(0.05, 0.1, 0.15, 0.95)
+    panel_style.border_color = Color(0.2, 0.4, 0.6)
+    panel_style.border_width_left = 2
+    panel_style.border_width_right = 2
+    panel_style.border_width_top = 2
+    panel_style.border_width_bottom = 2
+    panel_style.corner_radius_top_left = 10
+    panel_style.corner_radius_top_right = 10
+    panel_style.corner_radius_bottom_left = 10
+    panel_style.corner_radius_bottom_right = 10
+    main_panel.add_theme_stylebox_override("panel", panel_style)
+    
+    dreamweave_container.add_child(main_panel)
+    
+    # 主布局 - 确保名称一致
+    var vbox = VBoxContainer.new()
+    vbox.name = "VBoxContainer"  # 确保名称是"VBoxContainer"
+    vbox.anchors_preset = Control.PRESET_FULL_RECT
+    vbox.offset_left = 20
+    vbox.offset_right = -20
+    vbox.offset_top = 15
+    vbox.offset_bottom = -15
+    main_panel.add_child(vbox)
+    
+    # 标题
+    var title_label = Label.new()
+    title_label.text = "🌐 梦网 DreamWeave"
+    title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    title_label.add_theme_font_size_override("font_size", 24)
+    title_label.add_theme_color_override("font_color", Color(0.4, 0.8, 1.0))
+    vbox.add_child(title_label)
+    
+    # 副标题
+    var subtitle_label = Label.new()
+    subtitle_label.text = "今日推荐内容 - 点击❤️表达共鸣"
+    subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    subtitle_label.add_theme_font_size_override("font_size", 14)
+    subtitle_label.add_theme_color_override("font_color", Color.LIGHT_GRAY)
+    vbox.add_child(subtitle_label)
+    
+    # 分隔线
+    var separator = HSeparator.new()
+    separator.custom_minimum_size.y = 10
+    vbox.add_child(separator)
+    
+    # 内容滚动区域 - 确保名称一致
+    var scroll_container = ScrollContainer.new()
+    scroll_container.name = "ScrollContainer"  # 确保名称是"ScrollContainer"
+    scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+    scroll_container.custom_minimum_size = Vector2(0, 400)
+    vbox.add_child(scroll_container)
+    
+    # 内容列表容器 - 确保名称一致
+    var content_list = VBoxContainer.new()
+    content_list.name = "ContentList"  # 确保名称是"ContentList"
+    content_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    scroll_container.add_child(content_list)
+    
+    # 底部按钮区域
+    var button_container = HBoxContainer.new()
+    button_container.name = "HBoxContainer"  # 确保名称一致
+    button_container.alignment = BoxContainer.ALIGNMENT_CENTER
+    
+    # 刷新按钮
+    var refresh_button = Button.new()
+    refresh_button.text = "🔄 刷新内容"
+    refresh_button.custom_minimum_size = Vector2(120, 40)
+    refresh_button.pressed.connect(_on_dreamweave_refresh_pressed)
+    
+    # 统计标签
+    var stats_label = Label.new()
+    stats_label.name = "StatsLabel"
+    stats_label.text = "今日互动: 0次"
+    stats_label.add_theme_font_size_override("font_size", 12)
+    stats_label.add_theme_color_override("font_color", Color.LIGHT_GRAY)
+    
+    # 返回按钮
+    var return_button = Button.new()
+    return_button.text = "🏠 返回"
+    return_button.custom_minimum_size = Vector2(100, 40)
+    return_button.pressed.connect(_on_dreamweave_return_pressed)
+    
+    button_container.add_child(refresh_button)
+    button_container.add_child(stats_label)
+    button_container.add_child(return_button)
+    vbox.add_child(button_container)
+    
+    # 应用字体
+    if has_node("/root/FontManager"):
+        FontManager.apply_theme_to_node(dreamweave_container)
+    
+    # 添加到主场景
+    ui_container.get_parent().add_child(dreamweave_container)
+    current_ui = dreamweave_container
+    
+    print("✅ 梦网界面创建完成")
+    print("   节点路径: Panel/VBoxContainer/ScrollContainer/ContentList")
+    return dreamweave_container
+
+func update_dreamweave_stats(interactions_count: int, total_content: int):
+    """更新梦网统计信息 - 修复版本"""
+    var dreamweave_ui = get_node_or_null("../DreamWeaveUI")
+    if dreamweave_ui == null:
+        # 尝试从父节点查找
+        var parent = ui_container.get_parent()
+        if parent != null:
+            dreamweave_ui = parent.get_node_or_null("DreamWeaveUI")
+    
+    if dreamweave_ui == null:
+        print("❌ 无法找到梦网界面来更新统计")
+        return
+    
+    var stats_label = dreamweave_ui.get_node_or_null("Panel/VBoxContainer/HBoxContainer/StatsLabel")
+    if stats_label != null:
+        stats_label.text = "今日互动: %d/%d" % [interactions_count, total_content]
+        print("✅ 更新统计: %d/%d" % [interactions_count, total_content])
+    else:
+        print("❌ 无法找到统计标签")

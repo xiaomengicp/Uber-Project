@@ -4,13 +4,23 @@
 extends Node
 
 # 游戏状态枚举
+
+# GameManager.gd 梦网状态扩展
+# 在现有的GameManager.gd中进行以下修改：
+
+# 1. 更新游戏状态枚举，添加DREAMWEAVE状态：
 enum GameState {
     MENU,
     AREA_SELECTION,
     DRIVING,
     HOME,
-    SHOP
+    SHOP,
+    DREAMWEAVE  # 新增梦网状态
 }
+
+# 2. 在_on_game_state_changed()函数中添加DREAMWEAVE状态处理：
+
+
 
 # 信号定义
 signal state_changed(new_state: GameState)
@@ -230,3 +240,12 @@ func calculate_final_score() -> float:
     
     # 这里可以加入其他因素，如NPC关系、经济状况等
     return attr_avg
+
+# 3. 添加便捷方法进入梦网状态：
+func enter_dreamweave_state():
+    """进入梦网状态"""
+    change_state(GameState.DREAMWEAVE)
+
+func exit_dreamweave_state():
+    """退出梦网状态，返回家中"""
+    change_state(GameState.HOME)

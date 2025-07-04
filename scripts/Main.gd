@@ -5,6 +5,7 @@ extends Control
 var ui_manager: UIManager
 var qte_system: DrivingQTESystem
 var shop_system: ShopSystem
+var dreamweave_system: DreamWeaveSystem
 
 # 当前游戏状态
 var current_area: String = ""
@@ -94,8 +95,12 @@ func initialize_managers():
     shop_system = ShopSystem.new()
     add_child(shop_system)
     
+    # 创建梦网系统
+    dreamweave_system = DreamWeaveSystem.new()
+    add_child(dreamweave_system)
+    
     print("✅ 管理器初始化完成")
-
+    
 func verify_ui_nodes():
     """验证UI节点结构"""
     print("🔍 验证UI节点...")
@@ -150,7 +155,13 @@ func connect_signals():
     # 驾驶控制信号
     connect_driving_controls()
     
+    # 梦网系统信号
+    dreamweave_system.content_liked.connect(_on_dreamweave_content_liked)
+    dreamweave_system.browsing_completed.connect(_on_dreamweave_browsing_completed)
+    
     print("✅ 信号连接完成")
+    
+    # print("✅ 信号连接完成")
 
 func connect_driving_controls():
     """连接驾驶控制按钮信号"""
@@ -227,8 +238,19 @@ func _input(event):
             KEY_F5:
                 # 调试属性
                 debug_player_attributes()
-
+            # 现有快捷键...
+            
+            KEY_F6:
+                # 调试梦网系统
+                debug_dreamweave_system()
+            KEY_F7:
+                # 快速测试梦网浏览
+                if GameManager.current_state == GameManager.GameState.HOME:
+                    start_dreamweave_browsing()
 # ============ 信号处理方法 ============
+# Main.gd 中的 _on_game_state_changed() 方法更新
+# 在现有的方法中添加DREAMWEAVE状态处理：
+
 func _on_game_state_changed(new_state: GameManager.GameState):
     """响应游戏状态变化"""
     print("🎮 游戏状态变化：", GameManager.GameState.keys()[new_state])
@@ -249,6 +271,12 @@ func _on_game_state_changed(new_state: GameManager.GameState):
         GameManager.GameState.SHOP:
             ui_manager.switch_to_ui("shop")
             update_shop_display()
+        GameManager.GameState.DREAMWEAVE:  # 新增梦网状态处理
+            # 梦网界面由start_dreamweave_browsing()方法直接创建
+            print("🌐 进入梦网状态")
+            
+# Main.gd 按钮处理修复
+# 在现有的 _on_ui_button_pressed() 方法中修改 "browse_dreamweave" 的处理
 
 func _on_ui_button_pressed(button_id: String, data: Dictionary):
     """处理UI按钮点击"""
@@ -270,8 +298,8 @@ func _on_ui_button_pressed(button_id: String, data: Dictionary):
         "quit":
             get_tree().quit()
         "browse_dreamweave":
-            GameManager.update_player_attribute("pressure", -0.5)
-            update_all_displays()
+            # 修改这里：调用新的梦网浏览方法，而不是简单的属性更新
+            start_dreamweave_browsing()
         "go_shopping":
             GameManager.change_state(GameManager.GameState.SHOP)
         "sleep":
@@ -285,7 +313,14 @@ func _on_ui_button_pressed(button_id: String, data: Dictionary):
             restart_game()
         "purchase_item":
             handle_item_purchase(data.get("item_id", ""))
-
+        # 梦网相关按钮处理
+        "dreamweave_like":
+            handle_dreamweave_like(data.get("content_id", ""))
+        "dreamweave_refresh":
+            refresh_dreamweave_content()
+        "dreamweave_return":
+            return_from_dreamweave()
+            
 func _on_area_selected(area_name: String):
     """处理区域选择"""
     # 修复区域名称映射
@@ -1013,7 +1048,16 @@ func update_home_display():
     
     var stats_label = get_node_or_null("UIContainer/HomeUI/CenterContainer/VBoxContainer/StatsLabel")
     if stats_label != null:
-        stats_label.text = "今日收入: %d元\n当前状态: %s" % [daily_income, economic_status]
+        # 添加梦网互动信息
+        var dreamweave_info = ""
+        if dreamweave_system != null:
+            var session_status = dreamweave_system.get_session_status()
+            if session_status.interactions_count > 0:
+                dreamweave_info = "\n梦网互动: %d次" % session_status.interactions_count
+        
+        stats_label.text = "今日收入: %d元\n当前状态: %s%s" % [daily_income, economic_status, dreamweave_info]
+
+
 
 # ============ 辅助方法 ============
 func get_interrupt_buttons() -> Dictionary:
@@ -1169,3 +1213,240 @@ func print_debug_info():
     print("  F4 - 测试购买功能")
     print("  F5 - 调试玩家属性")
     print("===================")
+
+# Main.gd 梦网系统集成部分
+# 将这些内容添加到现有的Main.gd中
+
+# 在现有的管理器引用中添加：
+
+# 在initialize_managers()函数中添加：
+
+
+# 在connect_signals()函数中添加：
+
+
+# 在_on_ui_button_pressed()函数中添加新的按钮处理：
+      
+
+
+# 添加新的梦网相关方法：
+
+# Main.gd 中更新梦网相关方法，添加状态切换
+
+func start_dreamweave_browsing():
+    """开始梦网浏览"""
+    print("🌐 开始梦网浏览...")
+    
+    # 切换到梦网状态
+    GameManager.change_state(GameManager.GameState.DREAMWEAVE)
+    
+    # 生成当日内容
+    var recent_npcs = get_recent_encountered_npcs()
+    var recent_events = get_recent_events()
+    
+    var daily_content = dreamweave_system.generate_daily_content(
+        GameManager.player_stats,
+        GameManager.current_day,
+        recent_npcs,
+        recent_events
+    )
+    
+    # 开始浏览会话
+    var content_list = dreamweave_system.start_browsing_session()
+    
+    # 创建并显示梦网界面
+    var dreamweave_ui = ui_manager.create_dreamweave_ui()
+    ui_manager.update_dreamweave_content(content_list)
+    
+    # 更新统计信息
+    ui_manager.update_dreamweave_stats(0, content_list.size())
+
+# Main.gd 修复的梦网返回方法
+
+func return_from_dreamweave():
+    """从梦网返回 - 修复版本"""
+    print("🏠 从梦网返回...")
+    
+    # 完成浏览会话
+    if dreamweave_system != null:
+        var session_result = dreamweave_system.complete_browsing_session()
+        
+        # 应用最终的属性变化
+        var final_effects = session_result.get("attribute_changes", {})
+        for attr in final_effects.keys():
+            var change = final_effects[attr]
+            GameManager.update_player_attribute(attr, change)
+        
+        print("✅ 梦网浏览结束，总点赞：", session_result.get("total_likes", 0), "，最终效果：", final_effects)
+    
+    # 修复梦网界面查找和移除
+    var dreamweave_ui = null
+    
+    # 尝试多种方式查找梦网界面
+    var possible_parents = [
+        get_tree().current_scene,
+        self,
+        ui_manager.ui_container.get_parent() if ui_manager != null and ui_manager.ui_container != null else null
+    ]
+    
+    for parent in possible_parents:
+        if parent != null:
+            dreamweave_ui = parent.get_node_or_null("DreamWeaveUI")
+            if dreamweave_ui != null:
+                print("✅ 找到梦网界面，准备移除")
+                dreamweave_ui.queue_free()
+                break
+    
+    if dreamweave_ui == null:
+        print("⚠️ 未找到梦网界面，可能已经被移除")
+    
+    # 返回家中界面
+    GameManager.change_state(GameManager.GameState.HOME)
+    
+    # 更新显示
+    update_all_displays()
+    
+    print("✅ 成功返回家中")
+    
+func handle_dreamweave_like(content_id: String):
+    """处理梦网点赞"""
+    if content_id == "":
+        print("❌ 无效的内容ID")
+        return
+    
+    print("💖 处理梦网点赞：", content_id)
+    
+    # 通过梦网系统处理点赞
+    var effects = dreamweave_system.like_content(content_id)
+    
+    if effects.is_empty():
+        print("⚠️ 点赞失败或无效果")
+        return
+    
+    # 应用属性变化
+    for attr in effects.keys():
+        var change = effects[attr]
+        GameManager.update_player_attribute(attr, change)
+    
+    # 更新UI显示
+    update_all_displays()
+    
+    # 显示反馈
+    ui_manager.show_dreamweave_like_feedback(content_id, effects)
+    
+    # 更新统计信息
+    var session_status = dreamweave_system.get_session_status()
+    var total_content = dreamweave_system.daily_content.size()
+    var interactions_count = dreamweave_system.player_interactions.size()
+    ui_manager.update_dreamweave_stats(interactions_count, total_content)
+    
+    print("✅ 点赞处理完成，属性变化：", effects)
+
+func refresh_dreamweave_content():
+    """刷新梦网内容"""
+    print("🔄 刷新梦网内容...")
+    
+    # 重新生成内容（模拟刷新）
+    var recent_npcs = get_recent_encountered_npcs()
+    var recent_events = get_recent_events()
+    
+    var daily_content = dreamweave_system.generate_daily_content(
+        GameManager.player_stats,
+        GameManager.current_day,
+        recent_npcs,
+        recent_events
+    )
+    
+    # 重新开始浏览会话
+    var content_list = dreamweave_system.start_browsing_session()
+    
+    # 更新UI显示
+    ui_manager.update_dreamweave_content(content_list)
+    ui_manager.update_dreamweave_stats(0, content_list.size())
+    
+    print("✅ 梦网内容刷新完成")
+
+
+func get_recent_encountered_npcs() -> Array:
+    """获取最近遇到的NPC列表"""
+    var recent_npcs = []
+    
+    # 从玩家统计数据中获取最近遇到的NPC
+    if GameManager.player_stats != null and GameManager.player_stats.npc_relationships != null:
+        # 获取今天遇到的NPC
+        for npc_id in GameManager.player_stats.npc_relationships.keys():
+            recent_npcs.append(npc_id)
+    
+    # 也可以从NPCEventManager获取
+    if NPCEventManager != null:
+        var encountered_events = NPCEventManager.encountered_events
+        for event_id in encountered_events:
+            # 从事件ID中提取NPC ID（简化处理）
+            if "_" in event_id:
+                var parts = event_id.split("_")
+                if parts.size() >= 2:
+                    var npc_id = parts[0]
+                    if npc_id not in recent_npcs:
+                        recent_npcs.append(npc_id)
+    
+    print("📊 最近遇到的NPC：", recent_npcs)
+    return recent_npcs
+
+func get_recent_events() -> Array:
+    """获取最近的事件列表"""
+    var recent_events = []
+    
+    # 基于当前游戏状态生成事件标签
+    if GameManager.player_stats != null:
+        # 基于属性状态推断最近的体验类型
+        if GameManager.player_stats.pressure > 70:
+            recent_events.append("high_pressure")
+        if GameManager.player_stats.empathy > 70:
+            recent_events.append("emotional_breakthrough")
+        if GameManager.player_stats.self_connection > 70:
+            recent_events.append("self_discovery")
+        if GameManager.player_stats.openness > 70:
+            recent_events.append("cultural_exploration")
+    
+    # 基于当前天数添加事件
+    if GameManager.current_day >= 3:
+        recent_events.append("mid_game")
+    if GameManager.current_day >= 5:
+        recent_events.append("late_game")
+    
+    print("📊 最近的事件：", recent_events)
+    return recent_events
+
+# 添加梦网系统信号处理方法：
+
+func _on_dreamweave_content_liked(content_id: String, content_type: String):
+    """响应梦网内容被点赞"""
+    print("💖 梦网内容被点赞：", content_id, " 类型：", content_type)
+    
+    # 这里可以添加特殊的反馈逻辑
+    # 比如根据内容类型给予不同的反馈
+
+func _on_dreamweave_browsing_completed(total_likes: int, attribute_changes: Dictionary):
+    """响应梦网浏览完成"""
+    print("🌐 梦网浏览完成，总点赞：", total_likes, " 属性变化：", attribute_changes)
+    
+    # 可以在这里添加浏览完成后的特殊逻辑
+    # 比如根据互动程度解锁特殊内容
+
+# 在update_home_display()方法中添加梦网按钮状态更新：
+
+# 调试方法：
+func debug_dreamweave_system():
+    """调试梦网系统"""
+    if dreamweave_system == null:
+        print("❌ 梦网系统未初始化")
+        return
+    
+    print("=== 梦网系统调试信息 ===")
+    var session_status = dreamweave_system.get_session_status()
+    print("会话状态：", session_status)
+    print("当日内容数量：", dreamweave_system.daily_content.size())
+    print("玩家互动：", dreamweave_system.player_interactions)
+    print("=======================")
+
+# 在现有的_input()方法中添加调试快捷键：
